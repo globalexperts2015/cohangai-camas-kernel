@@ -1,0 +1,307 @@
+{
+  "metadata": {
+    "title": "Anna Stories Pool - Public Safe",
+    "source": "wiki/stories/anna-stories.md",
+    "updated": "2026-06-06",
+    "total_stories": 28,
+    "usage": "Brand Voice Guardian agent query stories by theme/era when reviewing AI content for Story Authenticity dimension",
+    "rule": "AI content phải dùng story THẬT từ pool này. Story KHÔNG trong pool = REJECT khả năng Story Authenticity"
+  },
+  "themes": {
+    "vulnerability": ["S07_lac_kyoto", "S10_ELI_fail", "S13_adelaide_shock", "S08_cau_khoa_vinh"],
+    "family": ["S01_3_cau_cua_ba", "S02_lop_4_ba_dan_doc_sach", "S03_lop_6_ba_dan_TA", "S04_cau_khoa", "S09_ma_cho_di_hoc", "S26_phan_giai_cua_cha"],
+    "mentor": ["S06_thay_tin", "S16_jackie_venning", "S17_peter_australia", "S18_eleanor_king", "S20_halina"],
+    "transformation": ["S07_lac_kyoto", "S14_canberra_quyet_tam", "S25_vipassana"],
+    "learning": ["S05_thu_khoa", "S10_ELI_fail", "S11_ngoc_song_han", "S17_peter_australia", "S18_eleanor_king", "S19_canada_global_change"],
+    "migration_journey": ["S07_lac_kyoto", "S12_dau_hoc_bong_nghia_trang", "S13_adelaide_shock", "S15_KTX_trung_tam"],
+    "entrepreneurship": ["S22_mam_thuyen_nan", "S23_khoa_liu_luoi", "S24_hama_30_4_2016"],
+    "spiritual_breakthrough": ["S21_kateryna_ukraine", "S25_vipassana"],
+    "childhood_quang_tri": ["S01_3_cau_cua_ba", "S02_lop_4_ba_dan_doc_sach", "S03_lop_6_ba_dan_TA", "S04_cau_khoa"]
+  },
+  "stories": [
+    {
+      "id": "S01_3_cau_cua_ba",
+      "title": "3 câu của ba (Đào Hoà) lúc bữa ăn",
+      "era": "Tuổi thơ làng chài Quảng Trị",
+      "themes": ["family", "childhood_quang_tri", "values"],
+      "key_details": ["ba Đào Hoà", "làng chài Quảng Trị", "bữa ăn"],
+      "summary": "Khi Anna còn rất nhỏ, ba dạy 3 câu lúc bữa ăn: (1) Con muốn nên thì phải cầu mong cho người khác nên, (2) Buôn đông bán tây không bằng ăn mày mà hà tiện, (3) Của cải là vũ trụ gửi gắm, dùng không đúng mục đích vũ trụ sẽ lấy lại.",
+      "lesson": "Kim chỉ nam suốt đời Anna - không cạnh tranh, sống tiết kiệm, biết ơn",
+      "use_for": ["personal brand", "values content", "founder story"],
+      "source": "webinar-speakout-day-5"
+    },
+    {
+      "id": "S02_lop_4_ba_dan_doc_sach",
+      "title": "Lớp 4 - Ba dặn đọc sách dù nhà nghèo",
+      "era": "Tuổi thơ",
+      "themes": ["family", "childhood_quang_tri", "learning"],
+      "key_details": ["lớp 4", "200đ/quyển/tuần", "bà Cầm", "Lịch Vạn Niên", "Tri Thức Trẻ", "Thế Giới Ngày Nay"],
+      "summary": "Nhà đông con, ba mạ chỉ làm tôm cá 5 tháng/năm (26/3-2/9), ba vẫn dặn 'Con cần đọc sách để giỏi'. Cho 200đ thuê sách bà Cầm. Anna đọc hết kho 1 năm. Lớp 5-6 đọc Lịch Vạn Niên, Sách Xem Tướng. Ba mang Tri Thức Trẻ + Thế Giới Ngày Nay về.",
+      "lesson": "Gốc rễ thói quen học + đọc của Anna",
+      "use_for": ["learning content", "personal brand", "education values"]
+    },
+    {
+      "id": "S03_lop_6_ba_dan_TA",
+      "title": "'Con phải giỏi Tiếng Anh mới có tương lai' - ba lớp 6",
+      "era": "Tuổi thơ",
+      "themes": ["family", "education"],
+      "key_details": ["ba", "lớp 5 lên lớp 6"],
+      "summary": "Ba nói câu này với Anna khi từ lớp 5 lên lớp 6. Anna răm rắp nghe theo dù không hình dung 'tương lai' là gì.",
+      "lesson": "Niềm tin được trao từ thế hệ trước",
+      "use_for": ["education content", "vision content"]
+    },
+    {
+      "id": "S04_cau_khoa",
+      "title": "Cậu Khoa chăm Anna - mua quà mỗi lần đi xa về",
+      "era": "Tuổi thơ 3-4 tuổi",
+      "themes": ["family", "childhood_quang_tri"],
+      "key_details": ["cậu Khoa (em trai mạ)", "rạp Hợp tác xã", "giữ bò"],
+      "summary": "Anna sống với gia đình ngoại từ 3-4 tuổi. Cậu Khoa (em trai mạ) chăm Anna: dẫn đi giữ bò, đưa đi xem phim rạp Hợp tác xã, mua quà mỗi lần đi xa về. Anna đếm ngược ngày đợi cậu. Sau về với ba mạ, mỗi mùa đông hết gạo, Anna sang xin cậu lúa xay.",
+      "lesson": "Tình thân gia đình mở rộng",
+      "use_for": ["family content", "warmth content"]
+    },
+    {
+      "id": "S05_thu_khoa",
+      "title": "Thủ khoa ĐH Nông Lâm Huế + top 3% tốt nghiệp",
+      "era": "ĐH (2003-2008)",
+      "themes": ["learning", "achievement"],
+      "key_details": ["ĐH Nông Lâm Huế", "thủ khoa", "top 3%", "lớp trưởng", "học bổng JBAV", "Odon Valle"],
+      "summary": "Anna thủ khoa đầu vào ĐH Nông Lâm Huế, top 3% tốt nghiệp. Lớp trưởng. Học bổng JBAV (thủ khoa), Odon Valle (sinh viên xuất sắc), du học ngắn hạn Nhật năm 3.",
+      "lesson": "Nỗ lực có phần thưởng",
+      "use_for": ["proof founder", "achievement"]
+    },
+    {
+      "id": "S06_thay_tin",
+      "title": "'Tiếng Anh là cần câu cơm' - Thầy Bùi Xuân Tín",
+      "era": "ĐH Nông Lâm Huế",
+      "themes": ["mentor", "education"],
+      "key_details": ["thầy Bùi Xuân Tín", "chuyên gia tiêu cà phê cao su", "viết 2 câu lên bảng"],
+      "summary": "Chủ nhiệm lớp Anna là thầy Bùi Xuân Tín. Thầy chỉ tham gia họp lớp 1 lần đầu năm. Viết 2 câu lên bảng: 'Tiếng Anh là cần câu cơm. Cần câu cơm là Tiếng Anh.' Giải thích xong, xách cặp về. Không tham gia buổi nào nữa cho đến tốt nghiệp.",
+      "lesson": "Một câu nói đúng lúc đổi hướng cuộc đời",
+      "use_for": ["aphorism content", "TA learning content"]
+    },
+    {
+      "id": "S07_lac_kyoto",
+      "title": "2007 - Lạc đường ở ĐH Kyoto, 'Nhục lần thứ nhất + thứ hai'",
+      "era": "Sinh viên năm 3 (2007)",
+      "themes": ["vulnerability", "transformation", "learning", "migration_journey"],
+      "key_details": ["2007", "Kyoto", "trời mưa tầm tã", "thầy Mizuno", "Cô bạn", "máy bay về", "7 bạn 3-2-2"],
+      "summary": "Sinh viên năm 3, Anna sang Nhật theo chương trình trao đổi (đoàn ĐH Huế: 7 SV + 2 thầy, trong đó có Cô). Tại ĐH Kyoto, Anna lạc đoàn giữa trời mưa tầm tã. Không có điện thoại. Dùng ngôn ngữ hình thể + chắp vá. Cô thủ thư gọi cho thầy Mizuno đến đón. NHỤC LẦN THỨ NHẤT. Buổi tổng kết, thầy yêu cầu kể lại trải nghiệm bằng TA. Anna ú ớ. NHỤC LẦN THỨ HAI. Trên máy bay về, thầy nói với Cơ (Anna nghe lén): '7 bạn, 3 bạn TA tốt, 2 bạn còn khả năng học, 2 bạn khó.' Anna lịm người, không biết nhóm 2 hay 3.",
+      "lesson": "Gáo nước lạnh giúp Anna về VN học TA ráo riết",
+      "use_for": ["vulnerability content", "TA learning", "transformation moment", "Speakout", "personal brand"]
+    },
+    {
+      "id": "S08_cau_khoa_vinh",
+      "title": "2007 - Cậu Khoa mất + Vinh thoát đĩa đệm = Cú hích đời",
+      "era": "Sinh viên năm 3, Anna 22 tuổi",
+      "themes": ["vulnerability", "family", "transformation"],
+      "key_details": ["22 tuổi", "em Vinh hè lớp 6 lên 7", "thoát vị đĩa đệm", "BV TW Huế", "kháng sinh liều cao 10 ngày", "cậu Khoa", "sốt rét viêm gan", "mự Huệ + 4 con", "Cống đi SG"],
+      "summary": "Khi Anna 22 tuổi, 2 sự kiện đến cùng lúc: (1) Em trai Vinh hè lớp 6 lên 7 bị thoát vị đĩa đệm. Mổ BV TW Huế. Vết mổ nhiễm trùng, khóc liên tục, BS đi công tác gần 1 tháng, kháng sinh liều cao 10 ngày. Anna kiệt sức chăm em. (2) Cùng lúc cậu Khoa vào BV cấp cứu (sốt rét + viêm gan + suy nhược). Mất sau chưa đến 1 tuần. Để lại mự Huệ + 4 con.",
+      "quote": "Lúc đó nghĩ nếu sau này trong nhà có thêm người bệnh thì làm sao? Chỉ có cách duy nhất là phải học, phải bứt phá.",
+      "lesson": "Why mạnh mẽ nhất giúp Anna vươn lên du học",
+      "use_for": ["vulnerability content", "why content", "founder origin"]
+    },
+    {
+      "id": "S09_ma_cho_di_hoc",
+      "title": "Mạ xắt chuối, cho Anna 300 ngàn/tháng đi học TA",
+      "era": "Sau tốt nghiệp ĐH",
+      "themes": ["family", "vulnerability"],
+      "key_details": ["Sở Nông nghiệp Hà Tĩnh", "A Lưới", "Đà Nẵng", "10 ngàn/ngày nạp hụi", "300 ngàn/tháng"],
+      "summary": "Tốt nghiệp ĐH, Anna trúng tuyển Sở Nông nghiệp Hà Tĩnh. Chờ quyết định, đi A Lưới phiên dịch cho SV Nhật. Hỏi mình: 'Đây có phải cuộc sống mình muốn không?' Không. Về Quảng Trị xin ba: 'Con muốn đi học TA, đi du học.' Ba: 'Không. Nhà còn 5 đứa em, con đi làm giúp ba mạ rồi học chi thì học.' Anna thủ thỉ với mạ. Mạ im lặng xắt chuối, rồi: 'Thôi mi đi học đi. Ba mi không cho tiền thì tau cho. Mỗi ngày tau nạp hụi 10 ngàn, mỗi tháng gửi cho 300 ngàn.' Anna chỉ cần nghe đến đó là vui sướng như cánh cửa mở ra.",
+      "lesson": "Sự ủng hộ thầm lặng của mẹ là sức mạnh",
+      "use_for": ["family content", "mother content", "support content"]
+    },
+    {
+      "id": "S10_ELI_fail",
+      "title": "ELI Đà Nẵng - 3 tháng đầu fail rồi quay lại học từ dễ",
+      "era": "Đà Nẵng 2008-2010",
+      "themes": ["vulnerability", "learning"],
+      "key_details": ["trung tâm ELI Đà Nẵng", "đề IELTS Cambridge", "3 tháng", "25%", "Listen In", "IELTS Focus", "Grammar/Vocabulary for IELTS"],
+      "summary": "Tại trung tâm ELI Đà Nẵng, Anna cắm đầu giải đề IELTS Cambridge. 3 tháng đúng loanh quanh 25%. Nói/viết bế tắc. Quay lại học từ dễ (Listen In, IELTS Focus, Grammar for IELTS, Vocabulary for IELTS) trong 3 tháng. Giải đề tăng gấp đôi.",
+      "lesson": "Học chuẩn từ đầu, không nóng vội. 'Muốn nhanh cần phải từ từ.'",
+      "use_for": ["learning content", "vulnerability", "aphorism"]
+    },
+    {
+      "id": "S11_ngoc_song_han",
+      "title": "Cùng Ngọc luyện ở chân cầu Sông Hàn",
+      "era": "Đà Nẵng 2008-2010",
+      "themes": ["learning", "friendship"],
+      "key_details": ["Ngọc (1985, tiến sĩ CNTT Pháp)", "chân cầu Sông Hàn", "thư viện Đà Nẵng", "3 tháng IELTS 6.0"],
+      "summary": "Anna luyện cùng Ngọc ở Đà Nẵng. Mỗi chiều ra ngồi dưới chân cầu Sông Hàn (gần thư viện ĐN). Mỗi đứa 1 quyển sổ. Ngọc nói từ mới, Anna ghi (kèm cụm + câu + nghĩa). Tối lật vở ôn trước khi ngủ. 3 tháng, cả 2 thi IELTS Speaking + Listening trên 6.0, cùng đi du học.",
+      "lesson": "Gốc của information-storage-3-steps",
+      "use_for": ["learning method content", "friendship", "Speakout"]
+    },
+    {
+      "id": "S12_dau_hoc_bong_nghia_trang",
+      "title": "Đỗ học bổng Adelaide - Đứng nghĩa trang trống rỗng",
+      "era": "Đà Nẵng cuối 2010",
+      "themes": ["migration_journey", "transformation"],
+      "key_details": ["~10 hồ sơ", "Năng lực lãnh đạo Úc (Adelaide)", "Phát triển NZ", "nghĩa trang xã Triệu Giang", "2 anh đồng nghiệp"],
+      "summary": "Nộp ~10 hồ sơ. Mở email báo rớt nhiều quá nên có kinh nghiệm: 'Dear Hang, Thank you for your application...' biết ngay rớt. Cuối cùng được 2 học bổng Thạc sĩ. Ngày nhận tin trúng, Anna đứng nghĩa trang xã Triệu Giang, đầu trống rỗng. Cả ngày 2 anh đồng nghiệp gọi món chúc mừng nhưng vị giác tê liệt.",
+      "quote": "Trải nghiệm đó giúp Anna hiểu sự khác biệt giữa vui sướng và hạnh phúc.",
+      "lesson": "Khi đạt được điều mơ ước, cảm giác không như tưởng tượng",
+      "use_for": ["transformation", "achievement", "personal brand"]
+    },
+    {
+      "id": "S13_adelaide_shock",
+      "title": "29/12/2010 - Lần đầu đến Úc, sốc văn hoá ngôn ngữ",
+      "era": "Adelaide cuối 2010",
+      "themes": ["vulnerability", "migration_journey"],
+      "key_details": ["29/12/2010", "Adelaide", "mùa hè Úc đường ray cong vênh", "2 cân thịt bò", "bill $600 internet", "bạn Bangladesh"],
+      "summary": "Anna đến Adelaide chiều 29/12/2010. Mùa hè Úc, nắng đến mức đường ray xe lửa cong vênh. Anh lái xe trường nói tràng tiếng Úc, Anna không nghe được. Đi siêu thị mua thịt bò, Anna ú ớ. Ông bán cắt 2 cân (Anna chỉ muốn 5 lạng). Ăn bò cả tuần, tởn 2 năm sau. Đi ký hợp đồng điện thoại, quên tắt internet roaming, bill $600 về ngày mồng Một Tết. Lên lớp, thầy giảng nghe chữ được chữ mất.",
+      "lesson": "Sốc văn hoá là bước đầu của mọi chuyến đi xa",
+      "use_for": ["vulnerability", "Úc journey", "migration content"]
+    },
+    {
+      "id": "S14_canberra_quyet_tam",
+      "title": "2/2011 Canberra - 'Quên IELTS 6.5 và 12 năm học TA của mi đi Hằng'",
+      "era": "Adelaide 2/2011",
+      "themes": ["transformation", "learning"],
+      "key_details": ["180 học giả Úc", "toà nhà Quốc hội", "Jimmy Nguyen", "KoTo - Know One Teach One"],
+      "summary": "Sau 2 tháng nhập học, Anna bay Canberra. Hội nghị tại toà nhà Quốc hội. 180 học giả Úc cùng năm. Diễn giả gồm Jimmy Nguyen (sáng lập KoTo - Know One Teach One). Anna chỉ hiểu 30-50% bài trình bày.",
+      "quote": "Quên IELTS 6.5 và 12 năm học TA của mi đi Hằng. Bắt đầu lại thôi.",
+      "lesson": "Reset nhận thức, bắt đầu lại từ con số 0",
+      "use_for": ["transformation moment", "growth mindset", "Speakout"]
+    },
+    {
+      "id": "S15_KTX_trung_tam",
+      "title": "Chuyển vào KTX trung tâm Adelaide - 'quyết định thông minh nhất'",
+      "era": "Adelaide 2011",
+      "themes": ["migration_journey", "decision"],
+      "key_details": ["KTX trung tâm Adelaide", "5 phút đi bộ tới trường", "giá thuê gấp đôi", "bạn quốc tế đa quốc gia"],
+      "summary": "Quay về Adelaide, Anna chuyển vào KTX trung tâm thành phố (cách trường 5 phút đi bộ). Giá thuê gấp đôi, nhưng tiết kiệm thời gian. Có cơ hội kết bạn quốc tế (Trung Quốc, Hàn, HK, Malaysia, Indo, Lào, Campuchia, Ấn, Bangladesh, Pakistan, Mexico, Châu Phi, Nam Mỹ).",
+      "quote": "Hằng rất biết ơn chính bản thân mình, đã hào phóng với chính mình, đã không lăn tăn thiệt hơn khi đưa ra quyết định đó.",
+      "lesson": "Đầu tư cho thời gian + môi trường = đầu tư cho tương lai",
+      "use_for": ["decision content", "self-investment"]
+    },
+    {
+      "id": "S16_jackie_venning",
+      "title": "Jackie Venning - Thư chấp nhận học 2 ngày",
+      "era": "Trước Adelaide",
+      "themes": ["mentor", "migration_journey"],
+      "key_details": ["Jackie Venning", "ĐH Brisbane (cũ)", "Adelaide", "4-5 ngày trước deadline", "2 ngày", "CLPD"],
+      "summary": "Trước khi sang Úc, Anna đã có thư của ĐH Brisbane. 4-5 ngày trước deadline học bổng, trực giác báo có gì đó không ổn. Anna tìm Adelaide phù hợp hơn, gửi email rất dài cho Jackie Venning. Jackie giúp xin thư trong 2 ngày (thường 4 tuần).",
+      "quote_from_jackie": "Đọc email của em, cô cảm thấy quý mến + cần phải giúp.",
+      "quote_jackie_an_ui": "Em cứ bình tĩnh, Hằng. Ngay cả sinh viên bản địa cũng khó học chương trình này, huống chi TA là ngôn ngữ thứ 2 của em.",
+      "lesson": "Trực giác + chân thành mở cửa giúp đỡ",
+      "use_for": ["mentor content", "intuition", "kindness"]
+    },
+    {
+      "id": "S17_peter_australia",
+      "title": "Peter - Buổi Morning Tea định mệnh ở gốc cây Hub Learning Centre",
+      "era": "Adelaide 2011",
+      "themes": ["mentor", "vulnerability", "transformation", "learning"],
+      "key_details": ["sáng thứ tư", "Peter (giáo viên TA về hưu)", "Hub Learning Centre", "2 năm", "thứ 2 + 5, 9-12h"],
+      "summary": "Một sáng thứ tư, Anna không muốn làm quen ai (do thầy nói không hiểu, học hành đuối). Đứng ở gốc cây Hub Learning Centre nhâm nhi trà. Một người đàn ông đến: 'Chào cháu, tôi là Peter, giáo viên TA về hưu.' Anna nói thật: 'Cháu nói thầy không hiểu, thầy nói cháu không nghe được. Bài về dồn dập, cháu đuối.' Peter: 'Không sao. Để tôi giúp cháu.' Mỗi tuần 2 buổi, 2 năm, Peter coach Anna phát âm + viết.",
+      "quote": "Câu nói khôn ngoan nhất đời Hằng: thừa nhận điểm yếu + chia sẻ với người xa lạ + xin giúp đỡ.",
+      "lesson": "Vulnerability mở ra cánh cửa giúp đỡ",
+      "use_for": ["mentor content", "vulnerability", "asking for help", "personal brand"]
+    },
+    {
+      "id": "S18_eleanor_king",
+      "title": "Eleanor King - 'Đọc đúng trước khi nói' bên bờ sông Torrens",
+      "era": "Adelaide 2011-2012",
+      "themes": ["mentor", "learning"],
+      "key_details": ["Eleanor King (TS Vật lý vũ trụ Adelaide)", "kém Anna 3 tuổi", "bờ sông Torrens", "cầu gỗ nhỏ", "thứ tư trưa", "6 tháng", "1 trang A4/ngày"],
+      "summary": "Eleanor kèm Anna mỗi trưa thứ tư bên bờ sông Torrens. Anna muốn luyện giao tiếp nhanh. Eleanor nói: 'Hằng cần đọc đúng trước khi nói. Khi đọc chuẩn thì nói mới đúng được.' Mỗi ngày Eleanor đưa 1 trang A4 in sẵn. Suốt 6 tháng. Anna mời Eleanor ăn món Việt Nam.",
+      "lesson": "Đọc đúng trước khi nói - kiên nhẫn nền tảng",
+      "use_for": ["mentor content", "learning method", "Speakout pronunciation"]
+    },
+    {
+      "id": "S19_canada_global_change",
+      "title": "Canada 2015 - 'Mình lại nhầm' - TA tưởng ngon, sang lại đơ",
+      "era": "Canada 2015",
+      "themes": ["learning", "humility"],
+      "key_details": ["Global Change Leaders", "Bộ Ngoại giao Canada", "ĐH Francis Xavier", "gần 1 tháng phục hồi"],
+      "summary": "Sau Adelaide, Anna về VN 2 năm bận với Mắm Thuyền Nan + dịch cabin, nghĩ TA mình ngon, không cần học thêm. Nhận học bổng Global Change Leaders. Sang nơi đơ như chưa từng học TA. Gần 1 tháng mới phục hồi.",
+      "quote": "TA dù tự tin đến mấy nhưng không duy trì sẽ quên rất nhanh.",
+      "lesson": "Lý do Anna đi dạy TA: Dạy kẻo sợ quên",
+      "use_for": ["humility content", "learning content", "Speakout"]
+    },
+    {
+      "id": "S20_halina",
+      "title": "Cô Halina (68 tuổi) - Bước ngoặt Public Speaking",
+      "era": "Canada 2015",
+      "themes": ["mentor", "transformation"],
+      "key_details": ["Halina", "68 tuổi", "16 năm CBC", "24 năm dạy Public Speaking", "Chính trị gia + CEO Mỹ Canada"],
+      "summary": "Trong khoá Lãnh đạo, Halina dạy Public Speaking. 16 năm CBC, 24 năm dạy Chính trị gia + CEO Mỹ và Canada. Lúc đó cô 68 tuổi, vẫn trẻ + đầy năng lượng. Cả lớp kinh ngạc với sự tiến bộ sau khi cô coach.",
+      "quote_internal": "Lúc đó Hằng mới hiểu cái gốc của giao tiếp nằm ở chỗ nào, vì sao phần đông người Việt gặp vấn đề.",
+      "lesson": "Bước chuyển hoá rất lớn trong tiến trình dạy",
+      "use_for": ["transformation", "mentor", "Speakout"]
+    },
+    {
+      "id": "S21_kateryna_ukraine",
+      "title": "Kateryna (Ukraine) - 'Tuổi thơ gắn với thiên nhiên có nhiều tình thương'",
+      "era": "Canada 2015",
+      "themes": ["spiritual_breakthrough", "friendship"],
+      "key_details": ["Kateryna (Ukraine)", "17 bạn lớp", "ba mẹ giảng viên kinh tế", "đầu 2019 sang Hama 1 tuần"],
+      "summary": "Trong khoá có học phần 'Dòng sông cuộc đời'. Học viên vẽ cuộc đời mình lên giấy A0 và trình bày. Nhiều bạn khóc. Đi bộ về cùng Kateryna (Ukraine), bạn nói: 'Mình thấy 17 bạn lớp đều có tuổi thơ gắn với thiên nhiên, nên có nhiều tình thương + nghị lực. Mình sinh ra ở thành phố, ba mẹ giảng viên kinh tế, học giỏi mọi thứ nhưng từ sâu mình thấy có lỗ hổng.' Đầu 2019 Kateryna sang Hama thăm Anna 1 tuần.",
+      "lesson": "Tuổi thơ gần thiên nhiên = sức mạnh ngầm",
+      "use_for": ["roots content", "personal brand"]
+    },
+    {
+      "id": "S22_mam_thuyen_nan",
+      "title": "Mắm Thuyền Nan (2012-) - Hằng Mắm Ruốc",
+      "era": "VN 2012-",
+      "themes": ["entrepreneurship", "vietnam"],
+      "key_details": ["6 tháng đi dọc bờ biển Bắc-Nam", "nước mắm + ruốc", "nước mắm trẻ em", "mắm ruốc ủ 3 năm", "Hằng Mắm Ruốc"],
+      "summary": "Tốt nghiệp Adelaide cuối 2012 với niềm tin: gốc của phát triển bền vững là giá trị truyền thống + sống hoà hợp thiên nhiên. 6 tháng đi dọc bờ biển Bắc-Nam thu thập kinh nghiệm làm mắm. Chọn nước mắm + ruốc thương mại hoá. Sau 7 năm phân phối khắp các cửa hàng thực phẩm sạch.",
+      "lesson": "Founder journey, đi từ tri thức về sản phẩm thật",
+      "use_for": ["entrepreneurship content", "Breakout proof", "founder origin"]
+    },
+    {
+      "id": "S23_khoa_liu_luoi",
+      "title": "Khoá Líu Lưỡi đầu tiên (2014) - Phát hiện 9/10 học viên có vấn đề phát âm",
+      "era": "VN 2014",
+      "themes": ["entrepreneurship", "education"],
+      "key_details": ["sau Canada 2015", "khoá Líu Lưỡi", "Clear Speaking", "3 lớp x 15 học viên x 10 tuần", "20+ học viên du học"],
+      "summary": "Sau khi về từ Canada cuối 2015, Anna bắt đầu chia sẻ phương pháp thuyết trình cuối tuần. Phát hiện 9/10 học viên có vấn đề phát âm. Phát triển Khoá Líu Lưỡi (sau đổi thành Clear Speaking). Mỗi khoá 3 lớp x 15 học viên x 10 tuần. Hơn 20 học viên đi du học sau đó.",
+      "lesson": "Phát hiện gap rồi solve",
+      "use_for": ["entrepreneurship content", "Speakout founder story"]
+    },
+    {
+      "id": "S24_hama_30_4_2016",
+      "title": "30/4/2016 Lên Hama - Quả đồi cạnh QL 28",
+      "era": "VN 2016",
+      "themes": ["entrepreneurship", "intuition"],
+      "key_details": ["30/4/2016", "Gia Nghĩa", "chị Bình", "QL 28 đường Tà Đùng - Đà Lạt", "khoan giếng 180m", "đường điện 3 pha 1km", "4 nhà gỗ"],
+      "summary": "30/4/2016, Anna với 2 em trai lên Gia Nghĩa thăm chị Bình. Sáng dậy hỏi: 'Quanh đây có ai bán đất không?' Môi giới dẫn nhiều quả đồi, Anna chọn quả đồi cạnh QL 28 (đường Tà Đùng - Đà Lạt). Khoan giếng 180m mới gặp nước. Đường điện 3 pha kéo 1km. Ba xây đường từ chân lên đỉnh. Vinh (KTS) xây 4 nhà gỗ đặt theo loài hoa.",
+      "lesson": "Quyết định đột ngột theo trực giác có thể thay đổi cuộc đời",
+      "use_for": ["intuition content", "Hama founder"]
+    },
+    {
+      "id": "S25_vipassana",
+      "title": "Vipassana ở Hồng Trung Sơn - Vườn ươm 1-2 năm",
+      "era": "VN sau 2016",
+      "themes": ["spiritual_breakthrough", "transformation"],
+      "key_details": ["Vipassana", "Hồng Trung Sơn", "1-2 năm vườn ươm"],
+      "summary": "Sau khoá Vipassana ở Hồng Trung Sơn, Anna có hành trình hướng nội 1-2 năm (vườn ươm).",
+      "lesson": "Lặng để biết mình muốn gì",
+      "use_for": ["spiritual content", "transformation"]
+    },
+    {
+      "id": "S26_phan_giai_cua_cha",
+      "title": "PLACEHOLDER - Stories khác từ pool còn chưa indexed",
+      "era": "various",
+      "themes": ["family", "various"],
+      "note": "Nhiều stories khác trong anna-stories.md chưa được index ở đây. Khi agent cần story specific không có trong pool, query full file wiki/stories/anna-stories.md",
+      "use_for": ["fallback - query full file"]
+    }
+  ],
+  "verification_rules": {
+    "story_authenticity_check": [
+      "Khi review AI content, check story có match pool này không",
+      "Story dùng tên thật từ key_details của story đó",
+      "Năm/ngày match era hoặc key_details",
+      "Detail KHÔNG bịa (vd Anna không học Sydney nên KHÔNG có story Sydney)",
+      "Nếu story không match pool, score Story Authenticity thấp"
+    ],
+    "story_misuse_red_flags": [
+      "Lẫn lộn Lại Minh Hằng (học viên Breakout) với Đào Thị Hằng (Anna)",
+      "Dùng story người khác (vd học viên) làm story Anna",
+      "Bịa số liệu không có trong vault",
+      "Sửa năm/địa điểm của story đã có",
+      "Tạo story mới không có trong anna-stories.md hoặc 28+ pool"
+    ]
+  }
+}

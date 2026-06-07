@@ -1,0 +1,40 @@
+# Financial / Sepay PCI / Refund Language Rules
+# Layer 3 of BC9 Compliance Officer
+#
+# Nguồn: Sepay PCI compliance + Anna refund policy 14 ngày + điều kiện.
+# Tham chiếu: reference-sepay-credentials.md, project-breakout-k2-launch-state.md
+
+layer: financial
+description: "Sepay PCI + refund language clarity"
+
+banned_phrases:
+  - id: financial.no.guarantee.refund
+    pattern: "(hoàn tiền|refund)[\\s]+(100%|unconditional|vô điều kiện)"
+    severity: hard
+    reason: "Refund policy thực tế 14 ngày + điều kiện, không phải vô điều kiện"
+  - id: financial.no.return.guarantee
+    pattern: "(đảm bảo|cam kết)[\\s]+(lãi|profit|tăng doanh thu)[\\s]+(\\d+|x|gấp)"
+    severity: hard
+    reason: "Cấm hứa lãi cụ thể vi phạm consumer protection"
+  - id: financial.no.investment.advice
+    pattern: "(đầu tư chắc chắn|guaranteed return|sure thing|sure profit)"
+    severity: hard
+    reason: "Investment advice claim không phù hợp"
+  - id: financial.no.card.cvv
+    pattern: "\\bcvv[\\s:]+\\d{3,4}\\b|\\bcvc[\\s:]+\\d{3,4}\\b"
+    severity: hard
+    reason: "CVV/CVC raw vi phạm PCI"
+  - id: financial.no.fake.discount.always
+    pattern: "(giảm|sale|discount)[\\s]+\\d+%[\\s]+(mãi mãi|forever|vĩnh viễn)"
+    severity: hard
+    reason: "Fake permanent discount vi phạm consumer law"
+
+soft_warnings:
+  - id: financial.soft.no.tax
+    pattern: "(không thuế|tax-free|trốn thuế|né thuế)"
+    severity: soft
+    reason: "Tax avoidance language cần Anna review"
+  - id: financial.soft.crypto.advice
+    pattern: "(crypto|bitcoin|coin)[\\s]+(sẽ tăng|tăng [\\d]+x|giàu nhanh)"
+    severity: soft
+    reason: "Crypto investment claim FLAG cho Anna review"

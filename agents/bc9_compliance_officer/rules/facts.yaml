@@ -1,0 +1,36 @@
+# Facts Anna's Bio + Pricing (must NOT be contradicted)
+# Layer 7 of BC9 Compliance Officer
+#
+# Content phải không mâu thuẫn các fact dưới.
+# Nếu content claim fact khác = soft FLAG để Anna verify (không tự sửa per feedback-no-change-facts-without-asking)
+
+layer: facts
+description: "Facts must not contradict, FLAG cho Anna verify"
+
+banned_phrases:
+  - id: facts.wrong.contacts.number
+    pattern: "(50|60|70|80|90)[\\s\\.]?(000|k|nghìn)[\\s]+(học viên|leads|contacts)[\\s]+Speakout"
+    severity: soft
+    reason: "Speakout fact: 33,000+ total contacts / 29,473 GHL / 5,000 paid (CLAUDE.md mục 12)"
+  - id: facts.wrong.breakout.coaching.duration
+    pattern: "(coaching|mentoring)[\\s]+(12|18|24)[\\s]+(tháng|month)"
+    severity: soft
+    reason: "Breakout Coaching = 6 tháng per feedback-breakout-coaching-6-months, NOT 12"
+  - id: facts.wrong.mara.license.date
+    pattern: "(MARA|license|RMA)[\\s]+(2024|2025|2028|2029|2030)"
+    severity: soft
+    reason: "MARA license dự kiến 1/2027, Capstone 10/2026 (CLAUDE.md mục 2)"
+  - id: facts.wrong.breakout.pricing.tiers
+    pattern: "(Breakout|VIP|Foundation|Customer|Growth)[\\s\\S]{0,30}(99k|2M|4M|10M|20M|30M|100M)"
+    severity: soft
+    reason: "Breakout pricing 2026-06-05: VIP 199k / Foundation 3M / Customer 6M / Growth 15M / Coaching 50M (project-breakout-pricing)"
+  - id: facts.wrong.master.location
+    pattern: "(master|thạc sĩ)[\\s\\S]{0,40}(Sydney|Melbourne|Brisbane|Canberra)"
+    severity: soft
+    reason: "Anna Master Sustainability Adelaide (user-anna-education)"
+
+soft_warnings:
+  - id: facts.soft.numeric.unverified
+    pattern: "\\b(\\d{1,3}[\\s.,]\\d{3}|\\d{4,6})\\b[\\s]+(học viên|customer|leads)"
+    severity: soft
+    reason: "Số liệu cụ thể về học viên/customer cần verify, FLAG cho Anna confirm"

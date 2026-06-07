@@ -1,0 +1,42 @@
+# LegendCom TOS Rules
+# Layer 5 of BC9 Compliance Officer
+#
+# Nguồn: reference-legendcom.md
+# Anna paid ~$500/year subscription. TOS cấm redistribute Migration Act + Regulations + MSI + PAM3 raw.
+# Cho phép: synthesis + citation back to source.
+
+layer: legend_com
+description: "LegendCom subscription, cấm redistribute raw text"
+
+banned_phrases:
+  - id: legend.no.raw.migration.act
+    pattern: "(Migration Act 1958)[\\s\\S]{200,}"
+    severity: hard
+    reason: "Quote Migration Act >200 ký tự cần verify không phải copy raw từ LegendCom"
+  - id: legend.no.raw.msi
+    pattern: "MSI[\\s-]*(\\d+/?\\d*)[\\s\\S]{200,}"
+    severity: hard
+    reason: "Quote MSI raw >200 ký tự vi phạm LegendCom TOS"
+  - id: legend.no.raw.pam3
+    pattern: "PAM3[\\s\\S]{200,}"
+    severity: hard
+    reason: "Quote PAM3 raw >200 ký tự vi phạm LegendCom TOS"
+  - id: legend.no.dump.regulations
+    pattern: "Migration Regulations 1994[\\s\\S]{200,}"
+    severity: hard
+    reason: "Quote Migration Regulations raw >200 ký tự vi phạm LegendCom TOS"
+  - id: legend.no.attribution.legendcom
+    pattern: "LegendCom"
+    severity: soft
+    reason: "Không nhắc 'LegendCom' công khai trong content public (subscription private)"
+
+soft_warnings:
+  - id: legend.soft.missing.citation.govau
+    pattern: "(subclass \\d{3}|visa 4\\d{2})"
+    severity: soft
+    reason: "Mention subclass cụ thể nên có citation gov.au (immi.homeaffairs.gov.au)"
+    trigger_keywords:
+      - "subclass"
+      - "visa 4"
+      - "visa 5"
+      - "visa 8"

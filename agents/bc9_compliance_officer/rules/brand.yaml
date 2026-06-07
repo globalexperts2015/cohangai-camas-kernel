@@ -1,0 +1,65 @@
+# Brand Rules cho Anna (Đào Thị Hằng)
+# Layer 6 of BC9 Compliance Officer
+#
+# Nguồn memory:
+#   feedback-no-public-marital-status.md (cấm marital status + city)
+#   feedback-no-me-don-than-content.md (cấm mẹ đơn thân)
+#   feedback-term-nguoi-viet.md (không Việt kiều)
+#   feedback-display-name-dao-thi-hang.md (dùng full name)
+#   feedback-bmcorner-no-william.md (BMCorner không William)
+#   feedback-anna-solo-no-team.md (không team/nhân viên)
+#   project-anna-thought-leader.md (PURE TRUST 12 tháng, không cross-promote)
+
+layer: brand
+description: "Brand rules Anna, marital status + city + cross-promote"
+
+banned_phrases:
+  - id: brand.no.marital.status
+    pattern: "(mẹ đơn thân|ly thân|chồng cũ|độc thân|single mom|single mother|divorced)"
+    severity: hard
+    reason: "Cấm marital status public per feedback-no-public-marital-status (divorce case active)"
+  - id: brand.no.specific.city
+    pattern: "\\b(Perth|Adelaide|Gold Coast)\\b"
+    severity: hard
+    reason: "Cấm specific city per feedback-no-public-marital-status (chỉ 'Úc')"
+  - id: brand.no.viet.kieu
+    pattern: "(Việt[\\s]*kiều|viet[\\s]*kieu)"
+    severity: hard
+    reason: "Dùng 'người Việt' thay 'Việt kiều' per feedback-term-nguoi-viet"
+  - id: brand.no.wrong.display.name
+    pattern: "(Hằng Coaching|Anna Đào|Coach Hằng|Coach Anna)"
+    severity: hard
+    reason: "Dùng full 'Đào Thị Hằng' per feedback-display-name-dao-thi-hang"
+  - id: brand.no.team.mention
+    pattern: "(team của tôi|team của em|nhân viên của tôi|nhân viên của em|the team|my team|our team)"
+    severity: hard
+    reason: "Anna solo, không có team per feedback-anna-solo-no-team"
+  - id: brand.no.william.bmcorner
+    pattern: "William"
+    severity: soft
+    reason: "BMCorner gỡ William 2026-05-25, FLAG nếu xuất hiện trong BMCorner content"
+    trigger_keywords:
+      - "BMCorner"
+      - "bánh mì"
+      - "phở"
+  - id: brand.no.em.dash
+    pattern: "—"
+    severity: hard
+    reason: "Vault rule CLAUDE.md Section 11, tuyệt đối không em-dash"
+
+soft_warnings:
+  - id: brand.soft.cross.promote.speakout.in.personal
+    pattern: "(Speakout|Breakout)"
+    severity: soft
+    reason: "PURE TRUST 12 tháng, không cross-promote trong personal brand Hằng"
+    trigger_keywords:
+      - "personal"
+      - "thought leader"
+      - "Hằng solo"
+  - id: brand.soft.wrong.pronoun
+    pattern: "\\b(Anna)\\b"
+    severity: soft
+    reason: "Content VI dùng 'Hằng', EN dùng 'Anna' per feedback-name-hang-vi-anna-en"
+    trigger_keywords:
+      - "tiếng Việt"
+      - "vi-VN"

@@ -1,0 +1,38 @@
+# Platform TOS Rules (Zalo OA + GHL + Facebook Ads)
+# Layer 4 of BC9 Compliance Officer
+#
+# Tham chiếu: reference-zns-breakout-config.md, reference-anna-facebook-assets.md
+
+layer: platform
+description: "Zalo OA + GHL + FB Ads TOS"
+
+banned_phrases:
+  - id: platform.no.zns.unapproved.template
+    pattern: "ZNS template[\\s]+([0-9]+)"
+    severity: soft
+    reason: "Verify template ID approved trong reference-zns-breakout-config.md (586303 ZBS only)"
+  - id: platform.no.fb.banned.terms
+    pattern: "(weight loss guaranteed|miracle cure|chữa khỏi 100%|trị dứt điểm)"
+    severity: hard
+    reason: "FB Ads cấm health miracle claims"
+  - id: platform.no.fb.before.after
+    pattern: "(trước|before)[\\s/]+(sau|after)[\\s]+(\\d+ ngày|\\d+ kg)"
+    severity: soft
+    reason: "FB Ads restrict before/after weight loss imagery"
+  - id: platform.no.spam.cta
+    pattern: "(inbox ngay|nhắn ngay|đăng ký liền|chỉ còn \\d+ slot)[!]{3,}"
+    severity: soft
+    reason: "Spam CTA aggressive vi phạm FB community standards"
+  - id: platform.no.ghl.bulk.unconsented
+    pattern: "(send all|blast all 33k|gửi hết 33000|gửi toàn bộ 33k)"
+    severity: hard
+    reason: "Bulk send mà chưa Anna duyệt vi phạm rule BC4 (> 949 contacts)"
+
+soft_warnings:
+  - id: platform.soft.unsubscribe.missing
+    pattern: "^(?![\\s\\S]*unsubscribe)[\\s\\S]*$"
+    severity: soft
+    reason: "Email marketing nên có unsubscribe link per GHL TOS"
+    trigger_keywords:
+      - "email broadcast"
+      - "newsletter"

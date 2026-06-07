@@ -1,0 +1,71 @@
+# MARA (Migration Agent Registration Authority Australia) Compliance Rules
+# Layer 1 of BC9 Compliance Officer
+#
+# Áp dụng đến 1/2027 (Anna ôn Capstone 10/2026, license dự kiến 1/2027).
+# Nguồn gốc: migration/rules/banned_phrases_vi.txt + Constitution Section M.
+#
+# Schema:
+#   banned_phrases: HARD violations, auto-BLOCK
+#   soft_warnings: SOFT violations, FLAG cho Anna review
+#   required_when_visa: required pattern khi content nhắc visa/migration
+#
+# Anna có thể thêm rule bằng cách append vào danh sách dưới.
+
+layer: mara
+description: "MARA compliance, không claim visa rate, không personal advice"
+
+banned_phrases:
+  - id: mara.no.success.rate
+    pattern: "tỷ lệ (thành công|đậu)"
+    severity: hard
+    reason: "MARA cấm quote visa success rate"
+  - id: mara.no.100.percent
+    pattern: "100%[\\s]*(đậu|được|thành công|đảm bảo|guarantee)"
+    severity: hard
+    reason: "MARA cấm hứa kết quả định cư"
+  - id: mara.no.guarantee.visa
+    pattern: "(đảm bảo|cam kết|chắc chắn)[\\s]*(visa|đậu|được nhận visa|nhận visa)"
+    severity: hard
+    reason: "MARA cấm guarantee visa outcome"
+  - id: mara.no.guaranteed.en
+    pattern: "guaranteed[\\s]*(visa|outcome|success)"
+    severity: hard
+    reason: "MARA prohibits guaranteed visa outcome claims (English)"
+  - id: mara.no.personal.advice
+    pattern: "(tôi|em|mình|chị)[\\s]+khuyên[\\s]+(bạn|chị|anh|em|các bạn)"
+    severity: hard
+    reason: "Personal advice vi phạm MARA pre-license"
+  - id: mara.no.eligibility.assessment
+    pattern: "(bạn|chị|anh)[\\s]+(đủ|đã đủ)[\\s]+điều kiện"
+    severity: hard
+    reason: "Eligibility assessment cần MARA license"
+  - id: mara.no.shortcut
+    pattern: "(đường tắt|fast track|shortcut|đường vòng)"
+    severity: hard
+    reason: "MARA cấm misleading shortcut claims"
+  - id: mara.no.case.prediction
+    pattern: "(hồ sơ|case)[\\s]+(của bạn|của chị)[\\s]+sẽ"
+    severity: hard
+    reason: "MARA cấm specific case prediction"
+
+soft_warnings:
+  - id: mara.soft.you.should
+    pattern: "(bạn|chị|anh)[\\s]+(nên|phải|cần)[\\s]+(nộp|chọn)"
+    severity: soft
+    reason: "Có thể bị hiểu là personal advice, FLAG cho Anna review"
+  - id: mara.soft.special.policy
+    pattern: "(chính sách|ưu đãi)[\\s]+(mới|đặc biệt)[\\s]+cho[\\s]+(người Việt|cộng đồng Việt)"
+    severity: soft
+    reason: "Có thể misleading về chính sách visa"
+
+required_when_visa:
+  - id: mara.required.disclaimer
+    pattern: "(thông tin tham khảo|không phải tư vấn pháp lý|educational purposes)"
+    severity: soft
+    reason: "Content nhắc visa nên có disclaimer tham khảo, không tư vấn pháp lý chính thức"
+    trigger_keywords:
+      - "visa"
+      - "định cư"
+      - "subclass"
+      - "PR"
+      - "migration"

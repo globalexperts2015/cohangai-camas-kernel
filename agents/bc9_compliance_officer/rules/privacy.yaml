@@ -1,0 +1,48 @@
+# Privacy Act AU + Personal Information Disclosure Rules
+# Layer 2 of BC9 Compliance Officer
+#
+# Nguồn: Australian Privacy Act 1988 + APPs (13 principle).
+# Anna chốt 2026-06-06: GDPR DEACTIVATED (target VN domestic, < 5% EU customer).
+# Re-evaluate khi launch sản phẩm EU.
+
+layer: privacy
+description: "Privacy Act AU + cấm leak PII raw"
+
+banned_phrases:
+  - id: privacy.no.full.card
+    pattern: "\\b\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}\\b"
+    severity: hard
+    reason: "Card number raw (16 digit) vi phạm PCI + Privacy Act"
+  - id: privacy.no.full.ssn.pattern
+    pattern: "\\b(TFN|tax file number)[:\\s]+\\d{9}\\b"
+    severity: hard
+    reason: "TFN full digit không được publish"
+  - id: privacy.no.passport.pattern
+    pattern: "passport[\\s:]+[A-Z]{1,2}\\d{6,9}"
+    severity: hard
+    reason: "Passport number raw không được publish"
+  - id: privacy.no.dob.public
+    pattern: "(sinh ngày|date of birth|DOB)[\\s:]+\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4}"
+    severity: hard
+    reason: "DOB raw của customer không được publish public"
+  - id: privacy.no.phone.full
+    pattern: "\\+84[\\s-]?\\d{9,10}|\\b0\\d{9}\\b"
+    severity: soft
+    reason: "Phone number full khả năng leak PII, FLAG để Anna confirm"
+
+soft_warnings:
+  - id: privacy.soft.email.pattern
+    pattern: "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"
+    severity: soft
+    reason: "Email cụ thể trong content public cần Anna confirm"
+
+required_when_lead_form:
+  - id: privacy.required.consent.banner
+    pattern: "(đồng ý|consent|chấp nhận)[\\s\\S]+(thông tin|data|dữ liệu)"
+    severity: soft
+    reason: "Lead form cần consent banner per APP 1+3"
+    trigger_keywords:
+      - "đăng ký"
+      - "lead form"
+      - "subscribe"
+      - "form"
