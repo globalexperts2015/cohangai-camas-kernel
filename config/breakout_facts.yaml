@@ -1,0 +1,89 @@
+venture: breakout
+version: "1.0"
+updated: "2026-06-08"
+
+facts:
+  # === BIO (founder + brand) ===
+  - category: bio
+    content: "Đào Thị Hằng là founder Breakout, brand thought leader AI Solo Empire cho người Việt 30-45 muốn build solo business chuyên nghiệp không cần thuê team."
+    tags: [canonical, bio, founder, brand]
+    context: "Brand boundary venture Breakout"
+
+  - category: bio
+    content: "Hằng vận hành 6 venture solo (Breakout, Speakout, Cohangai, Migration, BMCorner, Đất Gia Nghĩa) bằng AIOS 27 BC agent + 13 cron jobs. Saving 40-60h/tuần ops + content + CSKH."
+    tags: [canonical, bio, founder, achievement]
+
+  - category: bio
+    content: "Hằng đã build CAMAS Kernel (Cohangai AIOS Multi-Agent System) Sprint 5-10, deploy Railway production từ 7/6/2026. 27 BC agent, Postgres pgvector v0.8.2 + Voyage voyage-3 1024d + Anthropic Claude Opus 4.7 + Haiku 4.5."
+    tags: [canonical, bio, technical, build-in-public]
+
+  - category: bio
+    content: "PURE TRUST 12 tháng từ 2026-06 đến 2027-06 là giai đoạn Hằng xây brand thought leader thuần tuý, KHÔNG cross-promote venture khác (Speakout/Breakout/Migration), KHÔNG public marital status/city Perth-Adelaide-Gold Coast, focus vào value content."
+    tags: [canonical, bio, brand-boundary, pure-trust]
+
+  # === PRICING (Empire Stack 5-tier) ===
+  - category: pricing
+    content: "Breakout có 5 tier Empire Stack: VIP 199k VND, Foundation System 3,000,000 VND, Customer System 6,000,000 VND, Growth System 15,000,000 VND, Coaching 6 tháng 50,000,000 VND. Total ladder 74,199,000 VND per customer."
+    tags: [canonical, pricing, empire-stack, ladder]
+
+  - category: pricing
+    content: "Coaching tier 50M là 6 THÁNG (KHÔNG phải 12 tháng). 1on1 + group sessions + 24/7 Telegram support + AIOS instance custom build cho venture của student. Anna correct Claude 5/6 incident sai duration."
+    tags: [canonical, pricing, coaching, duration]
+
+  # === SCHEDULE (K2 launch + ongoing) ===
+  - category: schedule
+    content: "Breakout Challenge K2 (Khoá 2) live tháng 6/2026: Day 1 = 9/6/2026 19:00 Perth (Tuesday), Day 2 = 10/6/2026 19:00 Perth (Wednesday), Day 3 = 11/6/2026 19:00 Perth (Thursday). 3 buổi live qua WebinarKit Live Pro, có record cho học viên đăng ký."
+    tags: [canonical, schedule, k2, launch, live]
+
+  - category: schedule
+    content: "Post-K2 follow-up 12/6/2026: BC4 post_24h cron 8am Perth → reflection form Tally + upsell Coaching qualify call calendar 30m. Refund window 14 ngày từ ngày kích hoạt tier."
+    tags: [canonical, schedule, post-k2, follow-up, refund-window]
+
+  # === TARGET (persona Breakout) ===
+  - category: target
+    content: "Target persona Breakout: người Việt 30-45 tuổi, đã có sản phẩm/dịch vụ đang vận hành, doanh thu hiện tại 50-500 triệu/tháng, MUỐN scale lên 300-800tr/tháng KHÔNG thuê thêm team. Hiện đang bottleneck ở content/sales/CSKH."
+    tags: [canonical, target, persona-primary]
+
+  - category: target
+    content: "Persona secondary Breakout: solo founder venture mới có sản phẩm 6-18 tháng, doanh thu 20-50tr/tháng, đang tự làm hết mọi việc 6am-10pm, burnout, muốn AI thay 1 VA Việt Nam (~10-15tr/tháng)."
+    tags: [canonical, target, persona-secondary]
+
+  - category: target
+    content: "Anti-persona Breakout (KHÔNG fit): startup tech early-stage chưa có sản phẩm, employee 9-5 chưa side hustle, người cần real-time <100ms latency, người cần on-premise compliance, người cần custom ML model."
+    tags: [canonical, target, anti-persona]
+
+  # === AUDIENCE (demographic) ===
+  - category: audience
+    content: "Audience Breakout VN: 70% nữ + 30% nam, location VN urban (TPHCM/HN/Đà Nẵng chiếm 60%), tier 2 city 30%, overseas Việt kiều 10%. Income tier 50-300tr/tháng household."
+    tags: [canonical, audience, demographic, geo]
+
+  - category: audience
+    content: "Audience Breakout overseas VN: 20% trong total, location Úc (Perth/Sydney/Melbourne), Mỹ (California), Singapore, EU. Mostly solo founder ngành F&B + coaching + e-commerce + service-based."
+    tags: [canonical, audience, demographic, overseas]
+
+  # === COMPLIANCE_AUDIT (Breakout-specific brand rules) ===
+  - category: compliance_audit
+    content: "Breakout brand boundary CỐ ĐỊNH: KHÔNG dùng 'mẹ đơn thân'/'ly thân'/'chồng cũ'/'độc thân', KHÔNG public city ('Perth'/'Adelaide'/'Gold Coast'/'Coomera'), chỉ 'Úc'. Lý do: divorce case 2026 active, paper trail risk."
+    tags: [canonical, compliance, brand-boundary, breakout]
+
+  - category: compliance_audit
+    content: "Breakout claim rule: KHÔNG hứa 'doanh thu cụ thể trong X ngày' không có disclaimer, KHÔNG '100% success/guarantee', KHÔNG dùng số liệu Anna chưa verify. Mọi claim revenue >50tr/tháng phải có timeline + condition + disclaimer."
+    tags: [canonical, compliance, claim-rule, breakout]
+
+  - category: compliance_audit
+    content: "Breakout PURE TRUST 12 tháng (2026-06-08 → 2027-06-08): KHÔNG cross-promote Speakout/Migration/BMCorner trong content Breakout, KHÔNG dùng brand 'Hằng Coaching'/'Anna Đào'/'Coach Hằng' (luôn full name 'Đào Thị Hằng' hoặc 'Hằng')."
+    tags: [canonical, compliance, pure-trust, breakout]
+
+  # === POLICY (refund + delivery) ===
+  - category: policy
+    content: "Breakout refund 14 ngày từ ngày kích hoạt tier (Foundation/Customer/Growth/Coaching). Điều kiện: chưa download/access >30% content, có lý do cụ thể. Submit via support@daothihang.com, processed trong 7 working day."
+    tags: [canonical, policy, refund, breakout]
+
+  - category: policy
+    content: "Breakout delivery: K2 live 3 buổi 9-11/6 qua WebinarKit Live Pro + record cho registered student. Post-K2 access platform app.breakout.live (whitelist gate qua email). Coaching tier có additional 1on1 + Telegram group exclusive."
+    tags: [canonical, policy, delivery, breakout]
+
+  # === VENTURE_STATE (current state, update thường xuyên) ===
+  - category: venture_state
+    content: "Breakout state 2026-06-08: K2 launch T-1, 1,183+ K2 contacts trong GHL pipeline, whitelist sync defensive cron daily 7752710. 5 BC4 K2 cron + BC5 monitor + BC1 rollup cron đã setup cron-job.org. Sepay LIVE merchant DTA46658 active."
+    tags: [canonical, venture-state, k2-readiness, "2026-06-08"]

@@ -1,0 +1,117 @@
+venture: "breakout"
+compliance_version: "1.0"
+updated: "2026-06-08"
+loaded_by: ["BC9ComplianceOfficer", "Pban09TuanThu"]
+
+# Brand boundary universal Anna (cross-venture, ABSOLUTE)
+brand_boundary:
+  forbidden_terms:
+    - "mẹ đơn thân"
+    - "ly thân"
+    - "chồng cũ"
+    - "độc thân"
+    - "Perth"
+    - "Adelaide"
+    - "Gold Coast"
+    - "Coomera"
+    - "Hằng Coaching"
+    - "Anna Đào"
+    - "Coach Hằng"
+    - "Việt kiều"
+  required_terms_vi:
+    - "Hằng"
+  required_terms_en:
+    - "Anna"
+  full_name_required: "Đào Thị Hằng"
+  case_sensitive: false
+  reason: "Divorce case 2026 active, PURE TRUST 12 tháng brand boundary (2026-06-08 đến 2027-06-08), paper trail risk"
+
+# Legal facts (already seeded vào agent_memory category=compliance_audit venture='breakout')
+legal_facts_seeded_count: 3
+legal_facts_categories:
+  - brand_boundary_breakout
+  - claim_rule_breakout
+  - pure_trust_breakout
+
+# MARA universal facts (14 records, venture='migration', cross-venture retrieve OK)
+mara_facts_count: 14
+mara_facts_note: "14 MARA + AU compliance facts seeded với venture='migration'. BC9 cross-venture retrieve khi content có visa/migration claim."
+
+# Claim rules, BC9 fact-check patterns
+claim_rules:
+  forbidden_patterns:
+    - pattern: "100%\\s+(success|guarantee|đảm bảo|chắc chắn)"
+      reason: "KHÔNG hứa kết quả 100%"
+      severity: block
+    - pattern: "(monthly|tháng)\\s+(revenue|doanh thu).{0,40}(triệu|million|tr)"
+      reason: "Cần fact-check số revenue + có disclaimer + timeline + condition"
+      severity: review
+    - pattern: "(visa rate|tỷ lệ.{0,10}đậu)"
+      reason: "MARA cấm claim visa rate"
+      severity: block
+      applies_to: ["migration"]
+    - pattern: "(thay đổi cuộc đời|breakthrough|đột phá tư duy)\\s+(sau|trong)\\s+\\d+"
+      reason: "Sáo rỗng + timeline không có condition"
+      severity: review
+    - pattern: "\\b(không cần làm gì|passive income).{0,40}(triệu|million|tr)"
+      reason: "Passive income claim mà không có effort breakdown"
+      severity: block
+    - pattern: "\\bMRR\\b|\\bARR\\b.{0,30}(\\d+[KMB])"
+      reason: "MRR/ARR specific claim cần verify source + timeline"
+      severity: review
+
+# Required disclaimers per content type
+required_disclaimers:
+  - content_type: "migration_advice"
+    text: "Thông tin tham khảo, không phải tư vấn pháp lý chính thức (MARA license dự kiến 1/2027)"
+    apply_when: "Content mention visa, immigration, MARA"
+
+  - content_type: "revenue_claim"
+    text: "Doanh thu là benchmark cá nhân, không hứa kết quả cụ thể cho mọi venture"
+    apply_when: "Content có số revenue claim"
+
+  - content_type: "coaching_outcome"
+    text: "Kết quả phụ thuộc nỗ lực + điều kiện cụ thể venture của bạn"
+    apply_when: "Content promote Coaching 50M tier"
+
+# Escalation policy
+escalation:
+  uncertain_facts:
+    action: "ask_anna_before_publish"
+    channel: "telegram"
+    chat_id: "-1003813280155"
+    chat_name: "Breakout Ops"
+
+  high_risk_terms:
+    action: "block_and_alert"
+    channel: "telegram"
+    chat_id: "-1003813280155"
+    bot_token_env: "TELEGRAM_BOT_TOKEN"
+
+  number_claims_without_source:
+    action: "require_source_or_remove"
+
+  cross_venture_promo:
+    action: "block_telegram_alert"
+    reason: "PURE TRUST 12 tháng KHÔNG cross-promote Speakout/Migration/BMCorner trong Breakout content"
+
+# Compliance gate threshold
+gate:
+  block_severity: ["block"]
+  review_severity: ["review"]
+  pass_threshold: 0.95
+  retrieval_config:
+    category_priority:
+      - compliance_audit
+      - venture_state
+      - policy
+    top_k: 10
+    relevance_threshold: 0.5
+
+# PURE TRUST 12 tháng window
+pure_trust:
+  start_date: "2026-06-08"
+  end_date: "2027-06-08"
+  status: active
+  rule: "Brand thought leader thuần tuý, KHÔNG cross-promote venture, KHÔNG public marital/city"
+  audit_frequency: weekly  # BC8 night audit verify state
