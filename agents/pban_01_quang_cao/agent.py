@@ -276,7 +276,7 @@ class Pban01QuangCao(BaseBC):
                 ],
                 "venture": ctx.venture_context,
                 "context": "ads.performance_review daily digest summary",
-                "category": "ads_insights",
+                "category": "venture_state",
             }
         ]
 
@@ -289,7 +289,7 @@ class Pban01QuangCao(BaseBC):
                     "tags": camp["tags"],
                     "venture": ctx.venture_context,
                     "context": f"ads.performance_review campaign={camp['campaign_id']}",
-                    "category": "ads_insights",
+                    "category": "venture_state",
                 }
             )
 

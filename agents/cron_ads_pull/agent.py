@@ -136,7 +136,7 @@ class CronAdsPull(BaseBC):
                 "tags": ["cron", "ads_pull", "daily", delegate_status],
                 "venture": "all",
                 "context": f"{EXPECTED_EVENT} {date_perth}",
-                "category": "ads_pull_audit",
+                "category": "venture_state",
             }
         ]
 
