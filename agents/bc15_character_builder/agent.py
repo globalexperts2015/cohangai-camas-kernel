@@ -133,9 +133,12 @@ class BC15CharacterBuilder(BaseBC):
 
         identity = character.get("identity", "Reluctant Hero")
         founder = character.get("founder_name", "unknown")
-        quality = character.get("quality_check", {}) or {}
-        passes = quality.get("passes_quality", True)
-        summary = f"character founder={founder} identity={identity} venture={venture} passes={passes}"
+        passes = character.get("passes_quality", True)
+        moments = character.get("backstory_key_moments", [])
+        parables = character.get("parables", [])
+        polarity = character.get("polarity", [])
+        flaws = character.get("character_flaws", [])
+        summary = f"character founder={founder} identity={identity} moments={len(moments)} parables={len(parables)} polarity={len(polarity)} flaws={len(flaws)}"
 
         memory_entry = {
             "agent_name": self.name,

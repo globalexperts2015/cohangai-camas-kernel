@@ -58,7 +58,7 @@ Output qua tool submit_character.
 
 SUBMIT_CHARACTER_TOOL = {
     "name": "submit_character",
-    "description": "Submit Attractive Character profile 5 elements production-grade",
+    "description": "Submit Attractive Character profile 5 elements",
     "input_schema": {
         "type": "object",
         "properties": {
@@ -66,46 +66,33 @@ SUBMIT_CHARACTER_TOOL = {
             "venture": {"type": "string"},
             "identity": {
                 "type": "string",
-                "enum": ["Leader", "Adventurer", "Evangelist", "Reluctant Hero"],
+                "description": "Leader | Adventurer | Evangelist | Reluctant Hero",
             },
             "identity_reason": {"type": "string"},
-            "backstory": {
-                "type": "object",
-                "properties": {
-                    "summary": {"type": "string"},
-                    "key_moments": {
-                        "type": "array",
-                        "minItems": 3,
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "year": {"type": "string"},
-                                "moment": {"type": "string"},
-                                "story_id_from_pool": {"type": "string"},
-                                "tier": {"type": "string", "enum": ["public_safe", "webinar_only"]},
-                            },
-                            "required": ["year", "moment"],
-                        },
+            "backstory_summary": {"type": "string"},
+            "backstory_key_moments": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "year": {"type": "string"},
+                        "moment": {"type": "string"},
+                        "tier": {"type": "string"},
                     },
                 },
-                "required": ["summary", "key_moments"],
             },
             "parables": {
                 "type": "array",
-                "minItems": 3,
                 "items": {
                     "type": "object",
                     "properties": {
                         "metaphor": {"type": "string"},
                         "explains": {"type": "string"},
-                        "usage_context": {"type": "string"},
                     },
-                    "required": ["metaphor", "explains"],
                 },
             },
             "polarity": {
                 "type": "array",
-                "minItems": 2,
                 "items": {
                     "type": "object",
                     "properties": {
@@ -114,43 +101,25 @@ SUBMIT_CHARACTER_TOOL = {
                         "who_loves_it": {"type": "string"},
                         "who_hates_it": {"type": "string"},
                     },
-                    "required": ["stand", "reason", "who_loves_it", "who_hates_it"],
                 },
             },
             "character_flaws": {
                 "type": "array",
-                "minItems": 3,
                 "items": {
                     "type": "object",
                     "properties": {
                         "flaw": {"type": "string"},
                         "vulnerability_context": {"type": "string"},
-                        "tier": {"type": "string", "enum": ["public_safe", "webinar_only"]},
+                        "tier": {"type": "string"},
                     },
-                    "required": ["flaw", "tier"],
                 },
             },
-            "voice_register": {
-                "type": "object",
-                "properties": {
-                    "pronoun_self": {"type": "string"},
-                    "pronoun_audience": {"type": "string"},
-                    "tone_signature": {"type": "string"},
-                    "sentence_length": {"type": "string"},
-                },
-            },
-            "quality_check": {
-                "type": "object",
-                "properties": {
-                    "all_5_elements_present": {"type": "boolean"},
-                    "stories_from_pool_only": {"type": "boolean"},
-                    "no_private_tier_leak": {"type": "boolean"},
-                    "no_forbidden_term": {"type": "boolean"},
-                    "passes_quality": {"type": "boolean"},
-                },
-            },
+            "voice_pronoun_self": {"type": "string"},
+            "voice_pronoun_audience": {"type": "string"},
+            "voice_tone_signature": {"type": "string"},
+            "passes_quality": {"type": "boolean"},
             "summary": {"type": "string"},
         },
-        "required": ["founder_name", "venture", "identity", "backstory", "parables", "polarity", "character_flaws", "voice_register", "summary"],
+        "required": ["founder_name", "venture", "identity", "summary"],
     },
 }
