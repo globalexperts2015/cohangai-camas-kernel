@@ -56,6 +56,16 @@ from agents.trust_capital_tracker import TrustCapitalTracker
 from agents.overlay_a_cohort_comparison import OverlayACohortComparison
 from agents.overlay_a_antifragility import OverlayAAntifragility
 
+# Sprint 14 missing critical: Stage 1.1 + 1.3 + 3 + 4 agents
+from agents.asset_bank_inventory import AssetBankInventory
+from agents.market_signal_scraper import MarketSignalScraper
+from agents.competitor_intelligence import CompetitorIntelligence
+from agents.value_creation_advisor import ValueCreationAdvisor
+
+# Sprint 14 enhance: Stage 9 Perfect Webinar + Stage 10 Onboarding proactive
+from agents.perfect_webinar_designer import PerfectWebinarDesigner
+from agents.onboarding_orchestrator import OnboardingOrchestrator
+
 # Sprint 13 P2: 7 L2 Cohangai Cohort 1 wizards
 from agents.l2_vision_clarity import L2VisionClarity
 from agents.l2_niche_validator_student import L2NicheValidatorStudent
@@ -269,6 +279,32 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     overlay_a_antifragility = OverlayAAntifragility(llm=scheduler.llm, memory=scheduler.memory)
     scheduler.register(overlay_a_antifragility)
     log.info("Overlay A Antifragility registered (overlay_a.antifragility_score, BC8 enhance)")
+
+    # Sprint 14 missing critical agents (Stage 1.1 + 1.3 + 3 + 4)
+    asset_bank = AssetBankInventory(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(asset_bank)
+    log.info("Asset Bank Inventory registered (asset.inventory_build, Stage 1.1)")
+
+    market_signal = MarketSignalScraper(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(market_signal)
+    log.info("Market Signal Scraper registered (market.signal_aggregate, Stage 1.3)")
+
+    competitor_intel = CompetitorIntelligence(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(competitor_intel)
+    log.info("Competitor Intelligence registered (competitor.intel_research, Stage 3)")
+
+    value_advisor = ValueCreationAdvisor(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(value_advisor)
+    log.info("Value Creation Advisor registered (value.creation_advise, Stage 4)")
+
+    # Sprint 14 enhance: Stage 9 Perfect Webinar + Stage 10 Onboarding
+    perfect_webinar = PerfectWebinarDesigner(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(perfect_webinar)
+    log.info("Perfect Webinar Designer registered (webinar.design_perfect_90min, Stage 9 Brunson)")
+
+    onboarding = OnboardingOrchestrator(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(onboarding)
+    log.info("Onboarding Orchestrator registered (onboarding.welcome_sequence/progress_check, Stage 10)")
 
     # Sprint 13 P2: 7 L2 Cohangai Cohort 1 wizards
     l2_classes = [

@@ -58,9 +58,26 @@ SUBMIT_PYRAMID_TOOL = {
                         "timestamp_start_seconds": {"type": "integer"},
                         "timestamp_end_seconds": {"type": "integer"},
                         "format": {"type": "string", "description": "60s shorts YouTube/TikTok"},
+                        "content_group": {
+                            "type": "string",
+                            "description": "Stage 7 framework v2: pain | mistake | myth | framework | case_study | bts | offer",
+                        },
                     },
                 },
-                "description": "10 Shorts 60s",
+                "description": "10 Shorts 60s tagged 7 nhóm framework v2 Stage 7",
+            },
+            "content_groups_distribution": {
+                "type": "object",
+                "description": "Count assets per 7 nhóm framework v2 Stage 7",
+                "properties": {
+                    "pain_count": {"type": "integer"},
+                    "mistake_count": {"type": "integer"},
+                    "myth_count": {"type": "integer"},
+                    "framework_count": {"type": "integer"},
+                    "case_study_count": {"type": "integer"},
+                    "bts_count": {"type": "integer"},
+                    "offer_count": {"type": "integer"},
+                },
             },
             "reel_angles": {
                 "type": "array",
@@ -146,7 +163,19 @@ def build_pyramid_prompt(
 
 # Task
 
-Distribute long-form video thành 65 derived assets:
+Distribute long-form video thành 65 derived assets + TAG 7 nhóm framework v2 Stage 7:
+
+## 7 nhóm content (Stage 7 framework v2)
+1. **pain**: customer pain reframe
+2. **mistake**: common mistake avoid
+3. **myth**: bust myth in niche
+4. **framework**: teach framework/method
+5. **case_study**: success/failure story
+6. **bts**: behind the scenes (build-in-public)
+7. **offer**: direct offer + CTA
+
+Mỗi short_hook PHẢI có content_group tag. Distribute target 40% pain/mistake + 30% framework/case_study + 20% bts + 10% offer.
+
 
 ## 10 Short hooks (60s YouTube/TikTok Shorts)
 Mỗi short có: hook_text (5s đầu critical) + timestamp_start + timestamp_end (extract 60s từ transcript) + format.
