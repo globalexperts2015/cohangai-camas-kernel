@@ -45,6 +45,12 @@ from agents.bc20_copy_stack import BC20CopyStack
 # Sprint 13 P0.3: Financial Modeler (CAC/LTV/Payback/Runway daily)
 from agents.financial_modeler import FinancialModeler
 
+# Sprint 13 P1: Framework v2 partial → strong L1
+from agents.niche_validator import NicheValidator
+from agents.demand_research import DemandResearch
+from agents.content_distributor import ContentDistributor
+from agents.trust_capital_tracker import TrustCapitalTracker
+
 # Sprint 5 Tier 3: 10 Phòng ban
 from agents.pban_01_quang_cao import Pban01QuangCao
 from agents.pban_02_noi_dung import Pban02NoiDung
@@ -218,6 +224,23 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     financial_modeler = FinancialModeler(llm=scheduler.llm, memory=scheduler.memory)
     scheduler.register(financial_modeler)
     log.info("Financial Modeler registered (financial.daily_calc + financial.venture_audit, Overlay B)")
+
+    # Sprint 13 P1: Framework v2 partial → strong L1
+    niche_validator = NicheValidator(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(niche_validator)
+    log.info("Niche Validator registered (niche.validate, Stage 3 framework v2)")
+
+    demand_research = DemandResearch(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(demand_research)
+    log.info("Demand Research registered (demand.research, Stage 5 framework v2)")
+
+    content_distributor = ContentDistributor(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(content_distributor)
+    log.info("Content Distributor registered (content.distribute_pyramid, Stage 11 Content Pyramid)")
+
+    trust_capital_tracker = TrustCapitalTracker(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(trust_capital_tracker)
+    log.info("Trust Capital Tracker registered (trust.quarterly_audit, Stage 13)")
 
     # Sprint 5 Tier 3: 10 Phòng ban Breakout Funnel OS
     pban_classes = [
