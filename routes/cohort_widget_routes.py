@@ -104,7 +104,7 @@ WIZARD_REGISTRY = {
         "event": "cohort.mvo_launch_plan",
         "week": 7,
         "title": "Chiến lược ra mắt sản phẩm",
-        "subtitle": "Kế hoạch 30 ngày ra mắt 5-15 khách trả tiền. Clone email sequence + GHL workflow Hằng đã build, customize cho bạn.",
+        "subtitle": "Kế hoạch 30 ngày ra mắt 5-15 khách trả tiền. Clone chuỗi email nuôi khách + automation Hằng đã build, customize cho bạn.",
         "input_label": "Tóm tắt offer + giải pháp đã thiết kế",
         "input_placeholder": "Tóm tắt: offer chính + giải pháp + persona khách + thời gian launch dự kiến...",
         "input_field": "vpc",
@@ -114,7 +114,7 @@ WIZARD_REGISTRY = {
         "event": "cohort.referral_engine_design",
         "week": 8,
         "title": "Cỗ máy bán hàng tự động (Capstone)",
-        "subtitle": "Biến khách thành đại sứ. Clone full CRM stack: GHL + ZNS + Sepay + lead scoring cron, sẵn sàng vận hành.",
+        "subtitle": "Biến khách thành đại sứ. Clone full hệ thống: CRM nuôi khách + thông báo + thanh toán + đánh giá khách tự động.",
         "input_label": "Tóm tắt offer + khách hàng đã design xuyên 7 tuần",
         "input_placeholder": "Tóm tắt offer chính + persona khách hàng + dòng tiền mục tiêu sau referral...",
         "input_field": "offer",
@@ -487,34 +487,34 @@ async def cohort_index() -> HTMLResponse:
 
         <div class="tech-tool">
           <div class="tech-tool-icon">📧</div>
-          <div class="tech-tool-status tech-tool-soon">Sprint 15-16</div>
-          <h3>Email sequence 5 chuỗi</h3>
-          <p>Welcome, Abandon Cart, Post-purchase, Cross-sell, Win-back. Clone từ GHL workflow K2 Hằng đã chạy.</p>
-          <span class="tech-tool-coming">Đang build, ra mắt Sprint 15-16</span>
+          <div class="tech-tool-status tech-tool-soon">Sắp ra mắt</div>
+          <h3>Chuỗi email nuôi khách</h3>
+          <p>5 chuỗi tự động: chào mừng, nhắc đơn bỏ quên, sau mua, bán thêm, kéo lại khách rời. Clone từ hệ thống Hằng đã chạy thật.</p>
+          <span class="tech-tool-coming">Đang hoàn thiện</span>
         </div>
 
         <div class="tech-tool">
           <div class="tech-tool-icon">💳</div>
-          <div class="tech-tool-status tech-tool-soon">Sprint 15-16</div>
-          <h3>Sepay checkout pattern</h3>
-          <p>Trang thanh toán + webhook Sepay → GHL contact + ZNS auto. Wire vào Railway service riêng.</p>
-          <span class="tech-tool-coming">Đang build, ra mắt Sprint 15-16</span>
+          <div class="tech-tool-status tech-tool-soon">Sắp ra mắt</div>
+          <h3>Hệ thống thanh toán</h3>
+          <p>Trang thanh toán + tự động ghi nhận khách + gửi thông báo xác nhận. Tích hợp sẵn ngân hàng Việt Nam, không cần Stripe.</p>
+          <span class="tech-tool-coming">Đang hoàn thiện</span>
         </div>
 
         <div class="tech-tool">
           <div class="tech-tool-icon">🤖</div>
-          <div class="tech-tool-status tech-tool-soon">Sprint 15-16</div>
-          <h3>GHL workflow CRM</h3>
-          <p>Clone workflow K2: lead nurture, follow-up, no-show win-back, refund handling. Toàn bộ logic ready.</p>
-          <span class="tech-tool-coming">Đang build, ra mắt Sprint 15-16</span>
+          <div class="tech-tool-status tech-tool-soon">Sắp ra mắt</div>
+          <h3>Hệ thống chăm sóc khách hàng</h3>
+          <p>Nuôi khách tiềm năng, theo dõi sau mua, kéo khách bỏ giỏ, xử lý hoàn tiền tự động. Toàn bộ luồng nghiệp vụ sẵn sàng.</p>
+          <span class="tech-tool-coming">Đang hoàn thiện</span>
         </div>
 
         <div class="tech-tool">
           <div class="tech-tool-icon">📊</div>
-          <div class="tech-tool-status tech-tool-soon">Sprint 15-16</div>
-          <h3>Lead scoring cron</h3>
-          <p>Auto-score 1000+ leads daily, Hot/Warm/Cold tier, push Telegram alert. Pattern Hằng đã chạy K2 webinar.</p>
-          <span class="tech-tool-coming">Đang build, ra mắt Sprint 15-16</span>
+          <div class="tech-tool-status tech-tool-soon">Sắp ra mắt</div>
+          <h3>Đánh giá khách tự động</h3>
+          <p>Chấm điểm 1000+ khách mỗi ngày, phân loại Nóng/Ấm/Lạnh, đẩy cảnh báo khách hot ngay. Bạn chỉ cần follow-up khách đáng giá nhất.</p>
+          <span class="tech-tool-coming">Đang hoàn thiện</span>
         </div>
       </div>
     </section>
@@ -601,11 +601,11 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
 </html>""")
 
 
-# Webinar K2 9-11/6/2026 Tally form URLs (replace after Tally form create in Block 3)
+# Webinar K2 9-11/6/2026 Tally form URLs (created 2026-06-08 via API, 21 blocks each)
 WEBINAR_K2_TALLY_URLS = {
-    1: "https://tally.so/r/wk2-b1-vision",
-    2: "https://tally.so/r/wk2-b2-customer",
-    3: "https://tally.so/r/wk2-b3-offer",
+    1: "https://tally.so/r/aQzkNE",  # K2 Buổi 1 · Vision Submission
+    2: "https://tally.so/r/68P4JO",  # K2 Buổi 2 · Customer Submission
+    3: "https://tally.so/r/7REjl9",  # K2 Buổi 3 · Offer Capstone Submission
 }
 
 
