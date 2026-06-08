@@ -360,6 +360,9 @@ body {
   border-radius: 16px;
   padding: 20px 18px;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  min-height: 240px;
 }
 
 .tech-tool:hover {
@@ -402,15 +405,18 @@ body {
   color: #5a6273;
   line-height: 1.5;
   margin-bottom: 14px;
+  flex: 1;
 }
 
 .tech-tool .cohort-btn {
   background: linear-gradient(135deg, #c1121f, #6a040f);
   color: white;
   font-size: 12px;
-  padding: 6px 14px;
+  padding: 8px 14px;
   border: 1px solid rgba(106, 4, 15, 0.4);
   font-weight: 600;
+  align-self: flex-start;
+  margin-top: auto;
 }
 
 .tech-tool .cohort-btn:hover {
