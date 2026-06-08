@@ -532,6 +532,83 @@ class MemoryLayer:
         except Exception as exc:  # noqa: BLE001
             log.debug("touch_records best-effort fail: %r", exc)
 
+    async def retrieve_by_tags_recent(
+        self,
+        tags_must_contain: list[str],
+        *,
+        limit: int = 5,
+        venture: Optional[str] = None,
+    ) -> list[MemoryRecord]:
+        """Direct SQL retrieve by tag containment, ordered by created_at DESC.
+
+        Bypass embedding semantic search. Use cho chain context retrieval (cohort
+        wizard chain) hoặc bất kỳ scenario nào cần exact-tag lookup recent.
+        """
+        if not tags_must_contain:
+            return []
+
+        where: list[str] = ["tags @> $1::text[]"]
+        params: list[Any] = [list(tags_must_contain)]
+        pi = 2
+
+        if venture is not None:
+            where.append(f"venture = ${pi}")
+            params.append(venture)
+            pi += 1
+
+        params.append(limit)
+        where_sql = " AND ".join(where)
+        sql = f"""
+        SELECT id, memory_id, agent_name, content, keywords, links, context, category,
+               tags, customer_id, venture, retrieval_count, last_accessed_at,
+               evolution_history, created_at, updated_at, embedding_model, embedded_at
+        FROM public.agent_memory
+        WHERE {where_sql}
+        ORDER BY created_at DESC
+        LIMIT ${pi};
+        """
+
+        try:
+            pool = await self._get_pool()
+            async with pool.acquire() as conn:
+                rows = await conn.fetch(sql, *params)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("MemoryLayer.retrieve_by_tags_recent SQL fail: %r", exc)
+            return []
+
+        records: list[MemoryRecord] = []
+        for r in rows:
+            evol = r["evolution_history"]
+            if isinstance(evol, str):
+                try:
+                    evol = json.loads(evol)
+                except (TypeError, ValueError):
+                    evol = []
+            records.append(
+                MemoryRecord(
+                    id=r["id"],
+                    memory_id=r["memory_id"],
+                    agent_name=r["agent_name"],
+                    content=r["content"],
+                    keywords=list(r["keywords"] or []),
+                    links=list(r["links"] or []),
+                    context=r["context"],
+                    category=r["category"],
+                    tags=list(r["tags"] or []),
+                    customer_id=r["customer_id"],
+                    venture=r["venture"],
+                    retrieval_count=r["retrieval_count"],
+                    last_accessed_at=r["last_accessed_at"],
+                    evolution_history=evol or [],
+                    created_at=r["created_at"],
+                    updated_at=r["updated_at"],
+                    embedding=None,
+                    embedding_model=r["embedding_model"],
+                    embedded_at=r["embedded_at"],
+                )
+            )
+        return records
+
     async def to_natural_language(self, records: list[MemoryRecord]) -> str:
         """Render bullet list NL cho inject vào prompt agent.
 

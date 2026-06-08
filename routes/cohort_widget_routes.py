@@ -23,7 +23,10 @@ from fastapi import APIRouter, Header, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+import json
+
 from kernel.base_agent import ExecutionContext
+from kernel.memory_layer import MemoryRecord
 from kernel.voice_gate import apply_voice_rewrite, voice_rewrite_enabled
 
 log = logging.getLogger("camas.cohort_widget")
@@ -105,6 +108,135 @@ WIZARD_REGISTRY = {
         "input_field": "offer",
     },
 }
+
+
+# Sprint 14 P0.4 Memory Chain
+# Mapping current wizard → which payload keys to inject từ previous wizards
+# Format: {wizard_friendly_name: {payload_key_in_current: source_wizard_friendly_name}}
+WIZARD_CHAIN_DEPS = {
+    "vision_clarity": {},  # First wizard, no chain
+    "niche_validator": {
+        "vision_context": "vision_clarity",
+    },
+    "transformation_mapper": {
+        "vision_context": "vision_clarity",
+        "niche_context": "niche_validator",
+    },
+    "vpc_fit_check": {
+        "transformation_context": "transformation_mapper",
+        "persona": "transformation_mapper",
+    },
+    "mvo_cohort": {
+        "vision": "vision_clarity",
+        "niche": "niche_validator",
+        "transformation": "transformation_mapper",
+        "vpc": "vpc_fit_check",
+    },
+    "offer_engineer": {
+        "transformation": "transformation_mapper",
+        "mvo": "mvo_cohort",
+        "persona": "vpc_fit_check",
+    },
+    "referral_engine": {
+        "offer": "offer_engineer",
+        "persona": "vpc_fit_check",
+    },
+}
+
+CHAIN_TAG = "cohort_chain"
+
+
+def _chain_enabled() -> bool:
+    """Env flag MEMORY_CHAIN_ENABLED, default true."""
+    return os.getenv("MEMORY_CHAIN_ENABLED", "true").lower() in ("1", "true", "yes")
+
+
+async def _retrieve_chain_context(memory, student_id: str, wizard_name: str) -> dict:
+    """Retrieve previous wizard outputs cho chain context injection.
+
+    Lookup recent memory entries tagged [CHAIN_TAG, student_id, prev_wizard_name].
+    Returns dict mapping payload_key → parsed_output_dict.
+    """
+    if not memory or not getattr(memory, "ready", False):
+        return {}
+
+    deps = WIZARD_CHAIN_DEPS.get(wizard_name, {})
+    if not deps:
+        return {}
+
+    chain_ctx: dict = {}
+    for payload_key, source_wizard in deps.items():
+        if payload_key in chain_ctx:
+            continue  # Already populated by another dep (eg persona)
+        try:
+            records = await memory.retrieve_by_tags_recent(
+                tags_must_contain=[CHAIN_TAG, student_id, source_wizard],
+                limit=1,
+                venture="cohangai",
+            )
+        except Exception as exc:  # noqa: BLE001
+            log.warning(
+                "Chain retrieve fail student=%s source=%s: %r",
+                student_id,
+                source_wizard,
+                exc,
+            )
+            continue
+        if not records:
+            log.info(
+                "Chain dep missing: student=%s wizard=%s needs %s output (skip)",
+                student_id,
+                wizard_name,
+                source_wizard,
+            )
+            continue
+        try:
+            parsed = json.loads(records[0].content)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            parsed = {"raw": records[0].content}
+        chain_ctx[payload_key] = parsed
+
+    return chain_ctx
+
+
+async def _store_chain_output(
+    memory,
+    student_id: str,
+    wizard_name: str,
+    agent_name: str,
+    full_output: dict,
+) -> None:
+    """Store full wizard output cho chain retrieval downstream wizards.
+
+    Tagged [CHAIN_TAG, student_id, wizard_name]. Content = full JSON dict.
+    """
+    if not memory or not getattr(memory, "ready", False):
+        return
+
+    try:
+        content = json.dumps(full_output, ensure_ascii=False)
+    except (TypeError, ValueError):
+        content = str(full_output)
+
+    summary = full_output.get("summary") or full_output.get("verdict") or ""
+    keywords = ["cohort_chain", student_id, wizard_name]
+    tags = [CHAIN_TAG, student_id, wizard_name, "cohort_1"]
+
+    record = MemoryRecord(
+        agent_name=f"cohort_chain_{wizard_name}",
+        content=content,
+        keywords=keywords,
+        tags=tags,
+        category="task",
+        context=f"Cohort chain output student={student_id} wizard={wizard_name}",
+        venture="cohangai",
+        evolution_history=[],
+    )
+
+    try:
+        await memory.store(record)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Chain store fail student=%s wizard=%s: %r", student_id, wizard_name, exc)
 
 
 def _verify_student_token(token: Optional[str]) -> str:
@@ -247,6 +379,15 @@ async def run_wizard(
     }
 
     sched = _scheduler(request)
+
+    # Sprint 14 P0.4 Memory Chain, inject previous wizard outputs
+    chain_loaded: list[str] = []
+    if _chain_enabled() and getattr(sched, "memory", None) is not None:
+        chain_ctx = await _retrieve_chain_context(sched.memory, student_id, wizard_name)
+        for key, value in chain_ctx.items():
+            payload[key] = value
+            chain_loaded.append(key)
+
     ctx = ExecutionContext(
         run_id=str(uuid.uuid4()),
         user_id=student_id,
@@ -254,7 +395,12 @@ async def run_wizard(
         trigger_event=w["event"],
         payload=payload,
     )
-    log.info("Cohort wizard run: student=%s wizard=%s", student_id, wizard_name)
+    log.info(
+        "Cohort wizard run: student=%s wizard=%s chain_loaded=%s",
+        student_id,
+        wizard_name,
+        chain_loaded,
+    )
     result = await sched.execute(w["agent"], ctx)
 
     if not result.success:
@@ -282,6 +428,15 @@ async def run_wizard(
         except Exception as exc:  # noqa: BLE001
             log.warning("Voice rewrite fail in run_wizard: %r, fall back original", exc)
 
+    # Sprint 14 P0.4 Memory Chain, persist full output for downstream wizards
+    chain_stored = False
+    if _chain_enabled() and getattr(sched, "memory", None) is not None:
+        try:
+            await _store_chain_output(sched.memory, student_id, wizard_name, agent_name=w["agent"], full_output=op)
+            chain_stored = True
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Chain store fail in run_wizard: %r", exc)
+
     return JSONResponse({
         "success": True,
         "wizard": wizard_name,
@@ -289,6 +444,8 @@ async def run_wizard(
         "summary": result.output_text,
         "markdown": markdown,
         "voice_rewritten": voice_rewritten,
+        "chain_loaded": chain_loaded,
+        "chain_stored": chain_stored,
         "payload": op,  # full JSON for debug/dev
     })
 
