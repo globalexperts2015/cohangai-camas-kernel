@@ -455,28 +455,112 @@ async def run_wizard(
     })
 
 
+def _humanize_key(k: str) -> str:
+    """Convert snake_case key to Title Case Vietnamese-friendly heading."""
+    # Special label mapping for common keys
+    label_map = {
+        "5_year_roadmap": "Roadmap 5 năm",
+        "next_3_action_steps": "3 Bước hành động tiếp theo",
+        "non_negotiables": "Non-Negotiables",
+        "energy_drivers": "Energy Drivers (nạp năng lượng)",
+        "energy_drains": "Energy Drains (hút năng lượng)",
+        "life_goal_categories": "5 Life Goal Categories",
+        "business_motivation": "Business Motivation (true why)",
+        "vision_statement": "Vision Statement",
+        "anna_persona_match": "Anna persona match",
+        "transformation_arc_summary": "Transformation Arc",
+        "primary_dream_outcome": "Primary Dream Outcome",
+        "value_equation_score": "Value Equation Score",
+        "grand_slam_offer": "Grand Slam Offer",
+        "bonus_stack": "Bonus Stack",
+        "30_day_plan": "Kế hoạch 30 ngày",
+        "waitlist_script": "Waitlist Script",
+    }
+    if k in label_map:
+        return label_map[k]
+    return k.replace("_", " ").title()
+
+
+def _render_dict_as_bullets(d: dict, indent: int = 0) -> list[str]:
+    """Render dict nested as Markdown bullets (no raw dict str)."""
+    lines = []
+    prefix = "  " * indent
+    for sk, sv in d.items():
+        label = _humanize_key(sk)
+        if isinstance(sv, (str, int, float)) and str(sv).strip():
+            lines.append(f"{prefix}- **{label}**: {sv}")
+        elif isinstance(sv, list) and sv:
+            lines.append(f"{prefix}- **{label}**:")
+            for sub in sv[:8]:
+                if isinstance(sub, dict):
+                    lines.extend(_render_dict_as_bullets(sub, indent + 1))
+                else:
+                    lines.append(f"{prefix}  - {sub}")
+        elif isinstance(sv, dict) and sv:
+            lines.append(f"{prefix}- **{label}**:")
+            lines.extend(_render_dict_as_bullets(sv, indent + 1))
+    return lines
+
+
 def _build_default_markdown(payload: dict, wizard: dict) -> str:
-    """Fallback markdown nếu agent KHÔNG return markdown field."""
-    lines = [f"# {wizard['title']}\n", f"_{wizard['subtitle']}_\n", "---\n"]
+    """Fallback markdown nếu agent KHÔNG return markdown field.
+
+    Render dict/list of dicts as nested bullets thay vì str() raw dict
+    (Sprint 14 P0.2 fix bug raw dict rendering).
+    """
+    lines = [f"# {wizard['title']}", "", f"_{wizard['subtitle']}_", "", "---", ""]
     summary = payload.get("summary", "")
     if summary:
         lines.append(f"## Tóm tắt\n\n{summary}\n")
 
-    # Render top-level fields
-    skip_keys = {"summary", "markdown_report", "markdown_playbook", "markdown_visual_map", "student_id"}
+    skip_keys = {"summary", "markdown_report", "markdown_playbook", "markdown_visual_map", "student_id", "venture"}
+
+    # Priority order cho key fields (render first nếu có)
+    priority_keys = [
+        "vision_statement",
+        "primary_dream_outcome",
+        "transformation_arc_summary",
+        "grand_slam_offer",
+    ]
+    rendered_keys = set()
+
+    for pk in priority_keys:
+        if pk in payload and payload[pk]:
+            v = payload[pk]
+            if isinstance(v, str) and v.strip():
+                lines.append(f"## {_humanize_key(pk)}\n\n{v}\n")
+                rendered_keys.add(pk)
+
+    # Render remaining fields
     for k, v in payload.items():
-        if k in skip_keys or not v:
+        if k in skip_keys or k in rendered_keys or not v:
             continue
+        heading = _humanize_key(k)
         if isinstance(v, list) and v:
-            lines.append(f"## {k.replace('_', ' ').title()}\n")
-            for item in v[:10]:
+            lines.append(f"## {heading}")
+            lines.append("")
+            for idx, item in enumerate(v[:10], 1):
                 if isinstance(item, dict):
-                    lines.append(f"- {item}")
+                    # Lookup label inside dict (eg category name)
+                    title_candidate = item.get("category") or item.get("name") or item.get("title") or f"Item {idx}"
+                    lines.append(f"### {idx}. {title_candidate}")
+                    lines.append("")
+                    bullet_lines = _render_dict_as_bullets(
+                        {sk: sv for sk, sv in item.items() if sk not in {"category", "name", "title"}},
+                        indent=0,
+                    )
+                    lines.extend(bullet_lines)
+                    lines.append("")
                 else:
                     lines.append(f"- {item}")
             lines.append("")
-        elif isinstance(v, str) and len(v) > 20:
-            lines.append(f"## {k.replace('_', ' ').title()}\n\n{v}\n")
+        elif isinstance(v, dict) and v:
+            lines.append(f"## {heading}")
+            lines.append("")
+            lines.extend(_render_dict_as_bullets(v, indent=0))
+            lines.append("")
+        elif isinstance(v, str) and v.strip():
+            lines.append(f"## {heading}\n\n{v}\n")
     return "\n".join(lines)
 
 
