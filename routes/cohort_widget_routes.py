@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import uuid
 from pathlib import Path
 from typing import Optional
@@ -24,6 +25,11 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 import json
+
+try:
+    import asyncpg
+except ImportError:  # pragma: no cover
+    asyncpg = None  # type: ignore[assignment]
 
 from kernel.base_agent import ExecutionContext
 from kernel.memory_layer import MemoryRecord
@@ -47,8 +53,8 @@ WIZARD_REGISTRY = {
         "agent": "l2_vision_clarity",
         "event": "cohort.vision_clarity",
         "week": 1,
-        "title": "Tuần 1: Tầm nhìn 5 năm",
-        "subtitle": "Vẽ ra cuộc đời bạn muốn TRƯỚC khi chọn nghề. Founder rõ vision = AI execute đúng đích.",
+        "title": "Thấu hiểu bản thân",
+        "subtitle": "Trước khi bắt đầu kinh doanh, hiểu chính mình để kinh doanh trở thành phong cách sống, không phải gánh nặng.",
         "input_label": "Kể về bản thân: tuổi, công việc, gia đình, mục tiêu thu nhập, lifestyle bạn muốn",
         "input_placeholder": "Ví dụ: Em 38 tuổi, nhân viên văn phòng lương 18tr, 2 con nhỏ. Muốn build business online thêm 15-20tr/tháng mà vẫn giữ việc chính trong 12 tháng đầu. Gia đình ủng hộ, ưu tiên family time tối 18-21h...",
         "input_field": "student_data",
@@ -57,9 +63,9 @@ WIZARD_REGISTRY = {
         "agent": "l2_niche_validator_student",
         "event": "cohort.niche_validate",
         "week": 2,
-        "title": "Tuần 2: Chọn đúng ngách",
-        "subtitle": "Soi 3 dấu hiệu sống còn của ngách. Tránh đổ 6 tháng vào ngách chết.",
-        "input_label": "Mô tả ngách bạn đang nghĩ tới (sản phẩm gì + bán cho ai + giải vấn đề gì)",
+        "title": "Chọn đúng thị trường để phục vụ",
+        "subtitle": "Chọn thị trường bạn yêu thương đủ sâu để không bao giờ bỏ cuộc khi gặp khó.",
+        "input_label": "Mô tả thị trường/ngách bạn đang nghĩ tới (bạn muốn phục vụ AI, giải vấn đề gì)",
         "input_placeholder": "Ví dụ: Dạy mẹ bỉm 25-40 tuổi cách bán hàng decor handmade online từ nhà, mục tiêu thu thêm 10tr/tháng mà không cần thuê mặt bằng",
         "input_field": "niche_statement",
     },
@@ -67,8 +73,8 @@ WIZARD_REGISTRY = {
         "agent": "l2_transformation_mapper_7d",
         "event": "cohort.transformation_map",
         "week": 3,
-        "title": "Tuần 3-4: Thấu hiểu khách hàng",
-        "subtitle": "Đọc vị 7 mặt cuộc sống khách hàng TRƯỚC và SAU khi mua bạn. Không hiểu khách = bán không ai mua.",
+        "title": "Thấu hiểu khách hàng",
+        "subtitle": "Hiểu khách sâu để có vô vàn ý tưởng kinh doanh. Đọc vị 7 mặt cuộc sống TRƯỚC và SAU khi mua bạn.",
         "input_label": "Mô tả 1 khách hàng cụ thể bạn muốn phục vụ (càng chi tiết càng tốt)",
         "input_placeholder": "Ví dụ: Chị Lan 32 tuổi, kế toán văn phòng, 2 con nhỏ, lương 14tr. Mỗi tháng cuối khó co kéo, lo tương lai con học trường tư. Chồng làm xa, ủng hộ nhưng không phụ được. Muốn kiếm thêm tại nhà nhưng không biết bắt đầu từ đâu, sợ bị lừa khi học các khoá online...",
         "input_field": "customer_persona",
@@ -77,42 +83,50 @@ WIZARD_REGISTRY = {
         "agent": "l2_vpc_fit_checker",
         "event": "cohort.vpc_fit_check",
         "week": 5,
-        "title": "Tuần 5: Khớp khách với sản phẩm",
-        "subtitle": "Soi xem sản phẩm bạn có THẬT SỰ giải nỗi đau khách không. Tránh build cái không ai cần.",
+        "title": "Thiết kế giải pháp giá trị",
+        "subtitle": "Khớp giải pháp với nỗi đau thật của khách. Tránh build cái không ai cần.",
         "input_label": "Ý tưởng sản phẩm/khoá học của bạn (giá, format, deliverable chính)",
         "input_placeholder": "Ví dụ: Khoá 6 tuần dạy mẹ bỉm bán decor handmade online từ A-Z. Giá 3 triệu, có group hỗ trợ 6 tháng + 1-on-1 audit sản phẩm đầu tiên...",
         "input_field": "product_idea",
     },
-    "mvo_cohort": {
-        "agent": "l2_mvo_cohort_launcher",
-        "event": "cohort.mvo_launch_plan",
-        "week": 6,
-        "title": "Tuần 6: Khoá đầu tiên",
-        "subtitle": "Thiết kế cohort 5-15 khách trả tiền trong 30 ngày. Đi từ 0 ra dòng tiền đầu tiên.",
-        "input_label": "Tóm tắt sản phẩm + khách hàng đã chốt từ các tuần trước",
-        "input_placeholder": "Tóm tắt: ngách + khách hàng target + sản phẩm + giá dự kiến + thời gian launch...",
-        "input_field": "vpc",
-    },
     "offer_engineer": {
         "agent": "l2_offer_engineer_student",
         "event": "cohort.offer_engineer",
-        "week": 7,
-        "title": "Tuần 7: Đóng gói offer không thể từ chối",
-        "subtitle": "Stack giá trị + cam kết + giới hạn = khách gật đầu mà không cần chốt nhiều. Bí mật của founder bán đắt.",
-        "input_label": "Tóm tắt khoá đầu tiên + persona khách hàng đã design",
-        "input_placeholder": "Tóm tắt khoá đầu tiên (tên + giá + format) + nỗi đau lớn nhất khách hàng + transformation bạn cam kết...",
+        "week": 6,
+        "title": "Thiết kế phễu sản phẩm khách không từ chối",
+        "subtitle": "Stack giá trị, cam kết, giới hạn để khách gật đầu không cần chốt nhiều. Bí mật của founder bán đắt.",
+        "input_label": "Tóm tắt giải pháp + persona khách hàng đã design",
+        "input_placeholder": "Tóm tắt khoá/sản phẩm (tên + giá + format) + nỗi đau lớn nhất khách + transformation bạn cam kết...",
         "input_field": "mvo",
+    },
+    "mvo_cohort": {
+        "agent": "l2_mvo_cohort_launcher",
+        "event": "cohort.mvo_launch_plan",
+        "week": 7,
+        "title": "Chiến lược ra mắt sản phẩm",
+        "subtitle": "Lên kế hoạch ra mắt cohort 5-15 khách trả tiền trong 30 ngày đầu. Đi từ 0 sang dòng tiền thật.",
+        "input_label": "Tóm tắt offer + giải pháp đã thiết kế",
+        "input_placeholder": "Tóm tắt: offer chính + giải pháp + persona khách + thời gian launch dự kiến...",
+        "input_field": "vpc",
     },
     "referral_engine": {
         "agent": "l2_referral_engine_template",
         "event": "cohort.referral_engine_design",
         "week": 8,
-        "title": "Tuần 8: Cỗ máy giới thiệu (Capstone)",
-        "subtitle": "Biến khách hiện tại thành đại sứ. Khách mới về tự động, không cần ads thêm.",
+        "title": "Cỗ máy bán hàng tự động (Capstone)",
+        "subtitle": "Biến khách hàng thành đại sứ thương hiệu. Khách mới về tự động, không cần ads thêm.",
         "input_label": "Tóm tắt offer + khách hàng đã design xuyên 7 tuần",
         "input_placeholder": "Tóm tắt offer chính + persona khách hàng + dòng tiền mục tiêu sau referral...",
         "input_field": "offer",
     },
+}
+
+# Tuần 4 = practice phase (no wizard, link back transformation_mapper for deeper iteration)
+WEEK_4_PLACEHOLDER = {
+    "week": 4,
+    "title": "Đào sâu insight khách hàng",
+    "subtitle": "Tuần thực hành: phỏng vấn 3-5 khách thật, refine output Tuần 3 với data mới. Insight càng sâu, offer càng trúng.",
+    "wizard_slug": "transformation_mapper",  # Re-run với context refined
 }
 
 
@@ -120,31 +134,33 @@ WIZARD_REGISTRY = {
 # Mapping current wizard → which payload keys to inject từ previous wizards
 # Format: {wizard_friendly_name: {payload_key_in_current: source_wizard_friendly_name}}
 WIZARD_CHAIN_DEPS = {
-    "vision_clarity": {},  # First wizard, no chain
-    "niche_validator": {
+    "vision_clarity": {},  # Tuần 1, first wizard, no chain
+    "niche_validator": {  # Tuần 2
         "vision_context": "vision_clarity",
     },
-    "transformation_mapper": {
+    "transformation_mapper": {  # Tuần 3-4
         "vision_context": "vision_clarity",
         "niche_context": "niche_validator",
     },
-    "vpc_fit_check": {
+    "vpc_fit_check": {  # Tuần 5
         "transformation_context": "transformation_mapper",
         "persona": "transformation_mapper",
     },
-    "mvo_cohort": {
+    "offer_engineer": {  # Tuần 6 (was 7, swapped)
+        "transformation": "transformation_mapper",
+        "vpc": "vpc_fit_check",
+        "persona": "vpc_fit_check",
+    },
+    "mvo_cohort": {  # Tuần 7 (was 6, swapped) - launch AFTER offer designed
         "vision": "vision_clarity",
         "niche": "niche_validator",
         "transformation": "transformation_mapper",
         "vpc": "vpc_fit_check",
-    },
-    "offer_engineer": {
-        "transformation": "transformation_mapper",
-        "mvo": "mvo_cohort",
-        "persona": "vpc_fit_check",
-    },
-    "referral_engine": {
         "offer": "offer_engineer",
+    },
+    "referral_engine": {  # Tuần 8
+        "offer": "offer_engineer",
+        "mvo": "mvo_cohort",
         "persona": "vpc_fit_check",
     },
 }
@@ -245,20 +261,133 @@ async def _store_chain_output(
         log.warning("Chain store fail student=%s wizard=%s: %r", student_id, wizard_name, exc)
 
 
-def _verify_student_token(token: Optional[str]) -> str:
-    """Validate student token + return student_id.
+# Webinar K2 9-11/6/2026 guest token config
+WEBINAR_TOKEN_PATTERN = re.compile(r"^wk2-b([1-3])-([a-f0-9]{8})$")
+WEBINAR_GUEST_QUOTA_PER_WIZARD = 5
+WEBINAR_GUEST_EXPIRES_AT = "2026-06-18T23:59:59+07:00"
 
-    Placeholder stub: token format `cohort1-{student_id}-{hash}`.
-    Real: query GHL contact + verify membership active.
+WEBINAR_WIZARDS_PER_BUOI = {
+    1: ["vision_clarity", "niche_validator"],
+    2: ["transformation_mapper", "vpc_fit_check"],
+    3: ["mvo_cohort", "offer_engineer"],
+}
+
+
+def _wizards_for_buoi(buoi: int) -> list[str]:
+    """Return allowed wizards for K2 webinar guest token of given buổi."""
+    return WEBINAR_WIZARDS_PER_BUOI.get(buoi, [])
+
+
+def _parse_webinar_token(token: str) -> Optional[dict]:
+    """Parse webinar K2 guest token, return tier info or None if not webinar format."""
+    m = WEBINAR_TOKEN_PATTERN.match(token)
+    if not m:
+        return None
+    buoi = int(m.group(1))
+    return {
+        "tier": "webinar_guest",
+        "buoi": buoi,
+        "phone_hash": m.group(2),
+        "quota_per_wizard": WEBINAR_GUEST_QUOTA_PER_WIZARD,
+        "expires_at": WEBINAR_GUEST_EXPIRES_AT,
+        "allowed_wizards": _wizards_for_buoi(buoi),
+    }
+
+
+def _verify_student_token(token: Optional[str]) -> str:
+    """Validate student/webinar token + return student_id.
+
+    Supports 2 formats:
+    - Cohort 1 student: `cohort1-{student_id}-{hash}` → return `{student_id}`
+    - Webinar K2 guest: `wk2-b{N}-{hash}` → return `webinar-guest-{hash}`
     """
     if not token:
         raise HTTPException(status_code=401, detail="Missing X-Cohort-Student-Token")
-    if not token.startswith("cohort1-"):
-        raise HTTPException(status_code=401, detail="Invalid token format")
-    parts = token.split("-", 2)
-    if len(parts) < 3:
-        raise HTTPException(status_code=401, detail="Malformed token")
-    return parts[1]
+
+    # Webinar K2 guest token (9-11/6/2026)
+    webinar_info = _parse_webinar_token(token)
+    if webinar_info:
+        return f"webinar-guest-{webinar_info['phone_hash']}"
+
+    # Cohort 1 student token
+    if token.startswith("cohort1-"):
+        parts = token.split("-", 2)
+        if len(parts) < 3:
+            raise HTTPException(status_code=401, detail="Malformed token")
+        return parts[1]
+
+    raise HTTPException(status_code=401, detail="Invalid token format")
+
+
+async def _check_webinar_quota(token: str, wizard_name: str) -> int:
+    """Return successful run count for webinar guest token + wizard combo.
+
+    Caller compares against WEBINAR_GUEST_QUOTA_PER_WIZARD. Returns 0 on error,
+    allowing run (graceful degradation, don't block webinar audience on infra glitch).
+    """
+    dsn = os.getenv("DATABASE_URL") or os.getenv("CDP_DATABASE_URL")
+    if not dsn or asyncpg is None:
+        log.warning("No DATABASE_URL or asyncpg missing, skip quota check")
+        return 0
+
+    conn = None
+    try:
+        conn = await asyncpg.connect(dsn)
+        count = await conn.fetchval(
+            "SELECT COUNT(*) FROM wizard_usage_log WHERE token = $1 AND wizard_name = $2 AND success = TRUE",
+            token,
+            wizard_name,
+        )
+        return int(count or 0)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Quota check fail token=%s wizard=%s: %r", token, wizard_name, exc)
+        return 0
+    finally:
+        if conn:
+            await conn.close()
+
+
+async def _log_wizard_usage(
+    token: str,
+    student_id: str,
+    wizard_name: str,
+    buoi: Optional[int],
+    success: bool,
+    utm: Optional[dict] = None,
+) -> None:
+    """Persist wizard usage event to wizard_usage_log table.
+
+    Fail silently on infra error to avoid blocking user-facing wizard runs.
+    """
+    dsn = os.getenv("DATABASE_URL") or os.getenv("CDP_DATABASE_URL")
+    if not dsn or asyncpg is None:
+        return
+
+    utm = utm or {}
+    conn = None
+    try:
+        conn = await asyncpg.connect(dsn)
+        await conn.execute(
+            """
+            INSERT INTO wizard_usage_log
+            (token, student_id, wizard_name, buoi, utm_source, utm_medium, utm_campaign, utm_content, success)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            """,
+            token,
+            student_id,
+            wizard_name,
+            buoi,
+            utm.get("source"),
+            utm.get("medium"),
+            utm.get("campaign"),
+            utm.get("content"),
+            success,
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Usage log fail token=%s wizard=%s: %r", token, wizard_name, exc)
+    finally:
+        if conn:
+            await conn.close()
 
 
 def _scheduler(request: Request):
@@ -270,14 +399,32 @@ def _scheduler(request: Request):
 
 @router.get("/", response_class=HTMLResponse)
 async def cohort_index() -> HTMLResponse:
-    """BreakoutOS dashboard, hub center + 8 tuần orbit."""
+    """BreakoutOS dashboard, premium hub center + 8 tuần orbit."""
     sorted_wizards = sorted(WIZARD_REGISTRY.items(), key=lambda x: x[1]["week"])
-    cards = []
+    # Build 8 cards: 7 wizards + 1 Tuần 4 placeholder
+    cards_by_week: dict = {}
     for slug, w in sorted_wizards:
-        cards.append(f"""
-        <div class="orbit-card orbit-card-{w['week']}">
-          <div class="cohort-week">Tuần {w['week']}</div>
-          <h3>{w['title'].replace(f"Tuần {w['week']}: ", "").replace(f"Tuần {w['week']}-{w['week']+1}: ", "")}</h3>
+        cards_by_week[w["week"]] = (slug, w)
+
+    # Insert Tuần 4 placeholder (link to transformation_mapper for re-iteration)
+    cards_html = []
+    for week in range(1, 9):
+        if week == 4:
+            p = WEEK_4_PLACEHOLDER
+            cards_html.append(f"""
+        <div class="orbit-card orbit-card-{week} orbit-card-practice">
+          <div class="cohort-week cohort-week-practice">Tuần {week} · Thực hành</div>
+          <h3>{p['title']}</h3>
+          <p>{p['subtitle']}</p>
+          <a class="cohort-btn" href="/cohort/wizard/{p['wizard_slug']}">Đào sâu lại →</a>
+        </div>
+        """)
+        elif week in cards_by_week:
+            slug, w = cards_by_week[week]
+            cards_html.append(f"""
+        <div class="orbit-card orbit-card-{week}">
+          <div class="cohort-week">Tuần {week}</div>
+          <h3>{w['title']}</h3>
           <p>{w['subtitle']}</p>
           <a class="cohort-btn" href="/cohort/wizard/{slug}">Bắt đầu →</a>
         </div>
@@ -291,25 +438,29 @@ async def cohort_index() -> HTMLResponse:
 </head>
 <body>
   <div class="cohort-container">
-    <header style="text-align:center;margin-bottom:20px">
-      <p style="font-size:13px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">
-        Hệ điều hành xây Solo Empire
-      </p>
-      <h1 style="font-size:36px;font-weight:800;background:linear-gradient(135deg,#ff7e5f,#d63031);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
-        BreakoutOS
-      </h1>
-      <p class="cohort-intro" style="font-size:16px;max-width:540px;margin:12px auto">
-        8 tuần. 7 trợ lý AI Hằng đã huấn luyện. Đi từ tầm nhìn đến khách trả tiền đầu tiên.
+    <header style="text-align:center;margin-bottom:24px">
+      <p class="hub-eyebrow">Hệ điều hành xây Solo Empire</p>
+      <p class="cohort-intro" style="font-size:16px;max-width:540px;margin:12px auto 0;color:#666">
+        8 tuần. 7 trợ lý AI Hằng đã huấn luyện. Đi từ tầm nhìn đến cỗ máy bán hàng tự động.
       </p>
     </header>
 
     <div class="orbit-wrapper">
+      <div class="orbit-ring orbit-ring-outer"></div>
       <div class="orbit-ring"></div>
+      <div class="orbit-glow"></div>
+
       <div class="orbit-hub">
-        <h2>BreakoutOS</h2>
-        <p class="hub-tagline">Hệ điều hành Solo Empire 8 tuần</p>
+        <div class="hub-inner">
+          <div class="hub-shimmer"></div>
+          <h2>BreakoutOS</h2>
+          <div class="hub-divider"></div>
+          <p class="hub-tagline">Hệ điều hành Solo Empire</p>
+          <p class="hub-meta">8 tuần · 7 AI · 1 founder</p>
+        </div>
       </div>
-      {"".join(cards)}
+
+      {"".join(cards_html)}
     </div>
 
     <p style="text-align:center;color:#999;font-size:13px;margin-top:40px;max-width:600px;margin-left:auto;margin-right:auto">
@@ -406,6 +557,9 @@ async def run_wizard(
     """Trigger wizard agent + return Markdown output."""
     student_id = _verify_student_token(x_cohort_student_token)
 
+    # Parse webinar K2 guest tier info (None if Cohort 1 student)
+    webinar_info = _parse_webinar_token(x_cohort_student_token or "")
+
     try:
         body = await request.json()
     except Exception:
@@ -414,6 +568,26 @@ async def run_wizard(
     wizard_name = body.get("wizard")
     if not wizard_name or wizard_name not in WIZARD_REGISTRY:
         raise HTTPException(status_code=400, detail=f"Invalid wizard. Available: {list(WIZARD_REGISTRY.keys())}")
+
+    # Webinar K2 guest gate: allowed_wizards per buổi + quota 5 runs/wizard
+    if webinar_info:
+        if wizard_name not in webinar_info["allowed_wizards"]:
+            raise HTTPException(
+                status_code=403,
+                detail=(
+                    f"Wizard '{wizard_name}' chưa unlock cho buổi {webinar_info['buoi']}. "
+                    "Bạn cần Cohort 1 K2 (Foundation/Customer/Growth/Breakout Founder) để dùng đủ 7 wizard."
+                ),
+            )
+        used_count = await _check_webinar_quota(x_cohort_student_token or "", wizard_name)
+        if used_count >= WEBINAR_GUEST_QUOTA_PER_WIZARD:
+            raise HTTPException(
+                status_code=429,
+                detail=(
+                    f"Hết lượt thử miễn phí ({WEBINAR_GUEST_QUOTA_PER_WIZARD}/wizard). "
+                    "Bạn cần Foundation 3M để dùng unlimited 12 tuần Breakout Founder."
+                ),
+            )
 
     w = WIZARD_REGISTRY[wizard_name]
     input_value = body.get("input", "").strip()
@@ -452,6 +626,16 @@ async def run_wizard(
     result = await sched.execute(w["agent"], ctx)
 
     if not result.success:
+        # Webinar K2 failure log (don't count failed runs toward quota, but track for debug)
+        if webinar_info:
+            await _log_wizard_usage(
+                token=x_cohort_student_token or "",
+                student_id=student_id,
+                wizard_name=wizard_name,
+                buoi=webinar_info["buoi"],
+                success=False,
+                utm=body.get("utm") or {},
+            )
         return JSONResponse(
             status_code=500,
             content={
@@ -484,6 +668,17 @@ async def run_wizard(
             chain_stored = True
         except Exception as exc:  # noqa: BLE001
             log.warning("Chain store fail in run_wizard: %r", exc)
+
+    # Webinar K2 usage log + UTM tracking
+    if webinar_info:
+        await _log_wizard_usage(
+            token=x_cohort_student_token or "",
+            student_id=student_id,
+            wizard_name=wizard_name,
+            buoi=webinar_info["buoi"],
+            success=True,
+            utm=body.get("utm") or {},
+        )
 
     return JSONResponse({
         "success": True,
