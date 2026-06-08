@@ -165,7 +165,7 @@ def generate_landing_id(student_id: str, wizard_name: str) -> str:
 WIZARD_ACTION_HANDLERS = {
     "offer_engineer": {
         "action_type": "html_landing",
-        "label": "🚀 Deploy thành landing page",
+        "label": "Tạo trang bán hàng từ offer này",
         "handler": generate_offer_landing_html,
     },
     # Future Sprint 15-16:

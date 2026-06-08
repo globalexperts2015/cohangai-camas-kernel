@@ -41,75 +41,76 @@ router = APIRouter(prefix="/cohort", tags=["cohort"])
 STATIC_DIR = Path(__file__).parent.parent / "static"
 
 # Wizard registry: student-facing name → agent_name + trigger_event + week
+# Việt hoá 2026-06-08: BreakoutOS branding, hấp dẫn user, không mention Hormozi/Grand Slam
 WIZARD_REGISTRY = {
     "vision_clarity": {
         "agent": "l2_vision_clarity",
         "event": "cohort.vision_clarity",
         "week": 1,
-        "title": "Bước 1: Vision Clarity",
-        "subtitle": "Làm rõ vision + life goal trước khi pick niche",
-        "input_label": "Mô tả bản thân, mục tiêu, gia đình, lifestyle bạn muốn",
-        "input_placeholder": "Ví dụ: Em là NV ngân hàng 38 tuổi, lương 18tr, 2 con. Muốn build AI Solo Empire để có thêm 15-20tr/tháng, gia đình ủng hộ, không bỏ việc ngay...",
+        "title": "Tuần 1: Tầm nhìn 5 năm",
+        "subtitle": "Vẽ ra cuộc đời bạn muốn TRƯỚC khi chọn nghề. Founder rõ vision = AI execute đúng đích.",
+        "input_label": "Kể về bản thân: tuổi, công việc, gia đình, mục tiêu thu nhập, lifestyle bạn muốn",
+        "input_placeholder": "Ví dụ: Em 38 tuổi, nhân viên văn phòng lương 18tr, 2 con nhỏ. Muốn build business online thêm 15-20tr/tháng mà vẫn giữ việc chính trong 12 tháng đầu. Gia đình ủng hộ, ưu tiên family time tối 18-21h...",
         "input_field": "student_data",
     },
     "niche_validator": {
         "agent": "l2_niche_validator_student",
         "event": "cohort.niche_validate",
         "week": 2,
-        "title": "Bước 2: Niche Validation",
-        "subtitle": "Validate niche 3-indicator test",
-        "input_label": "Niche statement bạn muốn validate",
-        "input_placeholder": "Ví dụ: Dạy Shopify dropshipping cho mẹ bỉm 25-40 muốn kiếm 10tr/tháng tại nhà",
+        "title": "Tuần 2: Chọn đúng ngách",
+        "subtitle": "Soi 3 dấu hiệu sống còn của ngách. Tránh đổ 6 tháng vào ngách chết.",
+        "input_label": "Mô tả ngách bạn đang nghĩ tới (sản phẩm gì + bán cho ai + giải vấn đề gì)",
+        "input_placeholder": "Ví dụ: Dạy mẹ bỉm 25-40 tuổi cách bán hàng decor handmade online từ nhà, mục tiêu thu thêm 10tr/tháng mà không cần thuê mặt bằng",
         "input_field": "niche_statement",
     },
     "transformation_mapper": {
         "agent": "l2_transformation_mapper_7d",
         "event": "cohort.transformation_map",
         "week": 3,
-        "title": "Bước 3-4: Transformation 7D",
-        "subtitle": "Map customer transformation across 7 dimensions",
-        "input_label": "Persona target của bạn",
-        "input_placeholder": "Ví dụ: Mẹ bỉm 25-40 muốn kiếm 10tr/tháng tại nhà từ Shopify dropshipping, lo lắng tương lai tài chính, gia đình chưa ủng hộ...",
+        "title": "Tuần 3-4: Thấu hiểu khách hàng",
+        "subtitle": "Đọc vị 7 mặt cuộc sống khách hàng TRƯỚC và SAU khi mua bạn. Không hiểu khách = bán không ai mua.",
+        "input_label": "Mô tả 1 khách hàng cụ thể bạn muốn phục vụ (càng chi tiết càng tốt)",
+        "input_placeholder": "Ví dụ: Chị Lan 32 tuổi, kế toán văn phòng, 2 con nhỏ, lương 14tr. Mỗi tháng cuối khó co kéo, lo tương lai con học trường tư. Chồng làm xa, ủng hộ nhưng không phụ được. Muốn kiếm thêm tại nhà nhưng không biết bắt đầu từ đâu, sợ bị lừa khi học các khoá online...",
         "input_field": "customer_persona",
     },
     "vpc_fit_check": {
         "agent": "l2_vpc_fit_checker",
         "event": "cohort.vpc_fit_check",
         "week": 5,
-        "title": "Bước 5: VPC Fit Check",
-        "subtitle": "Check fit Tròn Vuông persona ↔ product",
-        "input_label": "Ý tưởng product/service của bạn",
-        "input_placeholder": "Ví dụ: Course 6 tuần dạy Shopify dropshipping cho mẹ bỉm, giá 3M VND, group + 1on1 audit",
+        "title": "Tuần 5: Khớp khách với sản phẩm",
+        "subtitle": "Soi xem sản phẩm bạn có THẬT SỰ giải nỗi đau khách không. Tránh build cái không ai cần.",
+        "input_label": "Ý tưởng sản phẩm/khoá học của bạn (giá, format, deliverable chính)",
+        "input_placeholder": "Ví dụ: Khoá 6 tuần dạy mẹ bỉm bán decor handmade online từ A-Z. Giá 3 triệu, có group hỗ trợ 6 tháng + 1-on-1 audit sản phẩm đầu tiên...",
         "input_field": "product_idea",
     },
     "mvo_cohort": {
         "agent": "l2_mvo_cohort_launcher",
         "event": "cohort.mvo_launch_plan",
         "week": 6,
-        "title": "Bước 5-6: MVO Cohort Launcher",
-        "subtitle": "Design + launch first paid cohort 5-15 customer",
-        "input_label": "VPC fit + ý tưởng MVO của bạn",
-        "input_placeholder": "Tóm tắt output các bước trước...",
+        "title": "Tuần 6: Khoá đầu tiên",
+        "subtitle": "Thiết kế cohort 5-15 khách trả tiền trong 30 ngày. Đi từ 0 ra dòng tiền đầu tiên.",
+        "input_label": "Tóm tắt sản phẩm + khách hàng đã chốt từ các tuần trước",
+        "input_placeholder": "Tóm tắt: ngách + khách hàng target + sản phẩm + giá dự kiến + thời gian launch...",
         "input_field": "vpc",
     },
     "offer_engineer": {
         "agent": "l2_offer_engineer_student",
         "event": "cohort.offer_engineer",
         "week": 7,
-        "title": "Bước 7: Grand Slam Offer",
-        "subtitle": "Build Hormozi $100M Offer cho first cohort",
-        "input_label": "MVO + transformation context",
-        "input_placeholder": "Tóm tắt MVO + transformation đã design...",
+        "title": "Tuần 7: Đóng gói offer không thể từ chối",
+        "subtitle": "Stack giá trị + cam kết + giới hạn = khách gật đầu mà không cần chốt nhiều. Bí mật của founder bán đắt.",
+        "input_label": "Tóm tắt khoá đầu tiên + persona khách hàng đã design",
+        "input_placeholder": "Tóm tắt khoá đầu tiên (tên + giá + format) + nỗi đau lớn nhất khách hàng + transformation bạn cam kết...",
         "input_field": "mvo",
     },
     "referral_engine": {
         "agent": "l2_referral_engine_template",
         "event": "cohort.referral_engine_design",
         "week": 8,
-        "title": "Bước 8: Referral Engine (Capstone)",
-        "subtitle": "5th scale lever cho venture của bạn",
-        "input_label": "Offer + persona đã design",
-        "input_placeholder": "Tóm tắt offer + persona từ các bước trước...",
+        "title": "Tuần 8: Cỗ máy giới thiệu (Capstone)",
+        "subtitle": "Biến khách hiện tại thành đại sứ. Khách mới về tự động, không cần ads thêm.",
+        "input_label": "Tóm tắt offer + khách hàng đã design xuyên 7 tuần",
+        "input_placeholder": "Tóm tắt offer chính + persona khách hàng + dòng tiền mục tiêu sau referral...",
         "input_field": "offer",
     },
 }
@@ -269,7 +270,7 @@ def _scheduler(request: Request):
 
 @router.get("/", response_class=HTMLResponse)
 async def cohort_index() -> HTMLResponse:
-    """Cohort 1 dashboard index, list 7 wizards."""
+    """BreakoutOS dashboard, 8 tuần xây Solo Empire."""
     cards = []
     for slug, w in sorted(WIZARD_REGISTRY.items(), key=lambda x: x[1]["week"]):
         cards.append(f"""
@@ -284,16 +285,19 @@ async def cohort_index() -> HTMLResponse:
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <title>Cohangai Cohort 1 Dashboard</title>
+  <title>BreakoutOS, 8 tuần xây Solo Empire cùng Hằng</title>
   <link rel="stylesheet" href="/cohort/static/cohort-widget.css">
 </head>
 <body>
   <div class="cohort-container">
-    <h1>🚀 Cohangai Cohort 1 Dashboard</h1>
-    <p class="cohort-intro">8 tuần build AI Solo Empire cùng Hằng. Mỗi tuần 1 wizard AI hỗ trợ bạn.</p>
+    <h1>BreakoutOS</h1>
+    <p class="cohort-intro">8 tuần xây Solo Empire cùng Hằng. Mỗi tuần 1 trợ lý AI đồng hành với bạn từ vision đến khách trả tiền đầu tiên.</p>
     <div class="cohort-grid">
       {"".join(cards)}
     </div>
+    <p style="text-align:center;color:#999;font-size:13px;margin-top:32px">
+      Mỗi trợ lý AI là 1 chuyên gia ảo Hằng đã huấn luyện. Bạn cung cấp tư duy + dữ liệu thật, AI execute 10x nhanh hơn tự làm.
+    </p>
   </div>
 </body>
 </html>""")
@@ -316,8 +320,8 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
 </head>
 <body>
   <div class="cohort-container">
-    <a class="cohort-back" href="/cohort/">← Dashboard</a>
-    <div class="cohort-week-label">Tuần {w['week']}</div>
+    <a class="cohort-back" href="/cohort/">← BreakoutOS Dashboard</a>
+    <div class="cohort-week-label">BreakoutOS · Tuần {w['week']}/8</div>
     <h1>{w['title']}</h1>
     <p class="cohort-subtitle">{w['subtitle']}</p>
 
@@ -331,22 +335,22 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
                 rows="8"></textarea>
 
       <div class="cohort-auth">
-        <label for="cohort-token">Student token (do Anna cấp):</label>
-        <input type="text" id="cohort-token" placeholder="cohort1-yourstudentid-yourhash">
+        <label for="cohort-token">Mã truy cập (Hằng cấp khi bạn vào BreakoutOS):</label>
+        <input type="text" id="cohort-token" placeholder="cohort1-tenban-mahash">
       </div>
 
       <button id="cohort-run-btn" class="cohort-btn cohort-btn-primary">
-        🤖 Chạy AI Wizard
+        Nhờ trợ lý AI phân tích
       </button>
 
       <div id="cohort-loading" class="cohort-loading" style="display:none">
-        <p>⏳ AI đang phân tích... (30-90 giây)</p>
+        <p>Trợ lý AI đang phân tích... (30-90 giây)</p>
       </div>
 
       <div id="cohort-error" class="cohort-error" style="display:none"></div>
 
       <div id="cohort-output" class="cohort-output" style="display:none">
-        <h2>📋 Kết quả</h2>
+        <h2>Kết quả phân tích</h2>
         <div id="cohort-output-markdown"></div>
         <div class="cohort-action-row">
           <button id="cohort-save-btn" class="cohort-btn">💾 Lưu progress</button>
@@ -832,7 +836,7 @@ async def admin_dashboard(request: Request, key: Optional[str] = None) -> HTMLRe
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cohort 1 Admin Dashboard</title>
+<title>BreakoutOS Admin</title>
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#222;padding:24px}}
@@ -860,8 +864,8 @@ a:hover{{text-decoration:underline}}
 </style></head>
 <body>
 <div class="container">
-  <h1>🎯 Cohort 1 Admin Dashboard</h1>
-  <p class="subtitle">Wizard activity tracking. Updated 30 ngày gần nhất.</p>
+  <h1>BreakoutOS Admin</h1>
+  <p class="subtitle">Theo dõi học viên hoàn thành 8 tuần. Cập nhật 30 ngày gần nhất.</p>
 
   <div class="stats">
     <div class="stat"><div class="stat-num">{total_students}</div><div class="stat-label">Total students có activity</div></div>
