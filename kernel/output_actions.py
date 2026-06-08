@@ -655,6 +655,261 @@ def generate_lead_scoring_doc(
     )
 
 
+def generate_ad_creative_pack_html(
+    offer_payload: dict,
+    student_id: str,
+    landing_id: str,
+) -> str:
+    """Build Ad Creative Pack: headlines + Reel hooks + FB ad copy + email subjects.
+
+    Source: offer_engineer wizard output. Ready paste FB Ads Manager + TikTok Ads + Email blast.
+    """
+    offer_name = (
+        offer_payload.get("offer_name")
+        or offer_payload.get("magic_name")
+        or "Khoá của bạn"
+    )
+    transformation = (
+        offer_payload.get("transformation_promise")
+        or offer_payload.get("dream_outcome")
+        or "kết quả bạn mong đợi"
+    )
+    target_persona = (
+        offer_payload.get("target_persona")
+        or offer_payload.get("persona_name")
+        or "khách hàng mục tiêu"
+    )
+    pain = (
+        offer_payload.get("primary_pain")
+        or offer_payload.get("biggest_pain")
+        or "nỗi đau lớn nhất"
+    )
+    price_vnd = offer_payload.get("price_vnd") or offer_payload.get("price") or "[giá]"
+
+    headlines = [
+        {"angle": "Pain hook", "text": f"Bạn vẫn loay hoay với chuyện {_safe(pain)}? Tôi đã từng như bạn 5 năm trước."},
+        {"angle": "Curiosity", "text": f"Cách 1 nhân viên văn phòng 38t build {_safe(offer_name)} mà không cần bỏ việc"},
+        {"angle": "Social proof", "text": f"100+ học viên đã có {_safe(transformation)}. Bạn sẽ là người tiếp theo?"},
+        {"angle": "Specificity", "text": f"{_safe(offer_name)}: 30 ngày, 5 buổi, đi từ 0 đến khách trả tiền đầu tiên"},
+        {"angle": "Urgency", "text": f"Cohort {_safe(offer_name)} mở 1 đợt/quý. Hôm nay là ngày cuối còn ưu đãi."},
+    ]
+
+    reel_hooks = [
+        {
+            "duration": "15s",
+            "label": "Reel 15s · Pattern interrupt",
+            "script": f"""Hook (0-3s): "Bạn biết tại sao {_safe(target_persona)} không build được business không?"
+
+Insight (3-10s): "Vì họ làm theo template chung. Mà khách hàng KHÔNG generic. Khách của bạn có nỗi đau riêng…"
+
+CTA (10-15s): "Inbox tôi 'BREAKOUT' để nhận khung làm business RIÊNG cho bạn."
+""",
+        },
+        {
+            "duration": "30s",
+            "label": "Reel 30s · Story arc",
+            "script": f"""Hook (0-5s): "Năm 2021 tôi mất 18 tháng và 200tr build sai business."
+
+Why fail (5-15s): "Vì tôi copy template guru thay vì hiểu khách tôi. Đến khi tôi dừng lại, nghiên cứu khách thật 3 tuần…"
+
+Transform (15-25s): "Tôi build được {_safe(offer_name)} với 5 khách trả tiền đầu trong 30 ngày."
+
+CTA (25-30s): "Comment 'HẰNG' nếu bạn muốn thoát loop sai như tôi."
+""",
+        },
+        {
+            "duration": "60s",
+            "label": "Reel 60s · Education + offer",
+            "script": f"""Hook (0-5s): "3 lỗi sai khiến {_safe(target_persona)} không có khách trả tiền dù làm 6 tháng."
+
+Lỗi 1 (5-20s): "Lỗi đầu: bán product KHÔNG bán transformation. Khách không mua khoá học, họ mua kết quả {_safe(transformation)}."
+
+Lỗi 2 (20-35s): "Lỗi 2: pricing thấp vì sợ khách không mua. Khách không thấy giá trị qua giá thấp."
+
+Lỗi 3 (35-50s): "Lỗi 3: không có scarcity. Khách trì hoãn vì 'mai cũng đăng ký được'."
+
+CTA (50-60s): "{_safe(offer_name)} mở cohort 20 người tháng này, giá {_safe(price_vnd)}. Inbox để giữ chỗ."
+""",
+        },
+    ]
+
+    fb_ads = [
+        {
+            "length": "Short (50 từ)",
+            "copy": f"""Bạn muốn build {_safe(offer_name)}?
+
+Đa số {_safe(target_persona)} fail vì copy template guru.
+
+{_safe(offer_name)} dạy bạn build từ chính khách của bạn. 30 ngày, 5 buổi, có 5 khách trả tiền.
+
+Inbox để giữ chỗ.""",
+        },
+        {
+            "length": "Medium (150 từ)",
+            "copy": f"""Bạn đang loay hoay với chuyện {_safe(pain)}?
+
+Tôi đã từng như bạn. 18 tháng + 200tr build sai. Đến khi tôi hiểu ra: không phải product sai, không phải marketing sai. Mà tôi KHÔNG HIỂU khách hàng tôi.
+
+3 tuần nghiên cứu khách thật. Phỏng vấn 15 người. Build lại offer từ chính lời họ.
+
+Kết quả: {_safe(offer_name)} ra mắt với 5 khách trả tiền trong 30 ngày đầu. Bây giờ là 100+ học viên có {_safe(transformation)}.
+
+Tháng này tôi mở cohort 20 người. Giá {_safe(price_vnd)}, cam kết hoàn 14 ngày nếu hoàn thành module đầu mà không thấy giá trị.
+
+Inbox 'BREAKOUT' nếu bạn sẵn sàng dừng loop sai.""",
+        },
+        {
+            "length": "Long (300 từ)",
+            "copy": f"""Đây là post dài tôi viết cho {_safe(target_persona)} đang ở năm 2 build business mà chưa có khách trả tiền đáng kể.
+
+Năm 2021 tôi vẫn là nhân viên văn phòng 38 tuổi. Lương ổn nhưng nhìn 5 năm sau vẫn lương đó là sợ.
+
+Tôi bắt đầu build business online. Đọc 50+ guru. Mua 20tr khoá. Làm theo template. Không ra khách.
+
+18 tháng. Mất 200tr. Mất tự tin. Suýt bỏ luôn.
+
+Đến 1 hôm tôi dừng lại hỏi: "Tại sao mình copy hết template guru mà vẫn fail?"
+
+Câu trả lời: vì khách tôi KHÔNG GENERIC như template guru viết.
+
+Khách tôi là chị Lan, 32 tuổi, kế toán, 2 con, lo tương lai con học trường tư. Chị Lan cần gì? KHÔNG phải "marketing 101". Chị cần biết: "làm sao kiếm thêm 10tr/tháng tại nhà mà không bỏ việc chính."
+
+3 tuần. 15 cuộc phỏng vấn. Tôi build lại offer từ CHÍNH LỜI chị Lan.
+
+{_safe(offer_name)}: 30 ngày, 5 buổi, đi từ 0 đến 5 khách trả tiền.
+
+5 khách đầu trong 30 ngày launch. Bây giờ 100+ học viên có {_safe(transformation)}.
+
+Tháng này mở cohort 20 người, giá {_safe(price_vnd)}. Cam kết hoàn 14 ngày nếu hoàn module đầu mà không thấy giá trị.
+
+Inbox 'BREAKOUT' nếu bạn muốn dừng loop sai như tôi từng làm.""",
+        },
+    ]
+
+    email_subjects = [
+        f"Bạn còn 2 ngày để giữ chỗ {_safe(offer_name)}",
+        f"3 lỗi {_safe(target_persona)} hay mắc khi build business",
+        f"Tôi đã mất 200tr trước khi hiểu chuyện này…",
+        f"{_safe(offer_name)} mở cohort hôm nay, 20 chỗ",
+        f"Bạn không cần thêm 1 khoá học. Bạn cần thoát loop.",
+        f"5 khách trả tiền trong 30 ngày, đây là cách",
+        f"{_safe(transformation)} không khó như bạn nghĩ",
+    ]
+
+    headlines_html = "".join(
+        f"""<div class="ad-card">
+          <div class="ad-tag">{_esc(h['angle'])}</div>
+          <p class="ad-text">{_esc(h['text'])}</p>
+          <button class="copy-btn" data-text="{_esc(h['text'])}">📋 Copy</button>
+        </div>"""
+        for h in headlines
+    )
+
+    reels_html = "".join(
+        f"""<div class="reel-card">
+          <h3>{_esc(r['label'])}</h3>
+          <pre>{_esc(r['script'])}</pre>
+          <button class="copy-btn copy-block" data-block="reel-{i}">📋 Copy script</button>
+          <textarea id="reel-{i}" style="display:none">{_esc(r['script'])}</textarea>
+        </div>"""
+        for i, r in enumerate(reel_hooks)
+    )
+
+    ads_html = "".join(
+        f"""<div class="ad-fb-card">
+          <div class="ad-tag">{_esc(a['length'])}</div>
+          <pre>{_esc(a['copy'])}</pre>
+          <button class="copy-btn copy-block" data-block="fbad-{i}">📋 Copy ad</button>
+          <textarea id="fbad-{i}" style="display:none">{_esc(a['copy'])}</textarea>
+        </div>"""
+        for i, a in enumerate(fb_ads)
+    )
+
+    subjects_html = "".join(
+        f"""<li>
+          <span class="subj">{_esc(s)}</span>
+          <button class="copy-btn copy-small" data-text="{_esc(s)}">Copy</button>
+        </li>"""
+        for s in email_subjects
+    )
+
+    return _wrap_artifact_page(
+        title=f"Kho content quảng cáo · {offer_name}",
+        intro="5 angles headline + 3 Reel hooks + 3 FB ad copy + 7 email subjects. Customize giọng cho phù hợp với bạn. A/B test 3 variants ngắn-dài tìm winning angle.",
+        landing_id=landing_id,
+        content=f"""
+        <section class="creative-section">
+          <h2>🎯 5 Headlines (5 angles khác nhau)</h2>
+          <p class="section-hint">Test 5 angles này trên FB Ads Manager. Angle nào CTR cao nhất → double down.</p>
+          <div class="ads-grid">{headlines_html}</div>
+        </section>
+
+        <section class="creative-section">
+          <h2>🎬 3 Reel Hooks (15s + 30s + 60s)</h2>
+          <p class="section-hint">Quay 3 reels này, post 3 ngày liên tiếp. Đo retention rate + comment count.</p>
+          <div class="reels-grid">{reels_html}</div>
+        </section>
+
+        <section class="creative-section">
+          <h2>📘 3 FB Ad Copy (Short + Medium + Long)</h2>
+          <p class="section-hint">Long form post hữu cơ + Medium cho boost post + Short cho retargeting ads.</p>
+          <div class="reels-grid">{ads_html}</div>
+        </section>
+
+        <section class="creative-section">
+          <h2>✉️ 7 Email Subject Lines</h2>
+          <p class="section-hint">A/B test cho mỗi blast. Subject quyết định 50% open rate.</p>
+          <ul class="subjects-list">{subjects_html}</ul>
+        </section>
+
+        <script>
+        document.querySelectorAll('.copy-btn').forEach(btn => {{
+          btn.addEventListener('click', async () => {{
+            let text = btn.dataset.text;
+            if (!text && btn.dataset.block) {{
+              const el = document.getElementById(btn.dataset.block);
+              text = el.value || el.textContent;
+            }}
+            await navigator.clipboard.writeText(text);
+            const orig = btn.textContent;
+            btn.textContent = '✅ Đã copy';
+            setTimeout(() => {{ btn.textContent = orig; }}, 2000);
+          }});
+        }});
+        </script>
+        """,
+        extra_css="""
+        .creative-section { margin-bottom: 40px; background: white; padding: 24px; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .creative-section h2 { font-size: 20px; color: #2d0008; margin-bottom: 8px; border-bottom: 2px solid #c1121f; padding-bottom: 8px; }
+        .section-hint { font-size: 13px; color: #666; font-style: italic; margin-bottom: 16px; }
+        .ads-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+        .ad-card { background: linear-gradient(135deg, #fff5f5, white); padding: 16px; border-radius: 12px; border-left: 4px solid #c1121f; }
+        .ad-tag { display: inline-block; background: linear-gradient(135deg, #c1121f, #6a040f); color: white; font-size: 10px; padding: 3px 8px; border-radius: 8px; margin-bottom: 8px; font-weight: 700; letter-spacing: 1px; }
+        .ad-text { font-size: 14px; color: #2d0008; line-height: 1.5; margin-bottom: 10px; font-weight: 600; }
+        .copy-btn { background: linear-gradient(135deg, #c1121f, #6a040f); color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .copy-btn:hover { background: linear-gradient(135deg, #e63946, #c1121f); }
+        .copy-small { padding: 3px 10px; font-size: 11px; }
+        .reels-grid { display: flex; flex-direction: column; gap: 16px; }
+        .reel-card, .ad-fb-card { background: #fafbfd; padding: 16px; border-radius: 12px; border: 1px solid #eee; position: relative; }
+        .reel-card h3 { font-size: 14px; color: #c1121f; margin-bottom: 12px; }
+        .reel-card pre, .ad-fb-card pre { white-space: pre-wrap; font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.6; color: #333; background: white; padding: 14px; border-radius: 8px; }
+        .copy-block { position: absolute; top: 16px; right: 16px; }
+        .subjects-list { list-style: none; padding: 0; }
+        .subjects-list li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #fafbfd; border-radius: 8px; margin-bottom: 6px; }
+        .subj { flex: 1; font-size: 14px; color: #2d0008; }
+        """,
+    )
+
+
+def _safe(val) -> str:
+    """Safely coerce value to display string (handle None/dict/etc)."""
+    if val is None or val == "":
+        return "[chưa có data]"
+    if isinstance(val, dict):
+        return val.get("name") or val.get("text") or str(val)[:80]
+    return str(val)
+
+
 # ===== Helpers =====
 
 def _format_bonus_list(bonuses) -> str:
@@ -719,6 +974,11 @@ WIZARD_ACTION_HANDLERS = {
             "action_type": "html_landing",
             "label": "Tạo trang bán hàng từ offer này",
             "handler": generate_offer_landing_html,
+        },
+        {
+            "action_type": "ad_creative_pack",
+            "label": "Tạo kho content quảng cáo",
+            "handler": generate_ad_creative_pack_html,
         },
     ],
     "mvo_cohort": [
