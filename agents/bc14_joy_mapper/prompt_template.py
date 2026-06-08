@@ -1,4 +1,4 @@
-"""BC14 prompt template + tool schema."""
+"""BC14 prompt template + tool schema (flat schema fix Sprint 14)."""
 from __future__ import annotations
 
 import json
@@ -32,7 +32,7 @@ def build_joy_prompt(pain_matrix: dict, persona_context: dict, venture: str, kno
 
 Map Joy/Gain 1:1 cho MỖI pain trong pain_matrix:
 
-Quality requirements (theo knowledge_base section 6):
+Quality requirements:
 - Mỗi pain có ≥1 joy resolution
 - TOP 3 pain critical → MUST có Required + Expected resolution
 - Required gains ≥1
@@ -48,65 +48,58 @@ Output qua tool submit_joy_matrix.
 
 SUBMIT_JOY_MATRIX_TOOL = {
     "name": "submit_joy_matrix",
-    "description": "Submit Joy/Gain matrix mapped 1:1 với Pain (CIS M4 + Tròn Vuông Gains + Hormozi)",
+    "description": "Submit Joy/Gain matrix mapped 1:1 với Pain (flat schema)",
     "input_schema": {
         "type": "object",
         "properties": {
-            "joys_by_type": {
-                "type": "object",
-                "properties": {
-                    "required": {
-                        "type": "array",
-                        "minItems": 1,
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "gain": {"type": "string"},
-                                "addresses_pain": {"type": "string"},
-                                "dream_outcome": {"type": "string", "description": "Specific + measurable + timeline"},
-                            },
-                            "required": ["gain", "addresses_pain"],
-                        },
-                    },
-                    "expected": {
-                        "type": "array",
-                        "minItems": 1,
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "gain": {"type": "string"},
-                                "addresses_pain": {"type": "string"},
-                                "dream_outcome": {"type": "string"},
-                            },
-                            "required": ["gain", "addresses_pain"],
-                        },
-                    },
-                    "desired": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "gain": {"type": "string"},
-                                "addresses_pain": {"type": "string"},
-                            },
-                        },
-                    },
-                    "unexpected": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "gain": {"type": "string"},
-                                "wow_factor_reason": {"type": "string"},
-                            },
-                        },
+            "venture": {"type": "string"},
+            "persona_name": {"type": "string"},
+            "gains_required": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "gain": {"type": "string"},
+                        "addresses_pain": {"type": "string"},
+                        "dream_outcome": {"type": "string"},
                     },
                 },
-                "required": ["required", "expected"],
+                "description": "Required gains (≥1)",
+            },
+            "gains_expected": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "gain": {"type": "string"},
+                        "addresses_pain": {"type": "string"},
+                        "dream_outcome": {"type": "string"},
+                    },
+                },
+                "description": "Expected gains (≥1)",
+            },
+            "gains_desired": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "gain": {"type": "string"},
+                        "addresses_pain": {"type": "string"},
+                    },
+                },
+            },
+            "gains_unexpected": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "gain": {"type": "string"},
+                        "wow_factor_reason": {"type": "string"},
+                    },
+                },
             },
             "pain_to_joy_pairs": {
                 "type": "array",
-                "minItems": 1,
                 "description": "1:1 mapping mỗi pain → ≥1 joy",
                 "items": {
                     "type": "object",
@@ -114,41 +107,37 @@ SUBMIT_JOY_MATRIX_TOOL = {
                         "pain": {"type": "string"},
                         "pain_severity": {"type": "integer"},
                         "joy": {"type": "string"},
-                        "joy_type": {"type": "string", "enum": ["required", "expected", "desired", "unexpected"]},
+                        "joy_type": {"type": "string"},
                     },
-                    "required": ["pain", "joy", "joy_type"],
                 },
             },
             "primary_dream_outcome": {
                 "type": "string",
-                "description": "Hormozi Dream Outcome chính: specific + measurable + timeline",
+                "description": "Hormozi Dream Outcome: specific + measurable + timeline",
             },
             "wow_factor": {
                 "type": "string",
                 "description": "Unexpected gain mạnh nhất cho persona này",
             },
-            "value_equation_audit": {
-                "type": "object",
-                "description": "Hormozi 4 lever audit",
-                "properties": {
-                    "dream_outcome_strength": {"type": "integer", "minimum": 1, "maximum": 10},
-                    "likelihood_strength": {"type": "integer", "minimum": 1, "maximum": 10},
-                    "time_delay_reduction": {"type": "integer", "minimum": 1, "maximum": 10},
-                    "effort_reduction": {"type": "integer", "minimum": 1, "maximum": 10},
-                },
-            },
-            "quality_check": {
-                "type": "object",
-                "properties": {
-                    "all_pains_mapped": {"type": "boolean"},
-                    "top_3_have_required_expected": {"type": "boolean"},
-                    "wow_factor_identified": {"type": "boolean"},
-                    "dream_outcome_specific": {"type": "boolean"},
-                    "passes_quality": {"type": "boolean"},
-                },
-            },
+            "ve_dream_outcome_strength": {"type": "integer", "minimum": 1, "maximum": 10},
+            "ve_likelihood_strength": {"type": "integer", "minimum": 1, "maximum": 10},
+            "ve_time_delay_reduction": {"type": "integer", "minimum": 1, "maximum": 10},
+            "ve_effort_reduction": {"type": "integer", "minimum": 1, "maximum": 10},
+            "all_pains_mapped": {"type": "boolean"},
+            "top_3_have_required_expected": {"type": "boolean"},
+            "wow_factor_identified": {"type": "boolean"},
+            "dream_outcome_specific": {"type": "boolean"},
+            "passes_quality": {"type": "boolean"},
             "summary": {"type": "string"},
         },
-        "required": ["joys_by_type", "pain_to_joy_pairs", "primary_dream_outcome", "summary"],
+        "required": [
+            "venture",
+            "persona_name",
+            "gains_required",
+            "gains_expected",
+            "pain_to_joy_pairs",
+            "primary_dream_outcome",
+            "summary",
+        ],
     },
 }

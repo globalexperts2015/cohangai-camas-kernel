@@ -96,9 +96,9 @@ class BC14JoyMapper(BaseBC):
 
         dream = matrix.get("primary_dream_outcome", "")
         wow = matrix.get("wow_factor", "")
-        quality = matrix.get("quality_check", {}) or {}
-        passes = quality.get("passes_quality", True)
-        summary = f"joy matrix dream={dream[:60]} wow={wow[:40]} passes={passes}"
+        passes = matrix.get("passes_quality", True)
+        pairs = len(matrix.get("pain_to_joy_pairs", []))
+        summary = f"joy matrix dream={dream[:60]} wow={wow[:40]} pairs={pairs} passes={passes}"
 
         memory_entry = {
             "agent_name": self.name,
