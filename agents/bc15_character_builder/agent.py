@@ -27,8 +27,8 @@ from .prompt_template import (
 log = logging.getLogger("camas.bc15_character_builder")
 
 DEFAULT_MODEL = "claude-opus-4-7"
-DEFAULT_MAX_TOKENS = 3500
-DEFAULT_TIMEOUT = 120.0
+DEFAULT_MAX_TOKENS = 6000
+DEFAULT_TIMEOUT = 180.0
 
 
 class BC15CharacterBuilder(BaseBC):
@@ -109,6 +109,27 @@ class BC15CharacterBuilder(BaseBC):
         character = self._parse_response(response)
         if "error" in character:
             return AgentResult(success=False, output_text=character["error"], output_payload=character)
+
+        if not character or not character.get("founder_name"):
+            text_dump = ""
+            for block in response.content or []:
+                if getattr(block, "type", None) == "text":
+                    text_dump += getattr(block, "text", "")
+            log.warning(
+                "BC15 empty tool input, text_fallback_len=%d stop_reason=%s usage=%s",
+                len(text_dump),
+                getattr(response, "stop_reason", None),
+                getattr(response, "usage", None),
+            )
+            return AgentResult(
+                success=False,
+                output_text="BC15 empty tool input",
+                output_payload={
+                    "error": "LLM tool_use returned empty input",
+                    "stop_reason": str(getattr(response, "stop_reason", "")),
+                    "text_fallback": text_dump[:500],
+                },
+            )
 
         identity = character.get("identity", "Reluctant Hero")
         founder = character.get("founder_name", "unknown")
