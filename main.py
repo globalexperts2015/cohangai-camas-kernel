@@ -28,6 +28,13 @@ from agents.bc8_night_audit import BC8NightAudit
 from agents.bc9_compliance_officer import BC9ComplianceOfficer
 from agents.bc10_coaching_delivery import BC10CoachingDelivery
 
+# Sprint 12 Tier 2: WHO Intelligence (BC11-BC15)
+from agents.bc11_vpc_builder import BC11VPCBuilder
+from agents.bc12_consciousness_tracker import BC12ConsciousnessTracker
+from agents.bc13_pain_scorer import BC13PainScorer
+from agents.bc14_joy_mapper import BC14JoyMapper
+from agents.bc15_character_builder import BC15CharacterBuilder
+
 # Sprint 5 Tier 3: 10 Phòng ban
 from agents.pban_01_quang_cao import Pban01QuangCao
 from agents.pban_02_noi_dung import Pban02NoiDung
@@ -154,6 +161,27 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bc10 = BC10CoachingDelivery(llm=scheduler.llm, memory=scheduler.memory)
     scheduler.register(bc10)
     log.info("BC10 Coaching Delivery registered (coaching.pre_call/post_call/weekly_checkin)")
+
+    # Sprint 12 Tier 2: WHO Intelligence (BC11-BC15, framework encoders)
+    bc11 = BC11VPCBuilder(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc11)
+    log.info("BC11 VPC Builder registered (vpc.build_canvas, Eagle Camp Tròn Vuông + CIS M2)")
+
+    bc12 = BC12ConsciousnessTracker(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc12)
+    log.info("BC12 Consciousness Tracker registered (consciousness.classify, Eagle Camp 8 cấp)")
+
+    bc13 = BC13PainScorer(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc13)
+    log.info("BC13 Pain Scorer registered (pain.score_severity, CIS M3 + Hormozi VE + Dan Lok)")
+
+    bc14 = BC14JoyMapper(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc14)
+    log.info("BC14 Joy Mapper registered (joy.map_to_pain, CIS M4 + Tròn Vuông Gains + Hormozi)")
+
+    bc15 = BC15CharacterBuilder(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc15)
+    log.info("BC15 Character Builder registered (character.build_profile, Brunson + Dan Lok + Anna story pool)")
 
     # Sprint 5 Tier 3: 10 Phòng ban Breakout Funnel OS
     pban_classes = [
