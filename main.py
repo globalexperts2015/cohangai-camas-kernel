@@ -56,6 +56,15 @@ from agents.trust_capital_tracker import TrustCapitalTracker
 from agents.overlay_a_cohort_comparison import OverlayACohortComparison
 from agents.overlay_a_antifragility import OverlayAAntifragility
 
+# Sprint 13 P2: 7 L2 Cohangai Cohort 1 wizards
+from agents.l2_vision_clarity import L2VisionClarity
+from agents.l2_niche_validator_student import L2NicheValidatorStudent
+from agents.l2_transformation_mapper_7d import L2TransformationMapper7D
+from agents.l2_vpc_fit_checker import L2VPCFitChecker
+from agents.l2_mvo_cohort_launcher import L2MVOCohortLauncher
+from agents.l2_offer_engineer_student import L2OfferEngineerStudent
+from agents.l2_referral_engine_template import L2ReferralEngineTemplate
+
 # Sprint 5 Tier 3: 10 Phòng ban
 from agents.pban_01_quang_cao import Pban01QuangCao
 from agents.pban_02_noi_dung import Pban02NoiDung
@@ -260,6 +269,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     overlay_a_antifragility = OverlayAAntifragility(llm=scheduler.llm, memory=scheduler.memory)
     scheduler.register(overlay_a_antifragility)
     log.info("Overlay A Antifragility registered (overlay_a.antifragility_score, BC8 enhance)")
+
+    # Sprint 13 P2: 7 L2 Cohangai Cohort 1 wizards
+    l2_classes = [
+        ("L2.1 Vision Clarity", L2VisionClarity, "cohort.vision_clarity"),
+        ("L2.2 Niche Validator Student", L2NicheValidatorStudent, "cohort.niche_validate"),
+        ("L2.3 Transformation Mapper 7D", L2TransformationMapper7D, "cohort.transformation_map"),
+        ("L2.4 VPC Fit Checker", L2VPCFitChecker, "cohort.vpc_fit_check"),
+        ("L2.5 MVO Cohort Launcher", L2MVOCohortLauncher, "cohort.mvo_launch_plan"),
+        ("L2.6 Offer Engineer Student", L2OfferEngineerStudent, "cohort.offer_engineer"),
+        ("L2.7 Referral Engine Template", L2ReferralEngineTemplate, "cohort.referral_engine_design"),
+    ]
+    for label, klass, event in l2_classes:
+        agent = klass(llm=scheduler.llm, memory=scheduler.memory)
+        scheduler.register(agent)
+        log.info(f"{label} registered ({event})")
 
     # Sprint 5 Tier 3: 10 Phòng ban Breakout Funnel OS
     pban_classes = [
