@@ -166,7 +166,7 @@ body {
   font-size: 32px;
   font-weight: 800;
   letter-spacing: 1px;
-  background: linear-gradient(180deg, #ffd56f 0%, #d4af37 50%, #a37610 100%);
+  background: linear-gradient(180deg, #f5c842 0%, #c9a227 50%, #7a4f00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -178,7 +178,7 @@ body {
 .hub-divider {
   width: 60px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+  background: linear-gradient(90deg, transparent, #c9a227, transparent);
   margin: 12px 0 10px;
   position: relative;
   z-index: 2;
@@ -250,22 +250,22 @@ body {
   font-size: 10px;
   padding: 3px 9px;
   margin-bottom: 6px;
-  background: linear-gradient(135deg, #fff5e6, #ffe9c2);
-  color: #a37610;
+  background: linear-gradient(135deg, #f5c842, #d9a916);
+  color: #7a4f00;
   border: 1px solid rgba(212, 175, 55, 0.2);
   letter-spacing: 0.5px;
 }
 
-/* Tuần 4 practice card differs visually (subtle, not main action) */
+/* Tuần 4 practice card: distinct dashed gold border, vẫn premium */
 .orbit-card-practice {
-  background: linear-gradient(135deg, #fafbfd, #f0f2f7);
-  border: 1px dashed #c8cdd6;
+  background: linear-gradient(135deg, #fff9e6, #fdf0c8);
+  border: 2px dashed #c9a227;
 }
 
 .orbit-card-practice .cohort-week-practice {
-  background: linear-gradient(135deg, #e9ecef, #dce0e6);
-  color: #6c757d;
-  border-color: rgba(108, 117, 125, 0.2);
+  background: linear-gradient(135deg, #f5c842, #d9a916);
+  color: #4a2f00;
+  border: 1px solid rgba(122, 79, 0, 0.3);
 }
 
 .orbit-card h3 {
@@ -292,20 +292,26 @@ body {
   font-size: 12px;
   margin-top: 0;
   background: linear-gradient(135deg, #1a1a2e, #16213e);
-  color: #ffd56f;
+  color: #f5c842;
   border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
 .orbit-card .cohort-btn:hover {
   background: linear-gradient(135deg, #16213e, #0f0f1e);
-  border-color: #d4af37;
-  color: #ffe9c2;
+  border-color: #c9a227;
+  color: #d9a916;
 }
 
 .orbit-card-practice .cohort-btn {
-  background: white;
-  color: #5a6273;
-  border: 1px solid #c8cdd6;
+  background: linear-gradient(135deg, #c9a227, #7a4f00);
+  color: white;
+  border: 1px solid #7a4f00;
+  font-weight: 600;
+}
+
+.orbit-card-practice .cohort-btn:hover {
+  background: linear-gradient(135deg, #f5c842, #c9a227);
+  color: #4a2f00;
 }
 
 /* Mobile: collapse stacked */
