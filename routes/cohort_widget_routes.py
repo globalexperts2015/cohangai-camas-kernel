@@ -94,7 +94,7 @@ WIZARD_REGISTRY = {
         "event": "cohort.offer_engineer",
         "week": 6,
         "title": "Thiết kế phễu sản phẩm khách không từ chối",
-        "subtitle": "Stack giá trị, cam kết, giới hạn để khách gật đầu không cần chốt nhiều. Bí mật của founder bán đắt.",
+        "subtitle": "Stack giá trị, cam kết, giới hạn để khách gật đầu. AI tự tạo trang bán hàng đẹp sau khi bạn design xong.",
         "input_label": "Tóm tắt giải pháp + persona khách hàng đã design",
         "input_placeholder": "Tóm tắt khoá/sản phẩm (tên + giá + format) + nỗi đau lớn nhất khách + transformation bạn cam kết...",
         "input_field": "mvo",
@@ -104,7 +104,7 @@ WIZARD_REGISTRY = {
         "event": "cohort.mvo_launch_plan",
         "week": 7,
         "title": "Chiến lược ra mắt sản phẩm",
-        "subtitle": "Lên kế hoạch ra mắt cohort 5-15 khách trả tiền trong 30 ngày đầu. Đi từ 0 sang dòng tiền thật.",
+        "subtitle": "Kế hoạch 30 ngày ra mắt 5-15 khách trả tiền. Clone email sequence + GHL workflow Hằng đã build, customize cho bạn.",
         "input_label": "Tóm tắt offer + giải pháp đã thiết kế",
         "input_placeholder": "Tóm tắt: offer chính + giải pháp + persona khách + thời gian launch dự kiến...",
         "input_field": "vpc",
@@ -114,7 +114,7 @@ WIZARD_REGISTRY = {
         "event": "cohort.referral_engine_design",
         "week": 8,
         "title": "Cỗ máy bán hàng tự động (Capstone)",
-        "subtitle": "Biến khách hàng thành đại sứ thương hiệu. Khách mới về tự động, không cần ads thêm.",
+        "subtitle": "Biến khách thành đại sứ. Clone full CRM stack: GHL + ZNS + Sepay + lead scoring cron, sẵn sàng vận hành.",
         "input_label": "Tóm tắt offer + khách hàng đã design xuyên 7 tuần",
         "input_placeholder": "Tóm tắt offer chính + persona khách hàng + dòng tiền mục tiêu sau referral...",
         "input_field": "offer",
@@ -466,6 +466,58 @@ async def cohort_index() -> HTMLResponse:
     <p style="text-align:center;color:#999;font-size:13px;margin-top:40px;max-width:600px;margin-left:auto;margin-right:auto">
       Mỗi trợ lý AI là 1 chuyên gia ảo Hằng huấn luyện. Bạn cung cấp tư duy + dữ liệu thật, AI execute 10x nhanh hơn tự làm.
     </p>
+
+    <section class="tech-stack-section">
+      <div class="tech-stack-header">
+        <p class="hub-eyebrow">BreakoutOS Tech Stack</p>
+        <h2>Template clone-ready Hằng đã build sẵn</h2>
+        <p class="tech-stack-intro">
+          Bạn KHÔNG cần build CRM từ đầu. Sau khi design strategy + offer xong, clone setup Hằng đã chạy thật cho 6 ventures. Save 100+ giờ setup, customize cho venture của bạn.
+        </p>
+      </div>
+
+      <div class="tech-stack-grid">
+        <div class="tech-tool tech-tool-live">
+          <div class="tech-tool-icon">🚀</div>
+          <div class="tech-tool-status">LIVE</div>
+          <h3>Trang bán hàng landing</h3>
+          <p>AI tự tạo HTML landing từ offer bạn design. CTA Zalo deeplink, mobile responsive, ready share.</p>
+          <a class="cohort-btn" href="/cohort/wizard/offer_engineer">Tạo landing từ Tuần 6 →</a>
+        </div>
+
+        <div class="tech-tool">
+          <div class="tech-tool-icon">📧</div>
+          <div class="tech-tool-status tech-tool-soon">Sprint 15-16</div>
+          <h3>Email sequence 5 chuỗi</h3>
+          <p>Welcome, Abandon Cart, Post-purchase, Cross-sell, Win-back. Clone từ GHL workflow K2 Hằng đã chạy.</p>
+          <span class="tech-tool-coming">Đang build, ra mắt Sprint 15-16</span>
+        </div>
+
+        <div class="tech-tool">
+          <div class="tech-tool-icon">💳</div>
+          <div class="tech-tool-status tech-tool-soon">Sprint 15-16</div>
+          <h3>Sepay checkout pattern</h3>
+          <p>Trang thanh toán + webhook Sepay → GHL contact + ZNS auto. Wire vào Railway service riêng.</p>
+          <span class="tech-tool-coming">Đang build, ra mắt Sprint 15-16</span>
+        </div>
+
+        <div class="tech-tool">
+          <div class="tech-tool-icon">🤖</div>
+          <div class="tech-tool-status tech-tool-soon">Sprint 15-16</div>
+          <h3>GHL workflow CRM</h3>
+          <p>Clone workflow K2: lead nurture, follow-up, no-show win-back, refund handling. Toàn bộ logic ready.</p>
+          <span class="tech-tool-coming">Đang build, ra mắt Sprint 15-16</span>
+        </div>
+
+        <div class="tech-tool">
+          <div class="tech-tool-icon">📊</div>
+          <div class="tech-tool-status tech-tool-soon">Sprint 15-16</div>
+          <h3>Lead scoring cron</h3>
+          <p>Auto-score 1000+ leads daily, Hot/Warm/Cold tier, push Telegram alert. Pattern Hằng đã chạy K2 webinar.</p>
+          <span class="tech-tool-coming">Đang build, ra mắt Sprint 15-16</span>
+        </div>
+      </div>
+    </section>
   </div>
 </body>
 </html>""")
@@ -545,6 +597,196 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
   </div>
 
   <script src="/cohort/static/cohort-widget.js"></script>
+</body>
+</html>""")
+
+
+# Webinar K2 9-11/6/2026 Tally form URLs (replace after Tally form create in Block 3)
+WEBINAR_K2_TALLY_URLS = {
+    1: "https://tally.so/r/wk2-b1-vision",
+    2: "https://tally.so/r/wk2-b2-customer",
+    3: "https://tally.so/r/wk2-b3-offer",
+}
+
+
+@router.get("/webinar-demo/{wizard_name}", response_class=HTMLResponse)
+async def webinar_demo_page(wizard_name: str, request: Request) -> HTMLResponse:
+    """Simplified mobile-responsive landing for K2 9-11/6/2026 webinar audience.
+
+    Token auto-extracted from URL ?token=wk2-b{N}-{hash}. No manual token entry.
+    Embed Tally form button at end for submission + review live next buổi.
+    """
+    if wizard_name not in WIZARD_REGISTRY:
+        raise HTTPException(status_code=404, detail=f"Wizard '{wizard_name}' not found")
+
+    w = WIZARD_REGISTRY[wizard_name]
+    token = request.query_params.get("token", "")
+    webinar_info = _parse_webinar_token(token) if token else None
+    buoi = webinar_info["buoi"] if webinar_info else 0
+    tally_url = WEBINAR_K2_TALLY_URLS.get(buoi, "")
+
+    # UTM tracking (auto-attach for analytics)
+    utm_source = request.query_params.get("utm_source", "webinar_k2")
+    utm_medium = request.query_params.get("utm_medium", "wizard_demo")
+    utm_campaign = request.query_params.get("utm_campaign", f"b{buoi}" if buoi else "")
+    utm_content = request.query_params.get("utm_content", token)
+
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>{w['title']} | Webinar K2 Buổi {buoi or '?'}</title>
+  <link rel="stylesheet" href="/cohort/static/cohort-widget.css">
+  <style>
+    body {{ background: #fafafa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }}
+    .wd-container {{ max-width: 640px; margin: 0 auto; padding: 16px; }}
+    .wd-badge {{ display: inline-block; background: linear-gradient(135deg, #ff7e5f, #d63031); color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }}
+    .wd-title {{ font-size: 24px; font-weight: 700; margin: 0 0 8px; color: #222; line-height: 1.3; }}
+    .wd-subtitle {{ font-size: 15px; color: #666; margin: 0 0 24px; line-height: 1.5; }}
+    .wd-form {{ background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 16px; }}
+    .wd-form label {{ display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; }}
+    .wd-form textarea {{ width: 100%; box-sizing: border-box; border: 1px solid #e0e0e0; border-radius: 10px; padding: 12px; font-size: 15px; font-family: inherit; resize: vertical; min-height: 140px; }}
+    .wd-form textarea:focus {{ outline: none; border-color: #ff7e5f; }}
+    .wd-btn {{ display: block; width: 100%; box-sizing: border-box; padding: 14px; background: linear-gradient(135deg, #ff7e5f, #d63031); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 12px; }}
+    .wd-btn:disabled {{ opacity: 0.5; cursor: wait; }}
+    .wd-loading {{ text-align: center; color: #999; font-size: 13px; padding: 16px; }}
+    .wd-error {{ background: #fff0f0; color: #c00; border-radius: 10px; padding: 12px 16px; font-size: 14px; margin-top: 12px; }}
+    .wd-output {{ background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 16px; }}
+    .wd-output h2 {{ font-size: 18px; margin: 0 0 12px; color: #222; }}
+    .wd-output-md {{ font-size: 14px; line-height: 1.7; color: #333; }}
+    .wd-output-md h1, .wd-output-md h2, .wd-output-md h3 {{ font-size: 16px; font-weight: 600; margin-top: 16px; margin-bottom: 8px; }}
+    .wd-output-md ul, .wd-output-md ol {{ padding-left: 20px; }}
+    .wd-cta {{ background: #fff8e1; border: 2px solid #ffc107; border-radius: 16px; padding: 20px; text-align: center; margin: 24px 0; }}
+    .wd-cta h3 {{ font-size: 17px; margin: 0 0 8px; color: #c08a00; }}
+    .wd-cta p {{ font-size: 14px; color: #666; margin: 0 0 16px; }}
+    .wd-tally-btn {{ display: inline-block; background: linear-gradient(135deg, #ff7e5f, #d63031); color: white; padding: 14px 28px; border-radius: 12px; font-weight: 600; text-decoration: none; font-size: 15px; }}
+    .wd-footer {{ text-align: center; color: #aaa; font-size: 12px; padding: 20px 0; }}
+    .wd-token-warn {{ background: #fff0f0; color: #c00; padding: 12px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; }}
+  </style>
+</head>
+<body>
+  <div class="wd-container">
+    <div class="wd-badge">Webinar K2 · Buổi {buoi or '?'}</div>
+    <h1 class="wd-title">{w['title']}</h1>
+    <p class="wd-subtitle">{w['subtitle']}</p>
+
+    {"<div class='wd-token-warn'>⚠️ Token không hợp lệ. Bạn cần nhắn <strong>K2BUOI" + str(buoi or 1) + "</strong> đến Zalo 0932093593 để nhận token truy cập.</div>" if not webinar_info else ""}
+
+    <div class="wd-form" id="wd-form">
+      <label for="wd-input">{w['input_label']}</label>
+      <textarea id="wd-input"
+                placeholder="{w['input_placeholder']}"
+                rows="8"></textarea>
+      <button class="wd-btn" id="wd-run-btn" {"disabled" if not webinar_info else ""}>
+        Nhờ trợ lý AI phân tích
+      </button>
+      <div class="wd-loading" id="wd-loading" style="display:none">
+        Trợ lý AI đang phân tích, 30-90 giây...
+      </div>
+      <div class="wd-error" id="wd-error" style="display:none"></div>
+    </div>
+
+    <div class="wd-output" id="wd-output" style="display:none">
+      <h2>Kết quả phân tích</h2>
+      <div class="wd-output-md" id="wd-output-md"></div>
+    </div>
+
+    <div class="wd-cta" id="wd-cta" style="display:none">
+      <h3>Submit để được Hằng review LIVE buổi mai</h3>
+      <p>Top 3 outputs xuất sắc nhất sẽ được đọc tên + output LIVE đầu buổi tiếp theo + nhận <strong>1 vé Foundation 1 triệu</strong>.</p>
+      <a class="wd-tally-btn" id="wd-tally-btn" target="_blank" rel="noopener">
+        Submit output đến Tally form
+      </a>
+    </div>
+
+    <div class="wd-footer">
+      Cohangai · BreakoutOS K2 9-11/6/2026 · 7 wizard CAMAS Kernel
+    </div>
+  </div>
+
+  <script>
+    (function() {{
+      const TOKEN = {json.dumps(token)};
+      const WIZARD_NAME = {json.dumps(wizard_name)};
+      const TALLY_URL = {json.dumps(tally_url)};
+      const UTM = {{
+        source: {json.dumps(utm_source)},
+        medium: {json.dumps(utm_medium)},
+        campaign: {json.dumps(utm_campaign)},
+        content: {json.dumps(utm_content)},
+      }};
+
+      const $input = document.getElementById('wd-input');
+      const $runBtn = document.getElementById('wd-run-btn');
+      const $loading = document.getElementById('wd-loading');
+      const $error = document.getElementById('wd-error');
+      const $output = document.getElementById('wd-output');
+      const $outputMd = document.getElementById('wd-output-md');
+      const $cta = document.getElementById('wd-cta');
+      const $tallyBtn = document.getElementById('wd-tally-btn');
+
+      function mdToHtml(md) {{
+        // Minimal Markdown → HTML (headers, bold, lists). For full render use marked.js if needed.
+        return md
+          .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+          .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+          .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+          .replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>')
+          .replace(/^- (.+)$/gm, '<li>$1</li>')
+          .replace(/(<li>.+<\\/li>(\\n|$))+/g, '<ul>$&</ul>')
+          .replace(/\\n\\n/g, '</p><p>')
+          .replace(/^([^<].*)/gm, '<p>$1</p>')
+          .replace(/<p><\\/p>/g, '');
+      }}
+
+      $runBtn.addEventListener('click', async () => {{
+        const input = $input.value.trim();
+        if (input.length < 10) {{
+          $error.textContent = 'Input quá ngắn, cần ít nhất 10 ký tự';
+          $error.style.display = 'block';
+          return;
+        }}
+        $error.style.display = 'none';
+        $runBtn.disabled = true;
+        $loading.style.display = 'block';
+        try {{
+          const resp = await fetch('/cohort/run-wizard', {{
+            method: 'POST',
+            headers: {{
+              'Content-Type': 'application/json',
+              'X-Cohort-Student-Token': TOKEN,
+            }},
+            body: JSON.stringify({{
+              wizard: WIZARD_NAME,
+              input: input,
+              utm: UTM,
+            }}),
+          }});
+          const data = await resp.json();
+          if (!resp.ok || !data.success) {{
+            throw new Error(data.detail || data.error || 'Lỗi không xác định');
+          }}
+          $outputMd.innerHTML = mdToHtml(data.markdown || data.summary || '');
+          $output.style.display = 'block';
+          if (TALLY_URL) {{
+            const tallyWithOutput = TALLY_URL + '?token=' + encodeURIComponent(TOKEN)
+              + '&output=' + encodeURIComponent((data.markdown || '').slice(0, 4000))
+              + '&wizard=' + encodeURIComponent(WIZARD_NAME);
+            $tallyBtn.href = tallyWithOutput;
+            $cta.style.display = 'block';
+          }}
+          window.scrollTo({{ top: $output.offsetTop - 20, behavior: 'smooth' }});
+        }} catch (err) {{
+          $error.textContent = err.message;
+          $error.style.display = 'block';
+        }} finally {{
+          $loading.style.display = 'none';
+          $runBtn.disabled = false;
+        }}
+      }});
+    }})();
+  </script>
 </body>
 </html>""")
 
@@ -979,6 +1221,332 @@ def _verify_admin_key(key: Optional[str]) -> None:
         )
     if not key or key != expected:
         raise HTTPException(status_code=401, detail="Invalid admin key")
+
+
+@router.get("/admin/webinar-submissions", response_class=HTMLResponse)
+async def admin_webinar_submissions(
+    request: Request,
+    buoi: int = 1,
+    key: Optional[str] = None,
+) -> HTMLResponse:
+    """Webinar K2 admin view: list wizard runs per buổi sorted by activity desc.
+
+    Hằng uses this 6-7am sáng hôm sau buổi để pick top 3 winners.
+    Query wizard_usage_log table (migration 004).
+    """
+    _verify_admin_key(key)
+    if buoi not in (1, 2, 3):
+        raise HTTPException(status_code=400, detail="buoi phải là 1, 2, hoặc 3")
+
+    dsn = os.getenv("DATABASE_URL") or os.getenv("CDP_DATABASE_URL")
+    if not dsn or asyncpg is None:
+        raise HTTPException(status_code=503, detail="Database not configured")
+
+    conn = await asyncpg.connect(dsn)
+    try:
+        rows = await conn.fetch(
+            """
+            SELECT
+                token,
+                student_id,
+                COUNT(*) FILTER (WHERE success = TRUE) AS runs_success,
+                COUNT(*) FILTER (WHERE success = FALSE) AS runs_failed,
+                array_agg(DISTINCT wizard_name) AS wizards_used,
+                MAX(run_at) AS last_run,
+                MIN(run_at) AS first_run,
+                MAX(utm_source) AS utm_source,
+                MAX(utm_campaign) AS utm_campaign
+            FROM wizard_usage_log
+            WHERE buoi = $1
+            GROUP BY token, student_id
+            ORDER BY runs_success DESC, last_run DESC
+            LIMIT 100
+            """,
+            buoi,
+        )
+    finally:
+        await conn.close()
+
+    # Render simple table
+    table_rows = []
+    for i, r in enumerate(rows, start=1):
+        wizards = ", ".join(sorted(r["wizards_used"] or []))
+        last_run = r["last_run"].strftime("%H:%M %d/%m") if r["last_run"] else "—"
+        score = int(r["runs_success"] or 0) * 5  # +5/wizard run
+        token_short = (r["token"] or "")[:18] + "..." if len(r["token"] or "") > 18 else r["token"]
+        table_rows.append(f"""
+        <tr>
+          <td class="rank">#{i}</td>
+          <td class="token" title="{r['token']}">{token_short}</td>
+          <td>{r['student_id']}</td>
+          <td class="num">{r['runs_success']}</td>
+          <td class="num fail">{r['runs_failed']}</td>
+          <td class="wizards">{wizards}</td>
+          <td>{score}</td>
+          <td>{last_run}</td>
+          <td><input type="checkbox" class="winner-pick" data-token="{r['token']}" data-buoi="{buoi}"></td>
+          <td><textarea class="why-pick" data-token="{r['token']}" rows="2" placeholder="Why pick..."></textarea></td>
+        </tr>
+        """)
+
+    table_html = "".join(table_rows) if table_rows else "<tr><td colspan='10' style='text-align:center;padding:40px;color:#999'>Chưa có submission cho Buổi {}</td></tr>".format(buoi)
+
+    buoi_meta = {
+        1: ("BÁN CÁI GÌ", "vision_clarity + niche_validator"),
+        2: ("BÁN CHO AI", "transformation_mapper + vpc_fit_check"),
+        3: ("BÁN NHƯ THẾ NÀO", "mvo_cohort + offer_engineer"),
+    }
+    title, wizards_buoi = buoi_meta[buoi]
+
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>K2 B{buoi} Submissions Review | Hằng Admin</title>
+  <style>
+    body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fafafa; margin: 0; padding: 24px; color: #222; }}
+    .container {{ max-width: 1400px; margin: 0 auto; }}
+    h1 {{ font-size: 22px; margin: 0 0 4px; }}
+    .meta {{ color: #666; font-size: 13px; margin-bottom: 20px; }}
+    .nav {{ margin-bottom: 16px; }}
+    .nav a {{ display: inline-block; padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #444; margin-right: 8px; font-size: 13px; font-weight: 600; }}
+    .nav a.active {{ background: linear-gradient(135deg, #ff7e5f, #d63031); color: white; }}
+    table {{ width: 100%; background: white; border-collapse: collapse; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }}
+    thead {{ background: #f5f5f5; }}
+    th {{ text-align: left; padding: 12px 10px; font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e5e5e5; }}
+    td {{ padding: 10px; font-size: 13px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }}
+    .rank {{ font-weight: 700; color: #888; }}
+    .token {{ font-family: monospace; font-size: 11px; color: #555; }}
+    .num {{ text-align: center; font-weight: 600; }}
+    .num.fail {{ color: #c00; }}
+    .wizards {{ font-size: 12px; color: #666; }}
+    .winner-pick {{ width: 20px; height: 20px; cursor: pointer; }}
+    .why-pick {{ width: 100%; border: 1px solid #e5e5e5; border-radius: 6px; padding: 6px; font-family: inherit; font-size: 12px; resize: vertical; }}
+    .summary {{ background: #fff8e1; border: 2px solid #ffc107; border-radius: 12px; padding: 16px; margin-bottom: 16px; }}
+    .summary strong {{ color: #c08a00; }}
+    .actions {{ position: fixed; bottom: 20px; right: 20px; background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }}
+    .actions button {{ background: linear-gradient(135deg, #ff7e5f, #d63031); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }}
+    .actions span {{ margin-right: 12px; color: #666; font-size: 13px; }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>K2 Webinar Buổi {buoi}, {title}</h1>
+    <p class="meta">Wizards demo: {wizards_buoi} · Voucher reward: 1 vé Foundation 1M cho 3 winners</p>
+
+    <div class="nav">
+      <a href="?key={key}&buoi=1" class="{'active' if buoi == 1 else ''}">Buổi 1</a>
+      <a href="?key={key}&buoi=2" class="{'active' if buoi == 2 else ''}">Buổi 2</a>
+      <a href="?key={key}&buoi=3" class="{'active' if buoi == 3 else ''}">Buổi 3</a>
+      <a href="/cohort/admin/webinar-submissions/export?key={key}&buoi={buoi}" target="_blank">📥 Export CSV</a>
+    </div>
+
+    <div class="summary">
+      <strong>Workflow chấm winner</strong>: tick 3 row tốt nhất + viết note Why pick. Click "Lock winners" để generate voucher code + send ZNS + email. Criteria: Specific + Actionable + Heartfelt + Format đủ.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Token</th>
+          <th>Student</th>
+          <th>OK</th>
+          <th>Fail</th>
+          <th>Wizards used</th>
+          <th>Score</th>
+          <th>Last run</th>
+          <th>Pick</th>
+          <th>Why pick</th>
+        </tr>
+      </thead>
+      <tbody>
+        {table_html}
+      </tbody>
+    </table>
+
+    <div class="actions">
+      <span id="pick-count">0/3 picked</span>
+      <button id="lock-btn" disabled>🔒 Lock winners</button>
+    </div>
+  </div>
+
+  <script>
+    const KEY = {json.dumps(key or "")};
+    const BUOI = {buoi};
+
+    document.querySelectorAll('.winner-pick').forEach(cb => {{
+      cb.addEventListener('change', () => {{
+        const picked = document.querySelectorAll('.winner-pick:checked');
+        document.getElementById('pick-count').textContent = picked.length + '/3 picked';
+        document.getElementById('lock-btn').disabled = picked.length !== 3;
+        if (picked.length > 3) {{
+          cb.checked = false;
+          alert('Chỉ pick được 3 winners');
+        }}
+      }});
+    }});
+
+    document.getElementById('lock-btn').addEventListener('click', async () => {{
+      const winners = Array.from(document.querySelectorAll('.winner-pick:checked')).map(cb => {{
+        const token = cb.dataset.token;
+        const noteEl = document.querySelector(`.why-pick[data-token="${{token}}"]`);
+        return {{ token, why: noteEl.value.trim() }};
+      }});
+      if (winners.length !== 3) {{ alert('Cần pick đúng 3 winners'); return; }}
+      if (winners.some(w => !w.why)) {{ alert('Mọi winner cần có note "Why pick"'); return; }}
+      if (!confirm('Lock 3 winners + generate voucher Foundation 1M? Sẽ trigger ZNS + email tới winners.')) return;
+      const btn = document.getElementById('lock-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Locking...';
+      try {{
+        const resp = await fetch('/cohort/admin/webinar-submissions/lock-winners?key=' + encodeURIComponent(KEY), {{
+          method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{ buoi: BUOI, winners }}),
+        }});
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || 'Lock fail');
+        alert('Locked. Voucher codes: ' + data.voucher_codes.join(', '));
+        window.location.reload();
+      }} catch (err) {{
+        alert('Error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = '🔒 Lock winners';
+      }}
+    }});
+  </script>
+</body>
+</html>""")
+
+
+@router.post("/admin/webinar-submissions/lock-winners")
+async def admin_lock_winners(request: Request, key: Optional[str] = None) -> JSONResponse:
+    """Lock 3 winners per buổi, generate voucher codes, persist for downstream ZNS+email.
+
+    Persist to `wizard_winner_pick` table (auto-create on first call).
+    """
+    _verify_admin_key(key)
+    body = await request.json()
+    buoi = body.get("buoi")
+    winners = body.get("winners", [])
+    if buoi not in (1, 2, 3) or len(winners) != 3:
+        raise HTTPException(status_code=400, detail="buoi + 3 winners required")
+
+    dsn = os.getenv("DATABASE_URL") or os.getenv("CDP_DATABASE_URL")
+    if not dsn or asyncpg is None:
+        raise HTTPException(status_code=503, detail="Database not configured")
+
+    voucher_codes = []
+    conn = await asyncpg.connect(dsn)
+    try:
+        await conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS wizard_winner_pick (
+                id SERIAL PRIMARY KEY,
+                buoi SMALLINT NOT NULL,
+                rank SMALLINT NOT NULL,
+                token TEXT NOT NULL,
+                why_pick TEXT,
+                voucher_code TEXT NOT NULL UNIQUE,
+                voucher_value_vnd INT NOT NULL DEFAULT 1000000,
+                expires_at TIMESTAMPTZ NOT NULL,
+                picked_at TIMESTAMPTZ DEFAULT NOW(),
+                notified_at TIMESTAMPTZ,
+                redeemed_at TIMESTAMPTZ,
+                UNIQUE(buoi, rank)
+            );
+            """,
+        )
+        for rank, w in enumerate(winners, start=1):
+            code = f"K2-FND-B{buoi}-{rank}"
+            voucher_codes.append(code)
+            await conn.execute(
+                """
+                INSERT INTO wizard_winner_pick (buoi, rank, token, why_pick, voucher_code, expires_at)
+                VALUES ($1, $2, $3, $4, $5, '2026-06-18T23:59:59+07:00'::timestamptz)
+                ON CONFLICT (buoi, rank) DO UPDATE SET
+                    token = EXCLUDED.token,
+                    why_pick = EXCLUDED.why_pick,
+                    voucher_code = EXCLUDED.voucher_code,
+                    picked_at = NOW()
+                """,
+                buoi,
+                rank,
+                w["token"],
+                w["why"],
+                code,
+            )
+    finally:
+        await conn.close()
+
+    # Notify Telegram Breakout Ops (best effort)
+    try:
+        import json as _json
+        import urllib.request as _ureq
+        tg_token = os.getenv("TELEGRAM_BOT_TOKEN")
+        tg_chat = os.getenv("TELEGRAM_BREAKOUT_OPS_CHAT_ID") or "-1003813280155"
+        if tg_token:
+            msg = f"🏆 K2 B{buoi} winners locked:\n" + "\n".join(
+                f"#{i+1} {w['token']} → {voucher_codes[i]}" for i, w in enumerate(winners)
+            )
+            url = f"https://api.telegram.org/bot{tg_token}/sendMessage"
+            data = _json.dumps({"chat_id": tg_chat, "text": msg}).encode()
+            req = _ureq.Request(url, data=data, headers={"Content-Type": "application/json"})
+            _ureq.urlopen(req, timeout=5)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Telegram notify fail: %r", exc)
+
+    return JSONResponse({
+        "success": True,
+        "buoi": buoi,
+        "voucher_codes": voucher_codes,
+        "count": len(winners),
+    })
+
+
+@router.get("/admin/webinar-submissions/export")
+async def admin_webinar_export(
+    request: Request,
+    buoi: int = 1,
+    key: Optional[str] = None,
+) -> JSONResponse:
+    """Export submissions CSV-ready (JSON list for client to convert)."""
+    _verify_admin_key(key)
+    if buoi not in (1, 2, 3):
+        raise HTTPException(status_code=400, detail="buoi phải là 1, 2, hoặc 3")
+    dsn = os.getenv("DATABASE_URL") or os.getenv("CDP_DATABASE_URL")
+    if not dsn or asyncpg is None:
+        raise HTTPException(status_code=503, detail="Database not configured")
+    conn = await asyncpg.connect(dsn)
+    try:
+        rows = await conn.fetch(
+            """
+            SELECT token, student_id, wizard_name, success, utm_source, utm_campaign, run_at
+            FROM wizard_usage_log
+            WHERE buoi = $1
+            ORDER BY run_at DESC
+            """,
+            buoi,
+        )
+    finally:
+        await conn.close()
+    return JSONResponse({
+        "buoi": buoi,
+        "count": len(rows),
+        "rows": [
+            {
+                "token": r["token"],
+                "student_id": r["student_id"],
+                "wizard_name": r["wizard_name"],
+                "success": r["success"],
+                "utm_source": r["utm_source"],
+                "utm_campaign": r["utm_campaign"],
+                "run_at": r["run_at"].isoformat() if r["run_at"] else None,
+            }
+            for r in rows
+        ],
+    })
 
 
 @router.get("/admin/dashboard", response_class=HTMLResponse)
