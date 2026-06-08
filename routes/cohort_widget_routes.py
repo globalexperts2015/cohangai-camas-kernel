@@ -24,6 +24,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from kernel.base_agent import ExecutionContext
+from kernel.voice_gate import apply_voice_rewrite, voice_rewrite_enabled
 
 log = logging.getLogger("camas.cohort_widget")
 
@@ -270,12 +271,24 @@ async def run_wizard(
     op = result.output_payload or {}
     markdown = op.get("markdown_report") or op.get("markdown_playbook") or op.get("markdown_visual_map") or _build_default_markdown(op, w)
 
+    # Sprint 14 P0.3 voice gate, rewrite Markdown sang Anna voice qua Haiku 4.5
+    voice_rewritten = False
+    if voice_rewrite_enabled() and getattr(sched, "llm", None) is not None:
+        try:
+            rewritten = await apply_voice_rewrite(sched.llm, markdown, venture_context="cohangai")
+            if rewritten != markdown:
+                markdown = rewritten
+                voice_rewritten = True
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Voice rewrite fail in run_wizard: %r, fall back original", exc)
+
     return JSONResponse({
         "success": True,
         "wizard": wizard_name,
         "student_id": student_id,
         "summary": result.output_text,
         "markdown": markdown,
+        "voice_rewritten": voice_rewritten,
         "payload": op,  # full JSON for debug/dev
     })
 
