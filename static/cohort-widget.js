@@ -9,6 +9,7 @@
 
   const wizard = widget.dataset.wizard;
   const inputField = widget.dataset.inputField;
+  const deployLabel = widget.dataset.deployLabel; // undefined nếu wizard không support deploy
 
   const inputEl = document.getElementById("cohort-input");
   const tokenEl = document.getElementById("cohort-token");
@@ -18,6 +19,22 @@
   const outputEl = document.getElementById("cohort-output");
   const outputMdEl = document.getElementById("cohort-output-markdown");
   const saveBtn = document.getElementById("cohort-save-btn");
+
+  // Sprint 15-16 P0.5 Output → Action UI
+  const deployBtn = document.getElementById("cohort-deploy-btn");
+  const deployResultEl = document.getElementById("cohort-deploy-result");
+  const deployUrlEl = document.getElementById("cohort-deploy-url");
+  const deployCopyBtn = document.getElementById("cohort-deploy-copy");
+  const deployOpenLink = document.getElementById("cohort-deploy-open");
+  const deployLoadingEl = document.getElementById("cohort-deploy-loading");
+
+  // Track last wizard output for deploy
+  let lastWizardOutput = null;
+  const LAST_OUTPUT_KEY = `cohort_last_output_${wizard}`;
+  try {
+    const saved = localStorage.getItem(LAST_OUTPUT_KEY);
+    if (saved) lastWizardOutput = JSON.parse(saved);
+  } catch (e) {}
 
   // Load saved token from localStorage
   const SAVED_TOKEN_KEY = "cohort_student_token";
@@ -91,6 +108,18 @@
       outputEl.style.display = "block";
       localStorage.setItem(OUTPUT_KEY, markdown);
 
+      // Save full payload cho deploy-action
+      lastWizardOutput = data.payload || {};
+      try {
+        localStorage.setItem(LAST_OUTPUT_KEY, JSON.stringify(lastWizardOutput));
+      } catch (e) {}
+
+      // Show deploy button nếu wizard support
+      if (deployLabel && deployBtn) {
+        deployBtn.style.display = "inline-block";
+        deployResultEl.style.display = "none"; // reset
+      }
+
       // Scroll to output
       outputEl.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (e) {
@@ -132,6 +161,75 @@
       showError(`Save error: ${e.message}`);
     }
   });
+
+  // Show deploy button on load nếu có cached output + wizard support
+  if (deployLabel && deployBtn && lastWizardOutput) {
+    deployBtn.style.display = "inline-block";
+  }
+
+  // Deploy button handler
+  if (deployBtn) {
+    deployBtn.addEventListener("click", async () => {
+      const token = tokenEl.value.trim();
+      if (!token) {
+        showError("Cần token để deploy");
+        return;
+      }
+      if (!lastWizardOutput || Object.keys(lastWizardOutput).length === 0) {
+        showError("Chưa có wizard output. Chạy wizard trước rồi deploy.");
+        return;
+      }
+
+      errorEl.style.display = "none";
+      deployResultEl.style.display = "none";
+      deployBtn.disabled = true;
+      deployLoadingEl.style.display = "block";
+
+      try {
+        const resp = await fetch(`/cohort/wizard/${wizard}/deploy-action`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Cohort-Student-Token": token,
+          },
+          body: JSON.stringify({ wizard_output: lastWizardOutput }),
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.success) {
+          showError(data.error || data.detail || `Deploy fail HTTP ${resp.status}`);
+          return;
+        }
+
+        deployUrlEl.value = data.url;
+        deployOpenLink.href = data.url;
+        deployResultEl.style.display = "block";
+        deployResultEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      } catch (e) {
+        showError(`Deploy error: ${e.message}`);
+      } finally {
+        deployBtn.disabled = false;
+        deployLoadingEl.style.display = "none";
+      }
+    });
+  }
+
+  // Copy URL handler
+  if (deployCopyBtn) {
+    deployCopyBtn.addEventListener("click", async () => {
+      const url = deployUrlEl.value;
+      if (!url) return;
+      try {
+        await navigator.clipboard.writeText(url);
+        const originalText = deployCopyBtn.textContent;
+        deployCopyBtn.textContent = "✅ Copied!";
+        setTimeout(() => { deployCopyBtn.textContent = originalText; }, 2000);
+      } catch (e) {
+        // Fallback: select text
+        deployUrlEl.select();
+        document.execCommand("copy");
+      }
+    });
+  }
 
   function showError(msg) {
     errorEl.textContent = `❌ ${msg}`;

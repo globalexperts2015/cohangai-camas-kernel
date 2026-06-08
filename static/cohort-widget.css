@@ -271,3 +271,80 @@ body {
 #cohort-save-btn {
   margin-top: 20px;
 }
+
+/* Sprint 15-16 P0.5 Output → Action UI */
+.cohort-action-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.cohort-action-row .cohort-btn {
+  margin-top: 0;
+  flex: 1;
+  min-width: 160px;
+}
+
+.cohort-btn-deploy {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: white;
+  font-weight: 600;
+  border: none;
+}
+
+.cohort-btn-deploy:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e55a25, #d97f10);
+  transform: translateY(-1px);
+}
+
+.cohort-deploy-result {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fff5f0, #fff);
+  border-radius: 12px;
+  border: 2px solid #ffd6c2;
+}
+
+.cohort-deploy-result h3 {
+  color: #d9480f;
+  margin-bottom: 12px;
+}
+
+.cohort-deploy-url-box {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.cohort-deploy-url-box input {
+  flex: 1;
+  padding: 10px 14px;
+  font-family: monospace;
+  font-size: 13px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+}
+
+.cohort-deploy-url-box .cohort-btn {
+  margin: 0;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+#cohort-deploy-open {
+  display: inline-block;
+  margin-top: 12px;
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .cohort-action-row {
+    flex-direction: column;
+  }
+  .cohort-deploy-url-box {
+    flex-direction: column;
+  }
+}

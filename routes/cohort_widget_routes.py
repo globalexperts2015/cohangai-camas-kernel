@@ -305,6 +305,8 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
     if wizard_name not in WIZARD_REGISTRY:
         raise HTTPException(status_code=404, detail=f"Wizard '{wizard_name}' not found")
     w = WIZARD_REGISTRY[wizard_name]
+    action_cfg = get_action_for_wizard(wizard_name)
+    deploy_data_attr = f'data-deploy-label="{action_cfg["label"]}"' if action_cfg else ""
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -321,7 +323,8 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
 
     <div id="cohort-widget"
          data-wizard="{wizard_name}"
-         data-input-field="{w['input_field']}">
+         data-input-field="{w['input_field']}"
+         {deploy_data_attr}>
       <label for="cohort-input">{w['input_label']}</label>
       <textarea id="cohort-input"
                 placeholder="{w['input_placeholder']}"
@@ -345,7 +348,26 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
       <div id="cohort-output" class="cohort-output" style="display:none">
         <h2>📋 Kết quả</h2>
         <div id="cohort-output-markdown"></div>
-        <button id="cohort-save-btn" class="cohort-btn">💾 Lưu progress</button>
+        <div class="cohort-action-row">
+          <button id="cohort-save-btn" class="cohort-btn">💾 Lưu progress</button>
+          <button id="cohort-deploy-btn" class="cohort-btn cohort-btn-deploy" style="display:none">
+            {action_cfg["label"] if action_cfg else ""}
+          </button>
+        </div>
+
+        <div id="cohort-deploy-result" class="cohort-deploy-result" style="display:none">
+          <h3>✨ Deploy thành công</h3>
+          <p>Landing page của bạn:</p>
+          <div class="cohort-deploy-url-box">
+            <input type="text" id="cohort-deploy-url" readonly>
+            <button id="cohort-deploy-copy" class="cohort-btn">📋 Copy</button>
+          </div>
+          <p><a id="cohort-deploy-open" href="#" target="_blank" class="cohort-btn cohort-btn-primary">🌐 Mở landing</a></p>
+        </div>
+
+        <div id="cohort-deploy-loading" style="display:none" class="cohort-loading">
+          <p>⏳ Đang deploy landing page... (5-10 giây)</p>
+        </div>
       </div>
     </div>
   </div>
