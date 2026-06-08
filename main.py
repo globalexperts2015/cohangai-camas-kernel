@@ -103,6 +103,7 @@ from kernel.memory_layer import MemoryLayer, VoyageEmbedder
 from kernel.scheduler import Scheduler
 from routes.kernel_routes import router as kernel_router
 from routes.webhook_routes import router as webhook_router
+from routes.cohort_widget_routes import router as cohort_router, mount_static as mount_cohort_static
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
@@ -394,6 +395,8 @@ app = FastAPI(
 
 app.include_router(kernel_router, prefix="/kernel", tags=["kernel"])
 app.include_router(webhook_router, prefix="/webhook", tags=["webhook"])
+app.include_router(cohort_router, tags=["cohort"])
+mount_cohort_static(app)
 
 
 @app.get("/")

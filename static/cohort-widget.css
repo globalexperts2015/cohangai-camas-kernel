@@ -1,0 +1,273 @@
+/* Cohort Widget CSS - Cohangai Cohort 1 Dashboard */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background: #f5f7fa;
+}
+
+.cohort-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.cohort-container h1 {
+  font-size: 32px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.cohort-intro {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 32px;
+}
+
+.cohort-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.cohort-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8eaed;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cohort-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.cohort-week {
+  display: inline-block;
+  background: #ffeded;
+  color: #d22;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.cohort-card h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.cohort-card p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.cohort-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: white;
+  color: #d22;
+  border: 2px solid #d22;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.cohort-btn:hover {
+  background: #d22;
+  color: white;
+}
+
+.cohort-btn-primary {
+  background: #d22;
+  color: white;
+  padding: 14px 32px;
+  font-size: 16px;
+  margin: 24px 0;
+}
+
+.cohort-btn-primary:hover {
+  background: #a11;
+  color: white;
+}
+
+.cohort-back {
+  display: inline-block;
+  color: #666;
+  text-decoration: none;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.cohort-back:hover {
+  color: #d22;
+}
+
+.cohort-week-label {
+  display: inline-block;
+  background: #d22;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.cohort-subtitle {
+  font-size: 17px;
+  color: #666;
+  margin-bottom: 28px;
+}
+
+#cohort-widget {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8eaed;
+}
+
+#cohort-widget label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+#cohort-widget textarea {
+  width: 100%;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  border: 1px solid #d8dde3;
+  border-radius: 6px;
+  resize: vertical;
+  margin-bottom: 16px;
+}
+
+#cohort-widget textarea:focus {
+  outline: none;
+  border-color: #d22;
+}
+
+.cohort-auth {
+  background: #fff9f0;
+  border: 1px solid #ffe0a8;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.cohort-auth input {
+  width: 100%;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 13px;
+  border: 1px solid #d8dde3;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.cohort-loading {
+  background: #f0f4ff;
+  border: 1px solid #c8d8ff;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.cohort-error {
+  background: #fff0f0;
+  border: 1px solid #ffc8c8;
+  color: #c00;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 16px 0;
+}
+
+.cohort-output {
+  background: #f8fafc;
+  border: 1px solid #d8dde3;
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.cohort-output h2 {
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+#cohort-output-markdown {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+#cohort-output-markdown h1,
+#cohort-output-markdown h2,
+#cohort-output-markdown h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #1a1a1a;
+}
+
+#cohort-output-markdown h1 { font-size: 22px; }
+#cohort-output-markdown h2 { font-size: 18px; }
+#cohort-output-markdown h3 { font-size: 16px; }
+
+#cohort-output-markdown ul,
+#cohort-output-markdown ol {
+  margin: 10px 0 10px 24px;
+}
+
+#cohort-output-markdown li {
+  margin-bottom: 4px;
+}
+
+#cohort-output-markdown code {
+  background: #eef1f5;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: "SF Mono", Monaco, Consolas, monospace;
+  font-size: 13px;
+}
+
+#cohort-output-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+
+#cohort-output-markdown th,
+#cohort-output-markdown td {
+  border: 1px solid #d8dde3;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+#cohort-output-markdown th {
+  background: #eef1f5;
+  font-weight: 600;
+}
+
+#cohort-save-btn {
+  margin-top: 20px;
+}
