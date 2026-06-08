@@ -35,6 +35,13 @@ from agents.bc13_pain_scorer import BC13PainScorer
 from agents.bc14_joy_mapper import BC14JoyMapper
 from agents.bc15_character_builder import BC15CharacterBuilder
 
+# Sprint 12 Tier 2: WHAT Intelligence (BC16-BC20)
+from agents.bc16_value_ladder import BC16ValueLadder
+from agents.bc17_grand_slam_offer import BC17GrandSlamOffer
+from agents.bc18_value_equation import BC18ValueEquation
+from agents.bc19_funnel_architect import BC19FunnelArchitect
+from agents.bc20_copy_stack import BC20CopyStack
+
 # Sprint 5 Tier 3: 10 Phòng ban
 from agents.pban_01_quang_cao import Pban01QuangCao
 from agents.pban_02_noi_dung import Pban02NoiDung
@@ -182,6 +189,27 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bc15 = BC15CharacterBuilder(llm=scheduler.llm, memory=scheduler.memory)
     scheduler.register(bc15)
     log.info("BC15 Character Builder registered (character.build_profile, Brunson + Dan Lok + Anna story pool)")
+
+    # Sprint 12 Tier 2: WHAT Intelligence (BC16-BC20, framework encoders)
+    bc16 = BC16ValueLadder(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc16)
+    log.info("BC16 Value Ladder registered (ladder.design, Brunson Value Ladder + Anna Empire Stack + Eagle CL5)")
+
+    bc17 = BC17GrandSlamOffer(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc17)
+    log.info("BC17 Grand Slam Offer registered (offer.build_grand_slam, Hormozi + Brunson Stack + Dan Lok USP)")
+
+    bc18 = BC18ValueEquation(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc18)
+    log.info("BC18 Value Equation registered (offer.audit_value_equation, Hormozi 4 lever + Brunson Epiphany)")
+
+    bc19 = BC19FunnelArchitect(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc19)
+    log.info("BC19 Funnel Architect registered (funnel.architect_7_phases, Brunson 7 Phases + Eagle IPS + CIS M6)")
+
+    bc20 = BC20CopyStack(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(bc20)
+    log.info("BC20 Copy Stack registered (copy.generate_stack, Dan Lok 8 secrets + Brunson Soap Opera + Hormozi)")
 
     # Sprint 5 Tier 3: 10 Phòng ban Breakout Funnel OS
     pban_classes = [
