@@ -74,7 +74,7 @@ class BC15CharacterBuilder(BaseBC):
                     query=f"founder story venture {venture}",
                     categories=["bio"],
                     venture=venture if venture != "all" else None,
-                    top_k=20,
+                    k=20,
                 )
                 for r in results:
                     tier = "public_safe"

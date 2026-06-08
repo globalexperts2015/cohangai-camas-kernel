@@ -94,7 +94,7 @@ class BC11VPCBuilder(BaseBC):
                     query=f"persona {persona_name} target audience venture {venture}",
                     categories=["target", "audience", "bio", "venture_state", "compliance_audit"],
                     venture=venture if venture != "all" else None,
-                    top_k=10,
+                    k=10,
                 )
                 canonical_facts = [
                     {"category": r.category, "content": r.content}
