@@ -10,12 +10,16 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 
 import httpx
 
-KERNEL_URL = "https://camas-kernel-production.up.railway.app"
-CRON_SECRET = "xuGm0mxA_--UxKkkR-NBxsT_LIf0qizRaWfwwl9bvKA"
+KERNEL_URL = os.getenv("CAMAS_KERNEL_URL", "https://camas-kernel-production.up.railway.app")
+CRON_SECRET = os.getenv("CAMAS_CRON_SECRET", "")
+if not CRON_SECRET:
+    print("ERROR: set env CAMAS_CRON_SECRET trước khi chạy smoke test")
+    sys.exit(1)
 
 
 def call(agent: str, event: str, payload: dict, venture: str = "breakout") -> dict:

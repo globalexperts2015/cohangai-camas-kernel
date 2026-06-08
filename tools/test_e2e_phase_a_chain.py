@@ -16,8 +16,11 @@ from pathlib import Path
 
 import httpx
 
-KERNEL_URL = "https://camas-kernel-production.up.railway.app"
-CRON_SECRET = "xuGm0mxA_--UxKkkR-NBxsT_LIf0qizRaWfwwl9bvKA"
+KERNEL_URL = os.getenv("CAMAS_KERNEL_URL", "https://camas-kernel-production.up.railway.app")
+CRON_SECRET = os.getenv("CAMAS_CRON_SECRET", "")
+if not CRON_SECRET:
+    print("ERROR: set env CAMAS_CRON_SECRET trước khi chạy E2E test")
+    sys.exit(1)
 
 
 def call_kernel(agent_name: str, trigger_event: str, payload: dict, venture: str = "breakout") -> dict:
