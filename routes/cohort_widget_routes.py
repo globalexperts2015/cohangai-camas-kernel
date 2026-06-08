@@ -486,10 +486,18 @@ async def cohort_index() -> HTMLResponse:
         </div>
 
         <div class="tech-tool tech-tool-live">
+          <div class="tech-tool-icon">🎯</div>
+          <div class="tech-tool-status">LIVE</div>
+          <h3>Kho content quảng cáo</h3>
+          <p>5 headlines + 3 Reel hooks (15s/30s/60s) + 3 FB ad copy + 7 email subject lines. Ready paste FB Ads + TikTok + email blast.</p>
+          <a class="cohort-btn" href="/cohort/wizard/offer_engineer">Tạo từ Tuần 6 →</a>
+        </div>
+
+        <div class="tech-tool tech-tool-live">
           <div class="tech-tool-icon">📧</div>
           <div class="tech-tool-status">LIVE</div>
           <h3>Chuỗi email nuôi khách</h3>
-          <p>5 email tự động: chào mừng, nhắc đơn bỏ quên, sau mua, bán thêm, kéo lại khách rời. Template ready paste vào CRM của bạn.</p>
+          <p>5 email tự động: chào mừng, nhắc đơn bỏ quên, sau mua, bán thêm, kéo lại khách rời. Compatible Brevo / MailerLite / ConvertKit.</p>
           <a class="cohort-btn" href="/cohort/wizard/mvo_cohort">Tạo từ Tuần 7 →</a>
         </div>
 
@@ -515,14 +523,6 @@ async def cohort_index() -> HTMLResponse:
           <h3>Đánh giá khách tự động</h3>
           <p>Framework chấm điểm khách 3 tier (Nóng/Ấm/Lạnh) + công thức + hướng dẫn implement per CRM. Tập trung khách đáng giá nhất.</p>
           <a class="cohort-btn" href="/cohort/wizard/referral_engine">Tạo từ Tuần 8 →</a>
-        </div>
-
-        <div class="tech-tool tech-tool-live">
-          <div class="tech-tool-icon">🎯</div>
-          <div class="tech-tool-status">LIVE</div>
-          <h3>Kho content quảng cáo</h3>
-          <p>5 headlines + 3 Reel hooks (15s/30s/60s) + 3 FB ad copy + 7 email subject lines. Ready paste FB Ads + TikTok + email blast.</p>
-          <a class="cohort-btn" href="/cohort/wizard/offer_engineer">Tạo từ Tuần 6 →</a>
         </div>
       </div>
     </section>
