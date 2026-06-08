@@ -270,13 +270,14 @@ def _scheduler(request: Request):
 
 @router.get("/", response_class=HTMLResponse)
 async def cohort_index() -> HTMLResponse:
-    """BreakoutOS dashboard, 8 tuần xây Solo Empire."""
+    """BreakoutOS dashboard, hub center + 8 tuần orbit."""
+    sorted_wizards = sorted(WIZARD_REGISTRY.items(), key=lambda x: x[1]["week"])
     cards = []
-    for slug, w in sorted(WIZARD_REGISTRY.items(), key=lambda x: x[1]["week"]):
+    for slug, w in sorted_wizards:
         cards.append(f"""
-        <div class="cohort-card">
+        <div class="orbit-card orbit-card-{w['week']}">
           <div class="cohort-week">Tuần {w['week']}</div>
-          <h3>{w['title']}</h3>
+          <h3>{w['title'].replace(f"Tuần {w['week']}: ", "").replace(f"Tuần {w['week']}-{w['week']+1}: ", "")}</h3>
           <p>{w['subtitle']}</p>
           <a class="cohort-btn" href="/cohort/wizard/{slug}">Bắt đầu →</a>
         </div>
@@ -285,18 +286,34 @@ async def cohort_index() -> HTMLResponse:
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <title>BreakoutOS, 8 tuần xây Solo Empire cùng Hằng</title>
+  <title>BreakoutOS, hệ điều hành xây Solo Empire</title>
   <link rel="stylesheet" href="/cohort/static/cohort-widget.css">
 </head>
 <body>
   <div class="cohort-container">
-    <h1>BreakoutOS</h1>
-    <p class="cohort-intro">8 tuần xây Solo Empire cùng Hằng. Mỗi tuần 1 trợ lý AI đồng hành với bạn từ vision đến khách trả tiền đầu tiên.</p>
-    <div class="cohort-grid">
+    <header style="text-align:center;margin-bottom:20px">
+      <p style="font-size:13px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">
+        Hệ điều hành xây Solo Empire
+      </p>
+      <h1 style="font-size:36px;font-weight:800;background:linear-gradient(135deg,#ff7e5f,#d63031);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+        BreakoutOS
+      </h1>
+      <p class="cohort-intro" style="font-size:16px;max-width:540px;margin:12px auto">
+        8 tuần. 7 trợ lý AI Hằng đã huấn luyện. Đi từ tầm nhìn đến khách trả tiền đầu tiên.
+      </p>
+    </header>
+
+    <div class="orbit-wrapper">
+      <div class="orbit-ring"></div>
+      <div class="orbit-hub">
+        <h2>BreakoutOS</h2>
+        <p class="hub-tagline">Hệ điều hành Solo Empire 8 tuần</p>
+      </div>
       {"".join(cards)}
     </div>
-    <p style="text-align:center;color:#999;font-size:13px;margin-top:32px">
-      Mỗi trợ lý AI là 1 chuyên gia ảo Hằng đã huấn luyện. Bạn cung cấp tư duy + dữ liệu thật, AI execute 10x nhanh hơn tự làm.
+
+    <p style="text-align:center;color:#999;font-size:13px;margin-top:40px;max-width:600px;margin-left:auto;margin-right:auto">
+      Mỗi trợ lý AI là 1 chuyên gia ảo Hằng huấn luyện. Bạn cung cấp tư duy + dữ liệu thật, AI execute 10x nhanh hơn tự làm.
     </p>
   </div>
 </body>
