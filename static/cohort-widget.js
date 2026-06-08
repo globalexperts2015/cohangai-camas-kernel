@@ -20,8 +20,8 @@
   const outputMdEl = document.getElementById("cohort-output-markdown");
   const saveBtn = document.getElementById("cohort-save-btn");
 
-  // Sprint 15-16 P0.5 Output → Action UI
-  const deployBtn = document.getElementById("cohort-deploy-btn");
+  // Sprint 15-16 Output → Action UI (multi-action support)
+  const deployBtns = document.querySelectorAll(".cohort-deploy-action-btn");
   const deployResultEl = document.getElementById("cohort-deploy-result");
   const deployUrlEl = document.getElementById("cohort-deploy-url");
   const deployCopyBtn = document.getElementById("cohort-deploy-copy");
@@ -114,10 +114,10 @@
         localStorage.setItem(LAST_OUTPUT_KEY, JSON.stringify(lastWizardOutput));
       } catch (e) {}
 
-      // Show deploy button nếu wizard support
-      if (deployLabel && deployBtn) {
-        deployBtn.style.display = "inline-block";
-        deployResultEl.style.display = "none"; // reset
+      // Show deploy buttons (multi-action) nếu wizard support
+      if (deployBtns.length > 0) {
+        deployBtns.forEach(b => { b.style.display = "inline-block"; });
+        if (deployResultEl) deployResultEl.style.display = "none"; // reset
       }
 
       // Scroll to output
@@ -162,14 +162,14 @@
     }
   });
 
-  // Show deploy button on load nếu có cached output + wizard support
-  if (deployLabel && deployBtn && lastWizardOutput) {
-    deployBtn.style.display = "inline-block";
+  // Show deploy buttons on load nếu có cached output + wizard support
+  if (deployBtns.length > 0 && lastWizardOutput) {
+    deployBtns.forEach(b => { b.style.display = "inline-block"; });
   }
 
-  // Deploy button handler
-  if (deployBtn) {
-    deployBtn.addEventListener("click", async () => {
+  // Multi-action deploy button handlers
+  deployBtns.forEach(btn => {
+    btn.addEventListener("click", async () => {
       const token = tokenEl.value.trim();
       if (!token) {
         showError("Cần token để deploy");
@@ -180,10 +180,16 @@
         return;
       }
 
+      const actionType = btn.dataset.actionType;
+      const label = btn.dataset.label || "artifact";
+
       errorEl.style.display = "none";
-      deployResultEl.style.display = "none";
-      deployBtn.disabled = true;
-      deployLoadingEl.style.display = "block";
+      if (deployResultEl) deployResultEl.style.display = "none";
+      btn.disabled = true;
+      if (deployLoadingEl) {
+        deployLoadingEl.style.display = "block";
+        deployLoadingEl.querySelector("p").textContent = `Đang tạo ${label}... (5-10 giây)`;
+      }
 
       try {
         const resp = await fetch(`/cohort/wizard/${wizard}/deploy-action`, {
@@ -192,7 +198,10 @@
             "Content-Type": "application/json",
             "X-Cohort-Student-Token": token,
           },
-          body: JSON.stringify({ wizard_output: lastWizardOutput }),
+          body: JSON.stringify({
+            wizard_output: lastWizardOutput,
+            action_type: actionType,
+          }),
         });
         const data = await resp.json();
         if (!resp.ok || !data.success) {
@@ -200,18 +209,22 @@
           return;
         }
 
-        deployUrlEl.value = data.url;
-        deployOpenLink.href = data.url;
-        deployResultEl.style.display = "block";
-        deployResultEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (deployUrlEl) deployUrlEl.value = data.url;
+        if (deployOpenLink) deployOpenLink.href = data.url;
+        if (deployResultEl) {
+          deployResultEl.style.display = "block";
+          const h3 = deployResultEl.querySelector("h3");
+          if (h3) h3.textContent = `✨ ${label} đã sẵn sàng`;
+          deployResultEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       } catch (e) {
         showError(`Deploy error: ${e.message}`);
       } finally {
-        deployBtn.disabled = false;
-        deployLoadingEl.style.display = "none";
+        btn.disabled = false;
+        if (deployLoadingEl) deployLoadingEl.style.display = "none";
       }
     });
-  }
+  });
 
   // Copy URL handler
   if (deployCopyBtn) {

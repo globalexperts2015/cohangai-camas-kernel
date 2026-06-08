@@ -53,7 +53,7 @@ WIZARD_REGISTRY = {
         "agent": "l2_vision_clarity",
         "event": "cohort.vision_clarity",
         "week": 1,
-        "title": "Thấu hiểu bản thân",
+        "title": "Trợ Lý AI Tầm Nhìn",
         "subtitle": "Trước khi bắt đầu kinh doanh, hiểu chính mình để kinh doanh trở thành phong cách sống, không phải gánh nặng.",
         "input_label": "Kể về bản thân: tuổi, công việc, gia đình, mục tiêu thu nhập, lifestyle bạn muốn",
         "input_placeholder": "Ví dụ: Em 38 tuổi, nhân viên văn phòng lương 18tr, 2 con nhỏ. Muốn build business online thêm 15-20tr/tháng mà vẫn giữ việc chính trong 12 tháng đầu. Gia đình ủng hộ, ưu tiên family time tối 18-21h...",
@@ -63,7 +63,7 @@ WIZARD_REGISTRY = {
         "agent": "l2_niche_validator_student",
         "event": "cohort.niche_validate",
         "week": 2,
-        "title": "Chọn đúng thị trường để phục vụ",
+        "title": "Trợ Lý AI Ngách",
         "subtitle": "Chọn thị trường bạn yêu thương đủ sâu để không bao giờ bỏ cuộc khi gặp khó.",
         "input_label": "Mô tả thị trường/ngách bạn đang nghĩ tới (bạn muốn phục vụ AI, giải vấn đề gì)",
         "input_placeholder": "Ví dụ: Dạy mẹ bỉm 25-40 tuổi cách bán hàng decor handmade online từ nhà, mục tiêu thu thêm 10tr/tháng mà không cần thuê mặt bằng",
@@ -73,7 +73,7 @@ WIZARD_REGISTRY = {
         "agent": "l2_transformation_mapper_7d",
         "event": "cohort.transformation_map",
         "week": 3,
-        "title": "Thấu hiểu khách hàng",
+        "title": "Trợ Lý AI Thấu Khách",
         "subtitle": "Hiểu khách sâu để có vô vàn ý tưởng kinh doanh. Đọc vị 7 mặt cuộc sống TRƯỚC và SAU khi mua bạn.",
         "input_label": "Mô tả 1 khách hàng cụ thể bạn muốn phục vụ (càng chi tiết càng tốt)",
         "input_placeholder": "Ví dụ: Chị Lan 32 tuổi, kế toán văn phòng, 2 con nhỏ, lương 14tr. Mỗi tháng cuối khó co kéo, lo tương lai con học trường tư. Chồng làm xa, ủng hộ nhưng không phụ được. Muốn kiếm thêm tại nhà nhưng không biết bắt đầu từ đâu, sợ bị lừa khi học các khoá online...",
@@ -83,7 +83,7 @@ WIZARD_REGISTRY = {
         "agent": "l2_vpc_fit_checker",
         "event": "cohort.vpc_fit_check",
         "week": 5,
-        "title": "Thiết kế giải pháp giá trị",
+        "title": "Trợ Lý AI Giá Trị",
         "subtitle": "Khớp giải pháp với nỗi đau thật của khách. Tránh build cái không ai cần.",
         "input_label": "Ý tưởng sản phẩm/khoá học của bạn (giá, format, deliverable chính)",
         "input_placeholder": "Ví dụ: Khoá 6 tuần dạy mẹ bỉm bán decor handmade online từ A-Z. Giá 3 triệu, có group hỗ trợ 6 tháng + 1-on-1 audit sản phẩm đầu tiên...",
@@ -93,7 +93,7 @@ WIZARD_REGISTRY = {
         "agent": "l2_offer_engineer_student",
         "event": "cohort.offer_engineer",
         "week": 6,
-        "title": "Thiết kế phễu sản phẩm khách không từ chối",
+        "title": "Trợ Lý AI Đóng Gói",
         "subtitle": "Stack giá trị, cam kết, giới hạn để khách gật đầu. AI tự tạo trang bán hàng đẹp sau khi bạn design xong.",
         "input_label": "Tóm tắt giải pháp + persona khách hàng đã design",
         "input_placeholder": "Tóm tắt khoá/sản phẩm (tên + giá + format) + nỗi đau lớn nhất khách + transformation bạn cam kết...",
@@ -103,7 +103,7 @@ WIZARD_REGISTRY = {
         "agent": "l2_mvo_cohort_launcher",
         "event": "cohort.mvo_launch_plan",
         "week": 7,
-        "title": "Chiến lược ra mắt sản phẩm",
+        "title": "Trợ Lý AI Ra Mắt",
         "subtitle": "Kế hoạch 30 ngày ra mắt 5-15 khách trả tiền. Clone chuỗi email nuôi khách + automation Hằng đã build, customize cho bạn.",
         "input_label": "Tóm tắt offer + giải pháp đã thiết kế",
         "input_placeholder": "Tóm tắt: offer chính + giải pháp + persona khách + thời gian launch dự kiến...",
@@ -113,7 +113,7 @@ WIZARD_REGISTRY = {
         "agent": "l2_referral_engine_template",
         "event": "cohort.referral_engine_design",
         "week": 8,
-        "title": "Cỗ máy bán hàng tự động (Capstone)",
+        "title": "Trợ Lý AI Giới Thiệu (Capstone)",
         "subtitle": "Biến khách thành đại sứ. Clone full hệ thống: CRM nuôi khách + thông báo + thanh toán + đánh giá khách tự động.",
         "input_label": "Tóm tắt offer + khách hàng đã design xuyên 7 tuần",
         "input_placeholder": "Tóm tắt offer chính + persona khách hàng + dòng tiền mục tiêu sau referral...",
@@ -441,7 +441,7 @@ async def cohort_index() -> HTMLResponse:
     <header style="text-align:center;margin-bottom:24px">
       <p class="hub-eyebrow">Hệ điều hành xây Solo Empire</p>
       <p class="cohort-intro" style="font-size:16px;max-width:540px;margin:12px auto 0;color:#666">
-        8 tuần. 7 trợ lý AI Hằng đã huấn luyện. Đi từ tầm nhìn đến cỗ máy bán hàng tự động.
+        8 tuần. 7 trợ lý AI trong Team Cô Hằng AI Hằng đã huấn luyện. Đi từ tầm nhìn đến cỗ máy bán hàng tự động.
       </p>
     </header>
 
@@ -485,36 +485,36 @@ async def cohort_index() -> HTMLResponse:
           <a class="cohort-btn" href="/cohort/wizard/offer_engineer">Tạo landing từ Tuần 6 →</a>
         </div>
 
-        <div class="tech-tool">
+        <div class="tech-tool tech-tool-live">
           <div class="tech-tool-icon">📧</div>
-          <div class="tech-tool-status tech-tool-soon">Sắp ra mắt</div>
+          <div class="tech-tool-status">LIVE</div>
           <h3>Chuỗi email nuôi khách</h3>
-          <p>5 chuỗi tự động: chào mừng, nhắc đơn bỏ quên, sau mua, bán thêm, kéo lại khách rời. Clone từ hệ thống Hằng đã chạy thật.</p>
-          <span class="tech-tool-coming">Đang hoàn thiện</span>
+          <p>5 email tự động: chào mừng, nhắc đơn bỏ quên, sau mua, bán thêm, kéo lại khách rời. Template ready paste vào CRM của bạn.</p>
+          <a class="cohort-btn" href="/cohort/wizard/mvo_cohort">Tạo từ Tuần 7 →</a>
         </div>
 
-        <div class="tech-tool">
+        <div class="tech-tool tech-tool-live">
           <div class="tech-tool-icon">💳</div>
-          <div class="tech-tool-status tech-tool-soon">Sắp ra mắt</div>
+          <div class="tech-tool-status">LIVE</div>
           <h3>Hệ thống thanh toán</h3>
-          <p>Trang thanh toán + tự động ghi nhận khách + gửi thông báo xác nhận. Tích hợp sẵn ngân hàng Việt Nam, không cần Stripe.</p>
-          <span class="tech-tool-coming">Đang hoàn thiện</span>
+          <p>Trang thanh toán + hướng dẫn QR + bank info form. Customize info bank của bạn rồi share link cho khách.</p>
+          <a class="cohort-btn" href="/cohort/wizard/mvo_cohort">Tạo từ Tuần 7 →</a>
         </div>
 
-        <div class="tech-tool">
+        <div class="tech-tool tech-tool-live">
           <div class="tech-tool-icon">🤖</div>
-          <div class="tech-tool-status tech-tool-soon">Sắp ra mắt</div>
+          <div class="tech-tool-status">LIVE</div>
           <h3>Hệ thống chăm sóc khách hàng</h3>
-          <p>Nuôi khách tiềm năng, theo dõi sau mua, kéo khách bỏ giỏ, xử lý hoàn tiền tự động. Toàn bộ luồng nghiệp vụ sẵn sàng.</p>
-          <span class="tech-tool-coming">Đang hoàn thiện</span>
+          <p>6 workflow nuôi khách tự động: Welcome, Onboarding, Cart Abandon, Post-purchase, Refund, Win-back. JSON export cho CRM.</p>
+          <a class="cohort-btn" href="/cohort/wizard/referral_engine">Tạo từ Tuần 8 →</a>
         </div>
 
-        <div class="tech-tool">
+        <div class="tech-tool tech-tool-live">
           <div class="tech-tool-icon">📊</div>
-          <div class="tech-tool-status tech-tool-soon">Sắp ra mắt</div>
+          <div class="tech-tool-status">LIVE</div>
           <h3>Đánh giá khách tự động</h3>
-          <p>Chấm điểm 1000+ khách mỗi ngày, phân loại Nóng/Ấm/Lạnh, đẩy cảnh báo khách hot ngay. Bạn chỉ cần follow-up khách đáng giá nhất.</p>
-          <span class="tech-tool-coming">Đang hoàn thiện</span>
+          <p>Framework chấm điểm khách 3 tier (Nóng/Ấm/Lạnh) + công thức + hướng dẫn implement per CRM. Tập trung khách đáng giá nhất.</p>
+          <a class="cohort-btn" href="/cohort/wizard/referral_engine">Tạo từ Tuần 8 →</a>
         </div>
       </div>
     </section>
@@ -529,8 +529,18 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
     if wizard_name not in WIZARD_REGISTRY:
         raise HTTPException(status_code=404, detail=f"Wizard '{wizard_name}' not found")
     w = WIZARD_REGISTRY[wizard_name]
-    action_cfg = get_action_for_wizard(wizard_name)
-    deploy_data_attr = f'data-deploy-label="{action_cfg["label"]}"' if action_cfg else ""
+    from kernel.output_actions import get_actions_for_wizard
+    actions_list = get_actions_for_wizard(wizard_name)
+    # Render multiple deploy buttons (1 per action_type)
+    deploy_buttons_html = "".join(
+        f'<button class="cohort-btn cohort-btn-deploy cohort-deploy-action-btn" '
+        f'data-action-type="{a["action_type"]}" data-label="{_esc_html(a["label"])}" '
+        f'style="display:none">{_esc_html(a["label"])}</button>'
+        for a in actions_list
+    )
+    # Backward compat: data-deploy-label kept for single-action (offer_engineer existing)
+    action_cfg = actions_list[0] if actions_list else None
+    deploy_data_attr = f'data-deploy-label="{_esc_html(action_cfg["label"])}"' if action_cfg else ""
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -574,9 +584,7 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
         <div id="cohort-output-markdown"></div>
         <div class="cohort-action-row">
           <button id="cohort-save-btn" class="cohort-btn">💾 Lưu progress</button>
-          <button id="cohort-deploy-btn" class="cohort-btn cohort-btn-deploy" style="display:none">
-            {action_cfg["label"] if action_cfg else ""}
-          </button>
+          {deploy_buttons_html}
         </div>
 
         <div id="cohort-deploy-result" class="cohort-deploy-result" style="display:none">
@@ -667,7 +675,7 @@ async def webinar_demo_page(wizard_name: str, request: Request) -> HTMLResponse:
 </head>
 <body>
   <div class="wd-container">
-    <div class="wd-badge">Webinar K2 · Buổi {buoi or '?'}</div>
+    <div class="wd-badge">Team Cô Hằng AI · Buổi {buoi or '?'}</div>
     <h1 class="wd-title">{w['title']}</h1>
     <p class="wd-subtitle">{w['subtitle']}</p>
 
@@ -696,7 +704,7 @@ async def webinar_demo_page(wizard_name: str, request: Request) -> HTMLResponse:
       <h3>Submit để được Hằng review LIVE buổi mai</h3>
       <p>Top 3 outputs xuất sắc nhất sẽ được đọc tên + output LIVE đầu buổi tiếp theo + nhận <strong>1 vé Foundation 1 triệu</strong>.</p>
       <a class="wd-tally-btn" id="wd-tally-btn" target="_blank" rel="noopener">
-        Submit output đến Tally form
+        Submit output Team Cô Hằng AI
       </a>
     </div>
 
@@ -1101,24 +1109,42 @@ async def deploy_action(
     request: Request,
     x_cohort_student_token: Optional[str] = Header(None),
 ) -> JSONResponse:
-    """Deploy wizard output sang artifact thật (PILOT: offer_engineer → HTML landing).
+    """Deploy wizard output sang artifact thật.
 
-    Body: {"wizard_output": {...full wizard output_payload}}
+    Body:
+      - wizard_output: full output payload (optional, fallback memory chain)
+      - action_type: which action to deploy (e.g. 'html_landing', 'email_sequence',
+        'payment_landing', 'crm_workflow', 'lead_scoring'). Default = wizard's first action.
+
     Returns: {"success": true, "url": "...", "landing_id": "...", "action_type": "..."}
     """
+    from kernel.output_actions import get_actions_for_wizard, get_action_by_type
+
     student_id = _verify_student_token(x_cohort_student_token)
 
-    action_cfg = get_action_for_wizard(wizard_name)
-    if action_cfg is None:
+    actions_list = get_actions_for_wizard(wizard_name)
+    if not actions_list:
         raise HTTPException(
             status_code=400,
-            detail=f"Wizard '{wizard_name}' chưa support deploy-action. Pilot scope: offer_engineer.",
+            detail=f"Wizard '{wizard_name}' chưa support deploy-action.",
         )
 
     try:
         body = await request.json()
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    # Pick action_type: body override, else first action default
+    requested_action = body.get("action_type")
+    if requested_action:
+        action_cfg = get_action_by_type(wizard_name, requested_action)
+        if action_cfg is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Action type '{requested_action}' không support cho wizard {wizard_name}. Available: {[a['action_type'] for a in actions_list]}",
+            )
+    else:
+        action_cfg = actions_list[0]
 
     wizard_output = body.get("wizard_output") or {}
     if not wizard_output:
@@ -1142,49 +1168,60 @@ async def deploy_action(
             detail=f"Cần wizard_output trong body HOẶC chạy {wizard_name} trước để memory chain có data.",
         )
 
-    landing_id = generate_landing_id(student_id, wizard_name)
+    action_type = action_cfg["action_type"]
+    handler = action_cfg["handler"]
+    landing_id = generate_landing_id(student_id, f"{wizard_name}-{action_type[:6]}")
 
-    if action_cfg["action_type"] == "html_landing":
-        html_content = generate_offer_landing_html(
+    # Dispatch to handler (offer payload key naming varies, handler accepts payload dict)
+    try:
+        html_content = handler(
+            wizard_output,
+            student_id,
+            landing_id,
+        )
+    except TypeError:
+        # Legacy handler signature (offer_engineer): offer_payload= kwarg
+        html_content = handler(
             offer_payload=wizard_output,
             student_id=student_id,
             landing_id=landing_id,
         )
 
-        sched = _scheduler(request)
-        if getattr(sched, "memory", None) is not None:
-            try:
-                record = MemoryRecord(
-                    agent_name=f"cohort_landing_{wizard_name}",
-                    content=html_content,
-                    keywords=[LANDING_TAG, landing_id, student_id, wizard_name],
-                    tags=[LANDING_TAG, landing_id, student_id, wizard_name, "cohort_1"],
-                    category="task",
-                    context=f"Landing page deployed student={student_id} wizard={wizard_name} id={landing_id}",
-                    venture="cohangai",
-                    evolution_history=[],
-                )
-                await sched.memory.store(record)
-            except Exception as exc:  # noqa: BLE001
-                log.warning("Landing store fail: %r", exc)
-                raise HTTPException(status_code=500, detail=f"Storage fail: {exc}")
-        else:
-            raise HTTPException(status_code=503, detail="Memory layer not ready, không persist được")
+    sched = _scheduler(request)
+    if getattr(sched, "memory", None) is None:
+        raise HTTPException(status_code=503, detail="Memory layer not ready, không persist được")
 
-        base_url = os.getenv("CAMAS_PUBLIC_URL", "https://camas-kernel-production.up.railway.app")
-        landing_url = f"{base_url}/cohort/landing/{landing_id}"
+    try:
+        record = MemoryRecord(
+            agent_name=f"cohort_artifact_{wizard_name}_{action_type}",
+            content=html_content,
+            keywords=[LANDING_TAG, landing_id, student_id, wizard_name, action_type],
+            tags=[LANDING_TAG, landing_id, student_id, wizard_name, action_type, "cohort_1"],
+            category="task",
+            context=f"Artifact deployed student={student_id} wizard={wizard_name} action={action_type} id={landing_id}",
+            venture="cohangai",
+            evolution_history=[],
+        )
+        await sched.memory.store(record)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Artifact store fail: %r", exc)
+        raise HTTPException(status_code=500, detail=f"Storage fail: {exc}")
 
-        log.info("Landing deployed student=%s wizard=%s id=%s", student_id, wizard_name, landing_id)
+    base_url = os.getenv("CAMAS_PUBLIC_URL", "https://camas-kernel-production.up.railway.app")
+    landing_url = f"{base_url}/cohort/landing/{landing_id}"
 
-        return JSONResponse({
-            "success": True,
-            "action_type": "html_landing",
-            "landing_id": landing_id,
-            "url": landing_url,
-            "wizard": wizard_name,
-        })
+    log.info(
+        "Artifact deployed student=%s wizard=%s action=%s id=%s",
+        student_id, wizard_name, action_type, landing_id,
+    )
 
-    raise HTTPException(status_code=500, detail=f"Action type '{action_cfg['action_type']}' not implemented")
+    return JSONResponse({
+        "success": True,
+        "action_type": action_type,
+        "landing_id": landing_id,
+        "url": landing_url,
+        "wizard": wizard_name,
+    })
 
 
 @router.get("/landing/{landing_id}", response_class=HTMLResponse)
