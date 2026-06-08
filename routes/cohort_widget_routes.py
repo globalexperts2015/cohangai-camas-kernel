@@ -726,6 +726,236 @@ async def serve_landing(landing_id: str, request: Request) -> HTMLResponse:
     return HTMLResponse(records[0].content)
 
 
+# Sprint 14 P0.6 Admin Dashboard Observability
+
+ADMIN_KEY_ENV = "COHORT_ADMIN_KEY"
+
+
+def _verify_admin_key(key: Optional[str]) -> None:
+    """Bearer-style auth qua query param ?key=XXX."""
+    expected = os.getenv(ADMIN_KEY_ENV, "")
+    if not expected:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Admin disabled, set {ADMIN_KEY_ENV} env var",
+        )
+    if not key or key != expected:
+        raise HTTPException(status_code=401, detail="Invalid admin key")
+
+
+@router.get("/admin/dashboard", response_class=HTMLResponse)
+async def admin_dashboard(request: Request, key: Optional[str] = None) -> HTMLResponse:
+    """Anna admin view: list students + wizard activity + lead score."""
+    _verify_admin_key(key)
+    sched = _scheduler(request)
+    if getattr(sched, "memory", None) is None:
+        raise HTTPException(status_code=503, detail="Memory layer not ready")
+
+    # Pull all chain entries last 30 days
+    records = await sched.memory.retrieve_by_tags_recent(
+        tags_must_contain=[CHAIN_TAG],
+        limit=500,
+        venture="cohangai",
+    )
+
+    students: dict = {}
+    for r in records:
+        student_id = None
+        wizard = None
+        for t in (r.tags or []):
+            if t in WIZARD_REGISTRY:
+                wizard = t
+            elif t not in (CHAIN_TAG, "cohort_1") and not student_id:
+                student_id = t
+        if not student_id or not wizard:
+            continue
+        if student_id not in students:
+            students[student_id] = {"student_id": student_id, "wizards": {}, "last_activity": r.created_at}
+        students[student_id]["wizards"][wizard] = {
+            "created_at": r.created_at,
+            "content_len": len(r.content or ""),
+        }
+        if r.created_at and (students[student_id]["last_activity"] is None or r.created_at > students[student_id]["last_activity"]):
+            students[student_id]["last_activity"] = r.created_at
+
+    # Sort by # wizards desc then last_activity desc
+    sorted_students = sorted(
+        students.values(),
+        key=lambda s: (len(s["wizards"]), s["last_activity"] or 0),
+        reverse=True,
+    )
+
+    rows_html = []
+    for s in sorted_students[:100]:
+        wizard_badges = "".join(
+            f'<span class="badge badge-{w}" title="{_esc_html(w)}">{w[:3].upper()}</span>'
+            for w in s["wizards"].keys()
+        )
+        last_str = s["last_activity"].strftime("%d/%m %H:%M") if s["last_activity"] else "?"
+        score = len(s["wizards"]) * 10 + (50 if len(s["wizards"]) >= 6 else 0)
+        hot_class = "hot" if score >= 50 else ("warm" if score >= 30 else "cold")
+        rows_html.append(f"""
+        <tr class="row-{hot_class}">
+          <td><a href="/cohort/admin/student/{_esc_html(s['student_id'])}?key={_esc_html(key)}">{_esc_html(s['student_id'])}</a></td>
+          <td>{wizard_badges}</td>
+          <td><strong>{len(s['wizards'])}/7</strong></td>
+          <td><span class="score score-{hot_class}">{score}</span></td>
+          <td>{last_str}</td>
+        </tr>""")
+
+    rows_str = "".join(rows_html) or '<tr><td colspan="5" style="text-align:center;padding:40px;color:#999">Chưa có wizard run nào</td></tr>'
+    total_students = len(students)
+    hot_count = sum(1 for s in students.values() if len(s["wizards"]) >= 5)
+
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cohort 1 Admin Dashboard</title>
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#222;padding:24px}}
+.container{{max-width:1200px;margin:0 auto}}
+h1{{font-size:28px;margin-bottom:8px}}
+.subtitle{{color:#666;margin-bottom:24px}}
+.stats{{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap}}
+.stat{{background:white;border-radius:12px;padding:16px 20px;flex:1;min-width:180px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}}
+.stat-num{{font-size:32px;font-weight:700;color:#0066ff}}
+.stat-label{{color:#666;font-size:13px;margin-top:4px}}
+table{{width:100%;background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05)}}
+th,td{{padding:12px 16px;text-align:left;border-bottom:1px solid #eee}}
+th{{background:#f9fafb;font-size:13px;color:#666;text-transform:uppercase;letter-spacing:0.5px}}
+tr:hover{{background:#f9fafb}}
+.row-hot{{background:linear-gradient(to right,#fff5f5,white)}}
+.row-warm{{background:linear-gradient(to right,#fffbf0,white)}}
+.badge{{display:inline-block;background:#e0e7ff;color:#3730a3;font-size:10px;font-weight:600;padding:3px 7px;border-radius:6px;margin-right:4px}}
+.score{{display:inline-block;font-weight:700;padding:4px 10px;border-radius:12px}}
+.score-hot{{background:#fee;color:#c92a2a}}
+.score-warm{{background:#fff4e6;color:#d9480f}}
+.score-cold{{background:#e7f5ff;color:#1864ab}}
+a{{color:#0066ff;text-decoration:none;font-weight:600}}
+a:hover{{text-decoration:underline}}
+@media(max-width:600px){{body{{padding:12px}}th,td{{padding:8px}}}}
+</style></head>
+<body>
+<div class="container">
+  <h1>🎯 Cohort 1 Admin Dashboard</h1>
+  <p class="subtitle">Wizard activity tracking. Updated 30 ngày gần nhất.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num">{total_students}</div><div class="stat-label">Total students có activity</div></div>
+    <div class="stat"><div class="stat-num">{hot_count}</div><div class="stat-label">Hot leads (≥5 wizards)</div></div>
+    <div class="stat"><div class="stat-num">{len(records)}</div><div class="stat-label">Total wizard runs</div></div>
+    <div class="stat"><div class="stat-num">{len(WIZARD_REGISTRY)}</div><div class="stat-label">Wizards available</div></div>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th>Student ID</th>
+      <th>Wizards completed</th>
+      <th>Progress</th>
+      <th>Lead score</th>
+      <th>Last activity</th>
+    </tr></thead>
+    <tbody>{rows_str}</tbody>
+  </table>
+
+  <p style="margin-top:24px;color:#999;font-size:13px;text-align:center">
+    Lead score = wizards × 10 + 50 bonus nếu ≥6/7 wizards.
+    Hot ≥50 | Warm 30-49 | Cold &lt;30
+  </p>
+</div>
+</body></html>""")
+
+
+def _esc_html(s) -> str:
+    import html as _html
+    return _html.escape(str(s or ""), quote=True)
+
+
+@router.get("/admin/student/{student_id}", response_class=HTMLResponse)
+async def admin_student_detail(
+    student_id: str, request: Request, key: Optional[str] = None
+) -> HTMLResponse:
+    """Per-student detail: list all wizard outputs với preview + link full markdown."""
+    _verify_admin_key(key)
+    sched = _scheduler(request)
+    if getattr(sched, "memory", None) is None:
+        raise HTTPException(status_code=503, detail="Memory layer not ready")
+
+    records = await sched.memory.retrieve_by_tags_recent(
+        tags_must_contain=[CHAIN_TAG, student_id],
+        limit=50,
+        venture="cohangai",
+    )
+
+    if not records:
+        return HTMLResponse(f"""<!DOCTYPE html><html><body style="font-family:sans-serif;padding:40px;text-align:center">
+        <h2>Student '{_esc_html(student_id)}' chưa có wizard activity</h2>
+        <a href="/cohort/admin/dashboard?key={_esc_html(key)}">← Dashboard</a>
+        </body></html>""")
+
+    items_html = []
+    for r in records:
+        wizard = "?"
+        for t in (r.tags or []):
+            if t in WIZARD_REGISTRY:
+                wizard = t
+                break
+        wizard_meta = WIZARD_REGISTRY.get(wizard, {})
+        title = wizard_meta.get("title", wizard)
+        created = r.created_at.strftime("%d/%m %H:%M") if r.created_at else "?"
+        try:
+            parsed = json.loads(r.content)
+            preview_keys = list(parsed.keys())[:8] if isinstance(parsed, dict) else []
+            preview = ", ".join(preview_keys)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            preview = (r.content or "")[:150]
+
+        items_html.append(f"""
+        <div class="card">
+          <div class="card-header">
+            <h3>{_esc_html(title)}</h3>
+            <span class="time">{created}</span>
+          </div>
+          <div class="card-body">
+            <div class="meta">Wizard: <code>{_esc_html(wizard)}</code> · Content len: {len(r.content or '')} chars</div>
+            <div class="preview">{_esc_html(preview)}</div>
+          </div>
+        </div>""")
+
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{_esc_html(student_id)} | Cohort 1 Admin</title>
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;color:#222;padding:24px}}
+.container{{max-width:900px;margin:0 auto}}
+.back{{color:#0066ff;text-decoration:none;font-weight:600;margin-bottom:16px;display:inline-block}}
+h1{{font-size:28px;margin-bottom:24px}}
+.summary{{background:white;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}}
+.card{{background:white;border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05)}}
+.card-header{{background:#f9fafb;padding:16px 20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}}
+.card-header h3{{font-size:18px}}
+.time{{color:#999;font-size:13px}}
+.card-body{{padding:16px 20px}}
+.meta{{font-size:13px;color:#666;margin-bottom:8px}}
+.preview{{color:#444;font-size:14px;background:#f9fafb;padding:12px;border-radius:8px;border-left:3px solid #0066ff}}
+code{{background:#eef;padding:2px 6px;border-radius:4px;font-size:12px}}
+</style></head>
+<body>
+<div class="container">
+  <a class="back" href="/cohort/admin/dashboard?key={_esc_html(key)}">← Dashboard</a>
+  <h1>📋 {_esc_html(student_id)}</h1>
+  <div class="summary">
+    <strong>{len(records)} wizard outputs</strong> · Latest activity:
+    {records[0].created_at.strftime("%d/%m/%Y %H:%M") if records[0].created_at else "?"}
+  </div>
+  {"".join(items_html)}
+</div>
+</body></html>""")
+
+
 def mount_static(app):
     """Mount static dir cho widget JS/CSS. Call from main.py."""
     if STATIC_DIR.exists():
