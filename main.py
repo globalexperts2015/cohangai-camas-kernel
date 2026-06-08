@@ -50,6 +50,8 @@ from agents.niche_validator import NicheValidator
 from agents.demand_research import DemandResearch
 from agents.content_distributor import ContentDistributor
 from agents.trust_capital_tracker import TrustCapitalTracker
+from agents.overlay_a_cohort_comparison import OverlayACohortComparison
+from agents.overlay_a_antifragility import OverlayAAntifragility
 
 # Sprint 5 Tier 3: 10 Phòng ban
 from agents.pban_01_quang_cao import Pban01QuangCao
@@ -241,6 +243,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     trust_capital_tracker = TrustCapitalTracker(llm=scheduler.llm, memory=scheduler.memory)
     scheduler.register(trust_capital_tracker)
     log.info("Trust Capital Tracker registered (trust.quarterly_audit, Stage 13)")
+
+    # Sprint 13 P1.5: Overlay A enhance (BC3 + BC8 antifragility)
+    overlay_a_cohort = OverlayACohortComparison(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(overlay_a_cohort)
+    log.info("Overlay A Cohort Comparison registered (overlay_a.cohort_compare, BC3 enhance)")
+
+    overlay_a_antifragility = OverlayAAntifragility(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(overlay_a_antifragility)
+    log.info("Overlay A Antifragility registered (overlay_a.antifragility_score, BC8 enhance)")
 
     # Sprint 5 Tier 3: 10 Phòng ban Breakout Funnel OS
     pban_classes = [
