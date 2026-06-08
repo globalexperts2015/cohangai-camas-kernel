@@ -41,8 +41,8 @@ from .prompt_template import (
 log = logging.getLogger("camas.bc11_vpc_builder")
 
 DEFAULT_MODEL = "claude-opus-4-7"
-DEFAULT_MAX_TOKENS = 3500
-DEFAULT_TIMEOUT = 120.0
+DEFAULT_MAX_TOKENS = 6000
+DEFAULT_TIMEOUT = 180.0
 
 
 class BC11VPCBuilder(BaseBC):
@@ -141,11 +141,13 @@ class BC11VPCBuilder(BaseBC):
         orphan_pains = canvas.get("orphan_pains", []) or []
         orphan_gains = canvas.get("orphan_gains", []) or []
         anna_match = canvas.get("anna_persona_match", "none")
+        relievers = canvas.get("pain_relievers", []) or []
+        creators = canvas.get("gain_creators", []) or []
 
         summary = (
-            f"VPC canvas {persona_name} ({venture}) "
-            f"fit={fit_score} orphans={len(orphan_pains)+len(orphan_gains)} "
-            f"anna_match={anna_match}"
+            f"VPC {persona_name} ({venture}) fit={fit_score} "
+            f"relievers={len(relievers)} creators={len(creators)} "
+            f"orphans={len(orphan_pains)+len(orphan_gains)} anna_match={anna_match}"
         )
 
         memory_entry = {

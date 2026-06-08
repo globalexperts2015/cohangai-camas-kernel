@@ -66,141 +66,78 @@ Output qua tool submit_canvas. Detect orphan_pains + orphan_gains nếu có.
 
 SUBMIT_CANVAS_TOOL = {
     "name": "submit_canvas",
-    "description": "Submit Tròn Vuông VPC canvas 6 component, schema-validated production-grade.",
+    "description": "Submit Tròn Vuông VPC canvas 6 component (flat schema for LLM compliance)",
     "input_schema": {
         "type": "object",
         "properties": {
             "persona_name": {"type": "string"},
             "venture": {"type": "string"},
-            "trong_khach_hang": {
-                "type": "object",
-                "description": "Trục Tròn - Customer side",
-                "properties": {
-                    "jobs": {
-                        "type": "object",
-                        "properties": {
-                            "functional": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 2,
-                                "description": "Min 2 functional jobs cụ thể, có timeline/KPI",
-                            },
-                            "social": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 1,
-                            },
-                            "emotional": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 1,
-                            },
-                        },
-                        "required": ["functional", "social", "emotional"],
-                    },
-                    "pains": {
-                        "type": "object",
-                        "properties": {
-                            "functional": {"type": "array", "items": {"type": "string"}, "minItems": 2},
-                            "social": {"type": "array", "items": {"type": "string"}, "minItems": 2},
-                            "emotional": {"type": "array", "items": {"type": "string"}, "minItems": 2},
-                            "ancillary": {"type": "array", "items": {"type": "string"}},
-                        },
-                        "required": ["functional", "social", "emotional"],
-                    },
-                    "barriers": {
-                        "type": "object",
-                        "properties": {
-                            "time": {"type": "string"},
-                            "money": {"type": "string"},
-                            "skills": {"type": "string"},
-                        },
-                    },
-                    "risks": {
-                        "type": "object",
-                        "properties": {
-                            "financial": {"type": "string"},
-                            "social": {"type": "string"},
-                            "time": {"type": "string"},
-                        },
-                    },
-                    "gains": {
-                        "type": "object",
-                        "properties": {
-                            "required": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-                            "expected": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-                            "desired": {"type": "array", "items": {"type": "string"}},
-                            "unexpected": {"type": "array", "items": {"type": "string"}},
-                        },
-                        "required": ["required", "expected"],
+            "jobs_functional": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Functional jobs cụ thể, có timeline/KPI (≥2)",
+            },
+            "jobs_social": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Social jobs về status/image (≥1)",
+            },
+            "jobs_emotional": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Emotional jobs về cảm giác (≥1)",
+            },
+            "pains_functional": {"type": "array", "items": {"type": "string"}},
+            "pains_social": {"type": "array", "items": {"type": "string"}},
+            "pains_emotional": {"type": "array", "items": {"type": "string"}},
+            "pains_ancillary": {"type": "array", "items": {"type": "string"}},
+            "barrier_time": {"type": "string"},
+            "barrier_money": {"type": "string"},
+            "barrier_skills": {"type": "string"},
+            "risk_financial": {"type": "string"},
+            "risk_social": {"type": "string"},
+            "risk_time": {"type": "string"},
+            "gains_required": {"type": "array", "items": {"type": "string"}},
+            "gains_expected": {"type": "array", "items": {"type": "string"}},
+            "gains_desired": {"type": "array", "items": {"type": "string"}},
+            "gains_unexpected": {"type": "array", "items": {"type": "string"}},
+            "products_services": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Vuông: list sản phẩm/dịch vụ",
+            },
+            "pain_relievers": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "feature": {"type": "string"},
+                        "addresses_pain": {"type": "string"},
                     },
                 },
-                "required": ["jobs", "pains", "gains"],
+                "description": "Vuông: pain relievers (≥3, mỗi pain critical phải có)",
             },
-            "vuong_san_pham": {
-                "type": "object",
-                "description": "Trục Vuông - Product side",
-                "properties": {
-                    "products_services": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-                    "pain_relievers": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "feature": {"type": "string"},
-                                "addresses_pain": {"type": "string"},
-                            },
-                            "required": ["feature", "addresses_pain"],
-                        },
-                        "minItems": 3,
-                    },
-                    "gain_creators": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "feature": {"type": "string"},
-                                "creates_gain": {"type": "string"},
-                            },
-                            "required": ["feature", "creates_gain"],
-                        },
-                        "minItems": 2,
+            "gain_creators": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "feature": {"type": "string"},
+                        "creates_gain": {"type": "string"},
                     },
                 },
-                "required": ["products_services", "pain_relievers", "gain_creators"],
+                "description": "Vuông: gain creators (≥2, required/expected gains phải có)",
             },
-            "fit_score": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 100,
-                "description": "Mức fit Tròn ↔ Vuông. 100=mọi pair perfect, giảm cho mỗi orphan",
-            },
-            "orphan_pains": {
-                "type": "array",
-                "description": "Pain không có Pain Reliever match",
-                "items": {"type": "string"},
-            },
-            "orphan_gains": {
-                "type": "array",
-                "description": "Required/Expected Gain không có Gain Creator",
-                "items": {"type": "string"},
-            },
+            "fit_score": {"type": "integer", "minimum": 0, "maximum": 100},
+            "orphan_pains": {"type": "array", "items": {"type": "string"}},
+            "orphan_gains": {"type": "array", "items": {"type": "string"}},
             "anna_persona_match": {
                 "type": "string",
-                "enum": ["nhan_vien_vp", "me_bim_sua", "chu_shop", "custom", "none"],
-                "description": "Match với 1 trong 3 chân dung canonical Anna nếu có",
+                "description": "nhan_vien_vp | me_bim_sua | chu_shop | custom | none",
             },
+            "passes_quality": {"type": "boolean"},
             "summary": {"type": "string"},
-            "quality_check": {
-                "type": "object",
-                "properties": {
-                    "has_em_dash": {"type": "boolean"},
-                    "has_forbidden_term": {"type": "boolean"},
-                    "is_generic": {"type": "boolean"},
-                    "passes_quality": {"type": "boolean"},
-                },
-            },
         },
-        "required": ["persona_name", "venture", "trong_khach_hang", "vuong_san_pham", "fit_score", "summary"],
+        "required": ["persona_name", "venture", "jobs_functional", "pains_functional", "products_services", "pain_relievers", "gain_creators", "fit_score", "summary"],
     },
 }
