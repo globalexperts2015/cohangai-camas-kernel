@@ -121,12 +121,12 @@ WIZARD_REGISTRY = {
     },
 }
 
-# Tuần 4 = practice phase (no wizard, link back transformation_mapper for deeper iteration)
+# Tuần 4 = build customer profile, link transformation_mapper for refined persona
 WEEK_4_PLACEHOLDER = {
     "week": 4,
-    "title": "Đào sâu insight khách hàng",
-    "subtitle": "Tuần thực hành: phỏng vấn 3-5 khách thật, refine output Tuần 3 với data mới. Insight càng sâu, offer càng trúng.",
-    "wizard_slug": "transformation_mapper",  # Re-run với context refined
+    "title": "Xây dựng hồ sơ khách hàng",
+    "subtitle": "Tổng hợp dữ liệu 3 tuần đầu thành hồ sơ khách hàng đầy đủ: persona + nỗi đau + niềm vui + ngôn ngữ + kênh tiếp cận. Đây là nền cho mọi quyết định kinh doanh sau.",
+    "wizard_slug": "transformation_mapper",
 }
 
 
