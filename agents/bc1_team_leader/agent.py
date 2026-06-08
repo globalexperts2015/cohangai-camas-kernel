@@ -109,6 +109,9 @@ class BC1TeamLeader(BaseBC):
         # 1. Stats từ Postgres
         stats = await self._collect_stats(window_hours=window_hours)
 
+        # 1b. Referral stats từ breakout-referral service (P0.2 integration)
+        referral_stats = await self._collect_referral_stats()
+
         # 2. Top retrieved từ memory layer (semantic retrieve fallback nếu fail)
         try:
             retrieved = await self.memory.retrieve(
@@ -130,6 +133,7 @@ class BC1TeamLeader(BaseBC):
             stats=stats,
             top_retrieval=top_retrieval_summary,
             recommendation=recommendation,
+            referral_stats=referral_stats,
         )
 
         # 5. Send Telegram
@@ -313,6 +317,34 @@ class BC1TeamLeader(BaseBC):
         text = "".join(text_parts).strip()
         return text or "Không có khuyến nghị"
 
+    async def _collect_referral_stats(self) -> dict[str, Any]:
+        """Query breakout-referral service /admin/stats + top 5 leaderboard."""
+        url = os.getenv(
+            "REFERRAL_BASE_URL",
+            "https://breakout-referral-production.up.railway.app",
+        )
+        admin_key = os.getenv("REFERRAL_ADMIN_KEY", "")
+        if not admin_key:
+            return {"enabled": False, "reason": "REFERRAL_ADMIN_KEY not set"}
+
+        result: dict[str, Any] = {"enabled": True}
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                stats_resp = await client.get(
+                    f"{url}/admin/stats",
+                    headers={"X-Admin-Key": admin_key},
+                )
+                if stats_resp.status_code < 300:
+                    result["stats"] = stats_resp.json()
+
+                lb_resp = await client.get(f"{url}/referral/leaderboard?period=alltime&limit=5")
+                if lb_resp.status_code < 300:
+                    result["leaderboard"] = lb_resp.json().get("items", [])
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Referral stats fail: %r", exc)
+            result["error"] = str(exc)
+        return result
+
     def _build_digest(
         self,
         *,
@@ -322,6 +354,7 @@ class BC1TeamLeader(BaseBC):
         stats: dict[str, Any],
         top_retrieval: str,
         recommendation: str,
+        referral_stats: Optional[dict[str, Any]] = None,
     ) -> str:
         """Render markdown digest. Telegram parse_mode=Markdown."""
         header_emoji = "Morning Brief" if kind == "morning" else "Evening Brief"
@@ -363,13 +396,35 @@ class BC1TeamLeader(BaseBC):
             f"- Total memories: {total}",
             f"- Top agents: {top_agents_line}",
             f"- Top retrieval: {top_retrieval}",
+        ]
+
+        # Referral stats line nếu có
+        ref = referral_stats or {}
+        if ref.get("enabled") and "stats" in ref:
+            rs = ref["stats"]
+            lb = ref.get("leaderboard", [])
+            ref_lines = [
+                "",
+                "*Referral (P0.2):*",
+                f"- Conversions: {rs.get('total_conversions', 0)} | Revenue: {rs.get('total_revenue_vnd', 0):,}vnd | Commission: {rs.get('total_commission_vnd', 0):,}vnd",
+                f"- Unique referrers: {rs.get('unique_referrers', 0)} | Total clicks: {rs.get('total_clicks', 0)} | Conv rate: {rs.get('conversion_rate_pct', 0)}%",
+            ]
+            if lb:
+                top5 = ", ".join(
+                    f"#{i['rank']} {i['referrer_contact_id'][:8]} ({i['referrals']}/{i['commission_vnd']:,}vnd)"
+                    for i in lb[:5]
+                )
+                ref_lines.append(f"- Top 5: {top5}")
+            lines.extend(ref_lines)
+
+        lines.extend([
             "",
             "*Hot items cần Anna:*",
             *hot_lines,
             "",
             "*Recommended actions:*",
             f"- {recommendation}",
-        ]
+        ])
         return "\n".join(lines)
 
 
