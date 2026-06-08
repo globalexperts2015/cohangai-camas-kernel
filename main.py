@@ -42,6 +42,9 @@ from agents.bc18_value_equation import BC18ValueEquation
 from agents.bc19_funnel_architect import BC19FunnelArchitect
 from agents.bc20_copy_stack import BC20CopyStack
 
+# Sprint 13 P0.3: Financial Modeler (CAC/LTV/Payback/Runway daily)
+from agents.financial_modeler import FinancialModeler
+
 # Sprint 5 Tier 3: 10 Phòng ban
 from agents.pban_01_quang_cao import Pban01QuangCao
 from agents.pban_02_noi_dung import Pban02NoiDung
@@ -210,6 +213,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bc20 = BC20CopyStack(llm=scheduler.llm, memory=scheduler.memory)
     scheduler.register(bc20)
     log.info("BC20 Copy Stack registered (copy.generate_stack, Dan Lok 8 secrets + Brunson Soap Opera + Hormozi)")
+
+    # Sprint 13 P0.3: Financial Modeler daily CAC/LTV/Payback/Runway
+    financial_modeler = FinancialModeler(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(financial_modeler)
+    log.info("Financial Modeler registered (financial.daily_calc + financial.venture_audit, Overlay B)")
 
     # Sprint 5 Tier 3: 10 Phòng ban Breakout Funnel OS
     pban_classes = [
