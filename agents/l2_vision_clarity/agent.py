@@ -90,6 +90,10 @@ SUBMIT_VISION_TOOL = {
                 "type": "string",
                 "description": "nhan_vien_vp | me_bim_sua | chu_shop | custom | none",
             },
+            "markdown_report": {
+                "type": "string",
+                "description": "Full Markdown report cho student dashboard, format đẹp với headings ## + bullets, KHÔNG raw dict",
+            },
             "summary": {"type": "string"},
         },
         "required": [
@@ -99,6 +103,7 @@ SUBMIT_VISION_TOOL = {
             "life_goal_categories",
             "business_motivation",
             "next_3_action_steps",
+            "markdown_report",
             "summary",
         ],
     },
@@ -164,6 +169,55 @@ Format:
 
 ## 7. Next 3 action steps (30 ngày tới)
 Concrete, measurable, schedulable.
+
+## 8. Full markdown_report (BẮT BUỘC)
+
+Build COMPLETE Markdown report dashboard-friendly. KHÔNG render raw dict object. Format chuẩn:
+
+```
+# Vision Clarity Report
+
+## Vision 5 năm
+[Vision statement câu hoàn chỉnh]
+
+## 5 Life Goal Categories
+
+### 1. Tài chính
+- 5 năm: [goal]
+- 1 năm: [goal]
+- 3 tháng: [goal]
+
+### 2. Gia đình
+- 5 năm: ...
+- 1 năm: ...
+- 3 tháng: ...
+
+(... tiếp 3 category còn lại)
+
+## Business Motivation
+[True why...]
+
+## Non-Negotiables
+- [item 1]
+- [item 2]
+- ...
+
+## Energy Drivers vs Drains
+**Drivers**:
+- ...
+**Drains**:
+- ...
+
+## 5-Year Roadmap
+[markdown roadmap đã format]
+
+## 3 Action Steps tuần tới
+1. ...
+2. ...
+3. ...
+```
+
+Mỗi life_goal_category render thành sub-heading ### với 3 bullet (5 năm / 1 năm / 3 tháng). KHÔNG dump JSON.
 
 # Quality requirements
 - KHÔNG generic ("sống ý nghĩa"), MUST specific với student data
