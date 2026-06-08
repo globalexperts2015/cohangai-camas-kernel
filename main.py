@@ -42,6 +42,9 @@ from agents.bc18_value_equation import BC18ValueEquation
 from agents.bc19_funnel_architect import BC19FunnelArchitect
 from agents.bc20_copy_stack import BC20CopyStack
 
+# Sprint 13 P0.1: Offer Engineer (Hormozi $100M formula)
+from agents.offer_engineer import OfferEngineer
+
 # Sprint 13 P0.3: Financial Modeler (CAC/LTV/Payback/Runway daily)
 from agents.financial_modeler import FinancialModeler
 
@@ -221,6 +224,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bc20 = BC20CopyStack(llm=scheduler.llm, memory=scheduler.memory)
     scheduler.register(bc20)
     log.info("BC20 Copy Stack registered (copy.generate_stack, Dan Lok 8 secrets + Brunson Soap Opera + Hormozi)")
+
+    # Sprint 13 P0.1: Offer Engineer (Hormozi $100M formula, Stage 9)
+    offer_engineer = OfferEngineer(llm=scheduler.llm, memory=scheduler.memory)
+    scheduler.register(offer_engineer)
+    log.info("Offer Engineer registered (offer.engineer + offer.audit, Hormozi $100M Offers)")
 
     # Sprint 13 P0.3: Financial Modeler daily CAC/LTV/Payback/Runway
     financial_modeler = FinancialModeler(llm=scheduler.llm, memory=scheduler.memory)
