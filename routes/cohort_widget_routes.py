@@ -27,6 +27,11 @@ import json
 
 from kernel.base_agent import ExecutionContext
 from kernel.memory_layer import MemoryRecord
+from kernel.output_actions import (
+    generate_landing_id,
+    generate_offer_landing_html,
+    get_action_for_wizard,
+)
 from kernel.voice_gate import apply_voice_rewrite, voice_rewrite_enabled
 
 log = logging.getLogger("camas.cohort_widget")
@@ -519,6 +524,122 @@ async def save_progress(
         "week": w["week"],
         "saved_at": "now",
     })
+
+
+# Sprint 15-16 P0.5 PILOT Output → Action endpoints
+
+LANDING_TAG = "cohort_landing"
+
+
+@router.post("/wizard/{wizard_name}/deploy-action")
+async def deploy_action(
+    wizard_name: str,
+    request: Request,
+    x_cohort_student_token: Optional[str] = Header(None),
+) -> JSONResponse:
+    """Deploy wizard output sang artifact thật (PILOT: offer_engineer → HTML landing).
+
+    Body: {"wizard_output": {...full wizard output_payload}}
+    Returns: {"success": true, "url": "...", "landing_id": "...", "action_type": "..."}
+    """
+    student_id = _verify_student_token(x_cohort_student_token)
+
+    action_cfg = get_action_for_wizard(wizard_name)
+    if action_cfg is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Wizard '{wizard_name}' chưa support deploy-action. Pilot scope: offer_engineer.",
+        )
+
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    wizard_output = body.get("wizard_output") or {}
+    if not wizard_output:
+        # Fallback: retrieve latest wizard output từ memory chain
+        sched = _scheduler(request)
+        if getattr(sched, "memory", None) is not None:
+            records = await sched.memory.retrieve_by_tags_recent(
+                tags_must_contain=[CHAIN_TAG, student_id, wizard_name],
+                limit=1,
+                venture="cohangai",
+            )
+            if records:
+                try:
+                    wizard_output = json.loads(records[0].content)
+                except (TypeError, ValueError):
+                    pass
+
+    if not wizard_output:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cần wizard_output trong body HOẶC chạy {wizard_name} trước để memory chain có data.",
+        )
+
+    landing_id = generate_landing_id(student_id, wizard_name)
+
+    if action_cfg["action_type"] == "html_landing":
+        html_content = generate_offer_landing_html(
+            offer_payload=wizard_output,
+            student_id=student_id,
+            landing_id=landing_id,
+        )
+
+        sched = _scheduler(request)
+        if getattr(sched, "memory", None) is not None:
+            try:
+                record = MemoryRecord(
+                    agent_name=f"cohort_landing_{wizard_name}",
+                    content=html_content,
+                    keywords=[LANDING_TAG, landing_id, student_id, wizard_name],
+                    tags=[LANDING_TAG, landing_id, student_id, wizard_name, "cohort_1"],
+                    category="task",
+                    context=f"Landing page deployed student={student_id} wizard={wizard_name} id={landing_id}",
+                    venture="cohangai",
+                    evolution_history=[],
+                )
+                await sched.memory.store(record)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("Landing store fail: %r", exc)
+                raise HTTPException(status_code=500, detail=f"Storage fail: {exc}")
+        else:
+            raise HTTPException(status_code=503, detail="Memory layer not ready, không persist được")
+
+        base_url = os.getenv("CAMAS_PUBLIC_URL", "https://camas-kernel-production.up.railway.app")
+        landing_url = f"{base_url}/cohort/landing/{landing_id}"
+
+        log.info("Landing deployed student=%s wizard=%s id=%s", student_id, wizard_name, landing_id)
+
+        return JSONResponse({
+            "success": True,
+            "action_type": "html_landing",
+            "landing_id": landing_id,
+            "url": landing_url,
+            "wizard": wizard_name,
+        })
+
+    raise HTTPException(status_code=500, detail=f"Action type '{action_cfg['action_type']}' not implemented")
+
+
+@router.get("/landing/{landing_id}", response_class=HTMLResponse)
+async def serve_landing(landing_id: str, request: Request) -> HTMLResponse:
+    """Serve generated HTML landing page by ID."""
+    sched = _scheduler(request)
+    if getattr(sched, "memory", None) is None:
+        raise HTTPException(status_code=503, detail="Memory layer not ready")
+
+    records = await sched.memory.retrieve_by_tags_recent(
+        tags_must_contain=[LANDING_TAG, landing_id],
+        limit=1,
+        venture="cohangai",
+    )
+
+    if not records:
+        raise HTTPException(status_code=404, detail=f"Landing '{landing_id}' not found")
+
+    return HTMLResponse(records[0].content)
 
 
 def mount_static(app):
