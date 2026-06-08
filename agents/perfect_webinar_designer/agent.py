@@ -1,15 +1,11 @@
-"""Perfect Webinar Designer agent.
+"""Perfect Webinar Designer agent (flat schema fix per Sprint 14 anti-pattern 11).
 
-Stage 9 enhance per framework v2. Apply Russell Brunson Expert Secrets Perfect
-Webinar 90min framework: Why → What → How → Case Study → Stack → Close.
-
-Triết lý: 90min webinar bán high ticket KHÔNG phải free knowledge dump. Cấu
-trúc cụ thể: 5 min intro + 10 min hook + 25 min big domino + 25 min stack +
-15 min CTA + 10 min Q&A.
+Stage 9 enhance per framework v2. Apply Brunson Expert Secrets Perfect Webinar
+90min framework: Why → What → How → Case Study → Stack → Close.
 
 Trigger event: webinar.design_perfect_90min
-Autonomy L2 (Anna review trước run live).
-Output: slide-by-slide 90min webinar structure + script per section.
+Autonomy L2.
+Output: 90min webinar structure flat schema + Markdown script.
 """
 from __future__ import annotations
 
@@ -39,117 +35,69 @@ DEFAULT_TIMEOUT = 240.0
 
 SUBMIT_WEBINAR_TOOL = {
     "name": "submit_perfect_webinar",
-    "description": "Submit 90min webinar design Brunson Perfect Webinar framework",
+    "description": "Submit 90min webinar design (flat schema)",
     "input_schema": {
         "type": "object",
         "properties": {
             "venture": {"type": "string"},
-            "webinar_title": {"type": "string", "description": "Magnetic title"},
+            "webinar_title": {"type": "string"},
             "target_offer": {"type": "string"},
             "target_offer_price_vnd": {"type": "integer"},
-            "section_1_intro": {
-                "type": "object",
-                "description": "5 min intro: who am I + what learn today",
-                "properties": {
-                    "duration_minutes": {"type": "integer"},
-                    "key_message": {"type": "string"},
-                    "slides_outline": {"type": "array", "items": {"type": "string"}},
-                },
-            },
-            "section_2_hook_big_promise": {
-                "type": "object",
-                "description": "10 min hook + big promise",
-                "properties": {
-                    "duration_minutes": {"type": "integer"},
-                    "big_promise": {"type": "string"},
-                    "epiphany_bridge_story": {"type": "string"},
-                    "slides_outline": {"type": "array", "items": {"type": "string"}},
-                },
-            },
-            "section_3_big_domino_why": {
-                "type": "object",
-                "description": "25 min Why (Big Domino, identity shift)",
-                "properties": {
-                    "duration_minutes": {"type": "integer"},
-                    "big_domino_belief": {
-                        "type": "string",
-                        "description": "1 niềm tin lớn nếu đổ thì mọi objection đổ theo",
-                    },
-                    "3_secrets": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "secret": {"type": "string"},
-                                "story": {"type": "string"},
-                                "false_belief_destroyed": {"type": "string"},
-                                "new_belief_planted": {"type": "string"},
-                            },
-                        },
-                    },
-                    "slides_outline": {"type": "array", "items": {"type": "string"}},
-                },
-            },
-            "section_4_what_how": {
-                "type": "object",
-                "description": "20 min What + How (high-level method)",
-                "properties": {
-                    "duration_minutes": {"type": "integer"},
-                    "framework_taught": {"type": "string"},
-                    "key_steps": {"type": "array", "items": {"type": "string"}},
-                    "slides_outline": {"type": "array", "items": {"type": "string"}},
-                },
-            },
-            "section_5_case_study": {
-                "type": "object",
-                "description": "10 min case study (proof)",
-                "properties": {
-                    "duration_minutes": {"type": "integer"},
-                    "case_study_name": {"type": "string"},
-                    "before_state": {"type": "string"},
-                    "after_state": {"type": "string"},
-                    "metric_outcome": {"type": "string"},
-                    "slides_outline": {"type": "array", "items": {"type": "string"}},
-                },
-            },
-            "section_6_stack_offer": {
-                "type": "object",
-                "description": "15 min stack offer (Brunson Stack Method)",
-                "properties": {
-                    "duration_minutes": {"type": "integer"},
-                    "core_offer": {"type": "string"},
-                    "stack_items": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "item": {"type": "string"},
-                                "value_vnd": {"type": "integer"},
-                            },
-                        },
-                    },
-                    "total_stack_value_vnd": {"type": "integer"},
-                    "today_price_vnd": {"type": "integer"},
-                    "guarantee": {"type": "string"},
-                    "slides_outline": {"type": "array", "items": {"type": "string"}},
-                },
-            },
-            "section_7_qa_close": {
-                "type": "object",
-                "description": "5 min Q&A + close",
-                "properties": {
-                    "duration_minutes": {"type": "integer"},
-                    "common_objections": {"type": "array", "items": {"type": "string"}},
-                    "trial_closes": {"type": "array", "items": {"type": "string"}},
-                    "scarcity_urgency": {"type": "string"},
-                },
-            },
             "total_duration_minutes": {"type": "integer"},
             "expected_conversion_rate_pct": {"type": "number"},
-            "markdown_full_script": {
+            "s1_intro_minutes": {"type": "integer"},
+            "s1_intro_key_message": {"type": "string"},
+            "s1_intro_slides": {"type": "array", "items": {"type": "string"}},
+            "s2_hook_minutes": {"type": "integer"},
+            "s2_big_promise": {"type": "string"},
+            "s2_epiphany_bridge_story": {"type": "string"},
+            "s2_slides": {"type": "array", "items": {"type": "string"}},
+            "s3_big_domino_minutes": {"type": "integer"},
+            "s3_big_domino_belief": {
                 "type": "string",
-                "description": "Full Markdown 90min script slide-by-slide",
+                "description": "1 niềm tin lớn nếu đổ thì mọi objection đổ theo",
             },
+            "s3_secret_1": {"type": "string"},
+            "s3_secret_1_story": {"type": "string"},
+            "s3_secret_1_false_belief": {"type": "string"},
+            "s3_secret_1_new_belief": {"type": "string"},
+            "s3_secret_2": {"type": "string"},
+            "s3_secret_2_story": {"type": "string"},
+            "s3_secret_2_false_belief": {"type": "string"},
+            "s3_secret_2_new_belief": {"type": "string"},
+            "s3_secret_3": {"type": "string"},
+            "s3_secret_3_story": {"type": "string"},
+            "s3_secret_3_false_belief": {"type": "string"},
+            "s3_secret_3_new_belief": {"type": "string"},
+            "s4_what_how_minutes": {"type": "integer"},
+            "s4_framework_taught": {"type": "string"},
+            "s4_key_steps": {"type": "array", "items": {"type": "string"}},
+            "s5_case_study_minutes": {"type": "integer"},
+            "s5_case_study_name": {"type": "string"},
+            "s5_before_state": {"type": "string"},
+            "s5_after_state": {"type": "string"},
+            "s5_metric_outcome": {"type": "string"},
+            "s6_stack_minutes": {"type": "integer"},
+            "s6_core_offer": {"type": "string"},
+            "s6_stack_items": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "item": {"type": "string"},
+                        "value_vnd": {"type": "integer"},
+                    },
+                },
+                "description": "Stack 6-10 items",
+            },
+            "s6_total_stack_value_vnd": {"type": "integer"},
+            "s6_today_price_vnd": {"type": "integer"},
+            "s6_guarantee": {"type": "string"},
+            "s7_qa_minutes": {"type": "integer"},
+            "s7_common_objections": {"type": "array", "items": {"type": "string"}},
+            "s7_trial_closes": {"type": "array", "items": {"type": "string"}},
+            "s7_scarcity_urgency": {"type": "string"},
+            "markdown_full_script": {"type": "string"},
             "summary": {"type": "string"},
         },
         "required": [
@@ -157,9 +105,15 @@ SUBMIT_WEBINAR_TOOL = {
             "webinar_title",
             "target_offer",
             "target_offer_price_vnd",
-            "section_3_big_domino_why",
-            "section_6_stack_offer",
             "total_duration_minutes",
+            "s3_big_domino_belief",
+            "s3_secret_1",
+            "s3_secret_2",
+            "s3_secret_3",
+            "s6_core_offer",
+            "s6_stack_items",
+            "s6_total_stack_value_vnd",
+            "s6_today_price_vnd",
             "markdown_full_script",
             "summary",
         ],
@@ -168,18 +122,16 @@ SUBMIT_WEBINAR_TOOL = {
 
 
 def build_webinar_prompt(venture: str, target_offer: dict, persona: dict, key_secrets: list) -> str:
-    return f"""Bạn là Webinar Designer theo Russell Brunson Expert Secrets Perfect Webinar 90min framework.
+    return f"""Bạn là Webinar Designer theo Brunson Expert Secrets Perfect Webinar 90min framework.
 
-Triết lý 90min webinar: KHÔNG free knowledge dump. Cấu trúc:
-- 5 min intro (who + what learn)
+Cấu trúc 90 min:
+- 5 min intro (who + what)
 - 10 min hook + big promise
-- 25 min Big Domino + 3 secrets (identity shift)
-- 20 min What + How (high-level method only, NOT step-by-step)
-- 10 min case study (proof)
+- 25 min Big Domino + 3 secrets
+- 20 min What + How
+- 10 min case study
 - 15 min stack offer
-- 5 min Q&A + close
-
-Total = 90 min.
+- 5 min Q&A close
 
 # Venture
 {venture}
@@ -190,63 +142,61 @@ Total = 90 min.
 # Persona
 {json.dumps(persona, ensure_ascii=False, indent=2)[:1500]}
 
-# Key secrets to teach (Anna's framework)
-{json.dumps(key_secrets, ensure_ascii=False)[:1000]}
+# Key secrets hints
+{json.dumps(key_secrets, ensure_ascii=False)[:800]}
 
 # Task
 
-Design 90min webinar slide-by-slide:
+Output ALL fields (flat schema):
 
 ## Section 1 (5 min): Intro
-- Who am I + credibility
-- What you'll learn today
+- s1_intro_minutes (5)
+- s1_intro_key_message
+- s1_intro_slides (3-5 slides)
 
 ## Section 2 (10 min): Hook + Big Promise
-- Magnetic hook
-- Big promise specific
-- Epiphany Bridge story (vulnerability moment + turning point)
+- s2_hook_minutes (10)
+- s2_big_promise (specific)
+- s2_epiphany_bridge_story (vulnerability moment + turning point)
+- s2_slides
 
-## Section 3 (25 min): Big Domino Why
-- **Big Domino belief**: 1 niềm tin lớn của customer, nếu đổ → mọi objection đổ theo
-- 3 secrets, mỗi secret:
-  - secret statement
-  - story (Anna's real story or case study)
-  - false belief destroyed
-  - new belief planted
-- Identity shift (customer trở thành "someone who...")
+## Section 3 (25 min): Big Domino + 3 secrets
+- s3_big_domino_minutes (25)
+- s3_big_domino_belief (1 belief nếu đổ → mọi objection đổ)
+- s3_secret_1 + story + false_belief + new_belief
+- s3_secret_2 + story + false_belief + new_belief
+- s3_secret_3 + story + false_belief + new_belief
 
 ## Section 4 (20 min): What + How
-- Framework taught (high-level, KHÔNG step-by-step chi tiết)
-- Key steps (5-7 bullets)
-- Why this works (logic)
+- s4_what_how_minutes (20)
+- s4_framework_taught
+- s4_key_steps (5-7)
 
 ## Section 5 (10 min): Case Study
-- Real customer success
-- Before / After / Metric outcome
+- s5_case_study_minutes (10)
+- s5_case_study_name
+- s5_before_state + s5_after_state + s5_metric_outcome
 
 ## Section 6 (15 min): Stack Offer
-- Core offer
-- Stack 6-10 items, mỗi cái value_vnd
-- Total stack value (anchor 5-10x today price)
-- Today price (drop dramatic)
-- Guarantee
+- s6_stack_minutes (15)
+- s6_core_offer
+- s6_stack_items (6-10 items với value_vnd)
+- s6_total_stack_value_vnd (5-10x today price)
+- s6_today_price_vnd
+- s6_guarantee
 
-## Section 7 (5 min): Q&A + Close
-- Common objections + trial closes
-- Scarcity + urgency
+## Section 7 (5 min): Q&A Close
+- s7_qa_minutes (5)
+- s7_common_objections + trial_closes
+- s7_scarcity_urgency
 
-## Expected conversion rate
-Realistic Vietnamese market (5-15% typical for warm audience).
+## Total + conversion + markdown_full_script
 
-## Full Markdown script
-Slide-by-slide for Anna read/practice.
-
-# Quality requirements
-- Tổng duration = 90 min ±5
-- Big Domino must be SPECIFIC + EMOTIONAL
-- 3 secrets each có Anna's real story
+# Quality
+- Big Domino SPECIFIC + EMOTIONAL
+- 3 secrets có Anna's real story
 - Stack value 5-10x today price
-- Vietnamese tone Anna voice (Hằng/bạn)
+- Anna voice (Hằng/bạn)
 - KHÔNG em-dash
 
 Output qua tool submit_perfect_webinar.
@@ -254,22 +204,17 @@ Output qua tool submit_perfect_webinar.
 
 
 class PerfectWebinarDesigner(BaseBC):
-    """Perfect Webinar Designer 90min Brunson framework (Stage 9 enhance)."""
+    """Perfect Webinar Designer 90min flat schema."""
 
     name = "perfect_webinar_designer"
-    scope = "Design 90min Brunson Perfect Webinar slide-by-slide (Stage 9 enhance)"
-    autonomy_level = AutonomyLevel.L2_APPROVE  # Anna review trước run live
+    scope = "Design 90min Brunson Perfect Webinar (Stage 9 enhance, flat schema)"
+    autonomy_level = AutonomyLevel.L2_APPROVE
     escalate_to = EscalationTarget.TELEGRAM_OPS
     tools: list[str] = []
     requires_voice_gate = True
     requires_compliance_gate = True
 
-    def __init__(
-        self,
-        llm: LLMLayer,
-        memory: MemoryLayer,
-        model: str = DEFAULT_MODEL,
-    ) -> None:
+    def __init__(self, llm: LLMLayer, memory: MemoryLayer, model: str = DEFAULT_MODEL) -> None:
         super().__init__()
         self.llm = llm
         self.memory = memory
@@ -278,11 +223,7 @@ class PerfectWebinarDesigner(BaseBC):
     async def run(self, ctx: ExecutionContext) -> AgentResult:
         event = ctx.trigger_event or ""
         if event not in EXPECTED_EVENTS:
-            return AgentResult(
-                success=False,
-                output_text=f"{self.name} không xử lý event này",
-                output_payload={"trigger_event": event, "supported": list(EXPECTED_EVENTS)},
-            )
+            return AgentResult(success=False, output_text=f"unsupported {event}", output_payload={"supported": list(EXPECTED_EVENTS)})
 
         payload = ctx.payload or {}
         venture = ctx.venture_context or "breakout"
@@ -291,11 +232,7 @@ class PerfectWebinarDesigner(BaseBC):
         key_secrets = payload.get("key_secrets", [])
 
         if not target_offer:
-            return AgentResult(
-                success=False,
-                output_text="Missing target_offer",
-                output_payload={"error": "target_offer empty"},
-            )
+            return AgentResult(success=False, output_text="Missing target_offer", output_payload={"error": "target_offer empty"})
 
         if not self.llm.ready:
             return AgentResult(success=False, output_text="LLM not ready", output_payload={"error": "LLM not ready"})
@@ -304,8 +241,7 @@ class PerfectWebinarDesigner(BaseBC):
 
         try:
             response = await self.llm.client.messages.create(
-                model=self.model,
-                max_tokens=DEFAULT_MAX_TOKENS,
+                model=self.model, max_tokens=DEFAULT_MAX_TOKENS,
                 messages=[{"role": "user", "content": prompt}],
                 tools=[SUBMIT_WEBINAR_TOOL],
                 tool_choice={"type": "tool", "name": "submit_perfect_webinar"},
@@ -322,8 +258,10 @@ class PerfectWebinarDesigner(BaseBC):
         title = result.get("webinar_title", "")[:60]
         duration = result.get("total_duration_minutes", 0)
         conv = result.get("expected_conversion_rate_pct", 0)
+        domino = bool(result.get("s3_big_domino_belief"))
+        stack = len(result.get("s6_stack_items", []))
         date_str = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
-        summary = f"webinar design venture={venture} '{title}' duration={duration}min conv={conv}%"
+        summary = f"webinar venture={venture} '{title}' duration={duration}min conv={conv}% domino={domino} stack={stack}"
 
         memory_entry = {
             "agent_name": self.name,
