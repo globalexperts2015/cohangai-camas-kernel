@@ -750,9 +750,8 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
                 placeholder="{w['input_placeholder']}"
                 rows="8"></textarea>
 
-      <div class="cohort-auth">
-        <label for="cohort-token">Mã truy cập (Hằng cấp khi bạn vào BreakoutOS):</label>
-        <input type="text" id="cohort-token" placeholder="cohort1-tenban-mahash">
+      <div class="cohort-auth" style="display:none">
+        <input type="hidden" id="cohort-token">
       </div>
 
       <button id="cohort-run-btn" class="cohort-btn cohort-btn-primary">
