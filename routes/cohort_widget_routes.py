@@ -544,7 +544,7 @@ async def cohort_index() -> HTMLResponse:
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap">
-  <link rel="stylesheet" href="/cohort/static/cohort-widget.css">
+  <link rel="stylesheet" href="/cohort/static/cohort-widget.css?v=20260611-collapsible">
 </head>
 <body class="os-home">
   <div class="os-bg-grid"></div>
@@ -732,7 +732,7 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
 <head>
   <meta charset="utf-8">
   <title>{w['title']} | Cohangai Cohort 1</title>
-  <link rel="stylesheet" href="/cohort/static/cohort-widget.css">
+  <link rel="stylesheet" href="/cohort/static/cohort-widget.css?v=20260611-collapsible">
 </head>
 <body>
   <div class="cohort-container">
@@ -789,7 +789,7 @@ async def cohort_wizard_page(wizard_name: str) -> HTMLResponse:
     </div>
   </div>
 
-  <script src="/cohort/static/cohort-widget.js"></script>
+  <script src="/cohort/static/cohort-widget.js?v=20260611-collapsible"></script>
 </body>
 </html>""")
 
@@ -830,7 +830,7 @@ async def webinar_demo_page(wizard_name: str, request: Request) -> HTMLResponse:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>{w['title']} | Webinar K2 Buổi {buoi or '?'}</title>
-  <link rel="stylesheet" href="/cohort/static/cohort-widget.css">
+  <link rel="stylesheet" href="/cohort/static/cohort-widget.css?v=20260611-collapsible">
   <style>
     body {{ background: #fafafa; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }}
     .wd-container {{ max-width: 640px; margin: 0 auto; padding: 16px; }}
