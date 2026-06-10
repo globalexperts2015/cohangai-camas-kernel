@@ -1698,3 +1698,44 @@ body.os-home a { text-decoration: none; color: inherit; }
 @media (max-width: 480px) {
   .os-home .orbit-inner-group { grid-template-columns: 1fr; }
 }
+
+/* === Collapsible H2 sections in wizard output === */
+.cohort-collapse {
+  border: 1px solid #d8dde3;
+  border-radius: 10px;
+  margin: 12px 0;
+  background: #fafbfc;
+  overflow: hidden;
+}
+.cohort-collapse-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: #fff;
+  border: none;
+  padding: 16px 20px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.cohort-collapse-head:hover { background: #f1f4f8; }
+.cohort-collapse-title { flex: 1; }
+.cohort-collapse-icon {
+  font-size: 18px;
+  color: #E63946;
+  transition: transform 0.2s ease;
+  margin-left: 12px;
+}
+.cohort-collapse.cohort-collapse-open .cohort-collapse-icon { transform: rotate(180deg); }
+.cohort-collapse-body {
+  display: none;
+  padding: 4px 20px 18px;
+  border-top: 1px solid #e5e9ee;
+}
+.cohort-collapse.cohort-collapse-open .cohort-collapse-body { display: block; }
+.cohort-collapse-body > *:first-child { margin-top: 12px; }

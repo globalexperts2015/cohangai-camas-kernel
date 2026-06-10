@@ -61,7 +61,42 @@
   const savedOutput = localStorage.getItem(OUTPUT_KEY);
   if (savedOutput) {
     outputMdEl.innerHTML = markdownToHtml(savedOutput);
+    collapsifyH2(outputMdEl);
     outputEl.style.display = "block";
+  }
+
+  // Convert each H2 + its following siblings (until next H2) into a collapsible section.
+  // First section opens by default; rest collapsed. Click H2 to toggle.
+  function collapsifyH2(container) {
+    const children = Array.from(container.childNodes);
+    const h2s = children.filter(n => n.nodeType === 1 && n.tagName === "H2");
+    if (h2s.length === 0) return;
+    h2s.forEach((h2, idx) => {
+      const wrapper = document.createElement("section");
+      wrapper.className = "cohort-collapse" + (idx === 0 ? " cohort-collapse-open" : "");
+      const header = document.createElement("button");
+      header.type = "button";
+      header.className = "cohort-collapse-head";
+      header.innerHTML = `<span class="cohort-collapse-title">${h2.innerHTML}</span><span class="cohort-collapse-icon">▾</span>`;
+      const body = document.createElement("div");
+      body.className = "cohort-collapse-body";
+      // Collect siblings until next H2
+      let sibling = h2.nextSibling;
+      const toMove = [];
+      while (sibling && !(sibling.nodeType === 1 && sibling.tagName === "H2")) {
+        toMove.push(sibling);
+        sibling = sibling.nextSibling;
+      }
+      // Replace h2 with wrapper; move siblings into body
+      h2.parentNode.insertBefore(wrapper, h2);
+      h2.parentNode.removeChild(h2);
+      wrapper.appendChild(header);
+      wrapper.appendChild(body);
+      toMove.forEach(n => body.appendChild(n));
+      header.addEventListener("click", () => {
+        wrapper.classList.toggle("cohort-collapse-open");
+      });
+    });
   }
 
   runBtn.addEventListener("click", async () => {
@@ -107,6 +142,7 @@
 
       const markdown = data.markdown || "(no markdown output)";
       outputMdEl.innerHTML = markdownToHtml(markdown);
+      collapsifyH2(outputMdEl);
       outputEl.style.display = "block";
       localStorage.setItem(OUTPUT_KEY, markdown);
 
