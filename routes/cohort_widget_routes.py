@@ -74,7 +74,7 @@ WIZARD_REGISTRY = {
         "event": "cohort.transformation_map",
         "week": 3,
         "title": "Trợ Lý AI Thấu Khách",
-        "subtitle": "Hiểu khách sâu để có vô vàn ý tưởng kinh doanh. Đọc vị 7 mặt cuộc sống TRƯỚC và SAU khi mua bạn.",
+        "subtitle": "Hiểu khách sâu để bán đúng cái khách cần. Phân tích 3 việc khách mua sản phẩm để đạt, Top 3 nỗi đau với Pain Scale 1-10, phiên bản mới của khách, và 3 sản phẩm bạn nên bán.",
         "input_label": "Mô tả 1 khách hàng cụ thể bạn muốn phục vụ (càng chi tiết càng tốt)",
         "input_placeholder": "Ví dụ: Chị Lan 32 tuổi, kế toán văn phòng, 2 con nhỏ, lương 14tr. Mỗi tháng cuối khó co kéo, lo tương lai con học trường tư. Chồng làm xa, ủng hộ nhưng không phụ được. Muốn kiếm thêm tại nhà nhưng không biết bắt đầu từ đâu, sợ bị lừa khi học các khoá online...",
         "input_field": "customer_persona",
@@ -119,6 +119,71 @@ WIZARD_REGISTRY = {
         "input_placeholder": "Tóm tắt offer chính + persona khách hàng + dòng tiền mục tiêu sau referral...",
         "input_field": "offer",
     },
+    # ───── BreakoutOS v3 (added 2026-06-09) ─────
+    # GrowthOS layer (Week 5-7)
+    "content_engine": {
+        "agent": "c1_content_engine",
+        "event": "cohort.content_engine",
+        "week": 5,
+        "title": "Trợ Lý AI Content Engine",
+        "subtitle": "Sinh 100 Reel + 30 FB + 30 email + 30 blog + 12 webinar + 4 lead magnet + 30-day calendar. Pull TỪ hồ sơ khách + offer + voice. KHÔNG generic.",
+        "input_label": "Voice register (hang_webinar / custom) + ≥5 story THẬT của bạn",
+        "input_placeholder": "Voice: custom. Story pool: 1) Tôi mất 6 tháng học cách bán... 2) Bài học đầu tiên là... 3) Khách đầu tiên gọi điện 2 tuần sau... 4)... 5)...",
+        "input_field": "content_input",
+    },
+    "lead_gen_engine": {
+        "agent": "c2_lead_gen_engine",
+        "event": "cohort.lead_gen",
+        "week": 6,
+        "title": "Trợ Lý AI Lead Gen Engine",
+        "subtitle": "Kế hoạch kéo lead 30 ngày + 5 chiến lược kênh + 4 lead magnet adapt từ Content Engine + tagging logic + funnel map.",
+        "input_label": "Lợi thế bạn đã có (audience nào, budget tháng VND)",
+        "input_placeholder": "Ví dụ: FB cá nhân 5K friend, có YouTube chưa active, chưa có TikTok, budget 2tr/tháng cho ads...",
+        "input_field": "lead_gen_input",
+    },
+    # FanOS layer (Week 9)
+    "fan_hub_setup": {
+        "agent": "tool:fan_hub_spawn",
+        "event": "cohort.fan_hub_setup",
+        "week": 9,
+        "title": "Fan Hub Setup",
+        "subtitle": "Spawn Fan Hub instance riêng với CRM + tier system + Reputation Ledger + Trust Score. Tài sản dài hạn dùng được cho mọi venture sau.",
+        "input_label": "Email primary + display name + custom domain (optional)",
+        "input_placeholder": "Email: ban@example.com, Display: Lê Thị Lan, Custom domain: fan.cohanglan.com (hoặc bỏ trống để dùng {slug}.fan.breakout.live)",
+        "input_field": "fan_hub_input",
+    },
+    # ScaleOS layer (Week 10)
+    "ai_coo": {
+        "agent": "e1_ai_coo",
+        "event": "coo.daily",
+        "week": 10,
+        "title": "AI COO Dashboard",
+        "subtitle": "Báo cáo 6am Telegram mỗi sáng + tuần (Sunday 8pm) + tháng. 3 việc cần làm hôm nay + cảnh báo red flag. KHÔNG chỉ báo cáo, ĐỀ XUẤT hành động.",
+        "input_label": "Telegram chat_id để nhận daily report",
+        "input_placeholder": "Telegram chat_id: -100... (group) hoặc 123... (private chat). Hằng dùng group Breakout Ops -1003813280155.",
+        "input_field": "telegram_chat_id",
+    },
+    "scale_coach": {
+        "agent": "e2_scale_coach",
+        "event": "cohort.scale_coach",
+        "week": 10,
+        "title": "Trợ Lý AI Scale Coach",
+        "subtitle": "Kế hoạch scale 90 ngày từ 5-15 lên 50-100 khách. Webinar + Membership + Referral + Affiliate + Upsell. AI team + hire decision tree.",
+        "input_label": "State hiện tại: số khách trả tiền + doanh thu tháng VND + list size",
+        "input_placeholder": "Số khách: 12. Doanh thu tháng: 18tr. List size: 850. Available hours/week: 25. Capital runway: 6 tháng...",
+        "input_field": "scale_input",
+    },
+    "capstone_clone": {
+        "agent": "tool:capstone_spawn",
+        "event": "cohort.capstone_clone",
+        "week": 10,
+        "title": "Capstone, AIOS instance riêng",
+        "subtitle": "1-click spawn 1 BreakoutOS instance độc lập cho doanh nghiệp của bạn. 7 trợ lý AI + Fan Hub + AI COO + lifetime kernel update.",
+        "input_label": "Confirm spawn (yêu cầu đã hoàn thành 10 tuần + có ≥3 khách trả tiền)",
+        "input_placeholder": "Confirm: Tôi đã có {N} khách trả tiền và sẵn sàng vận hành BreakoutOS instance riêng.",
+        "input_field": "capstone_confirm",
+        "requires": ["scale_coach_completed", "min_customers_3"],
+    },
 }
 
 # Tuần 4 = build customer profile, link transformation_mapper for refined persona
@@ -162,6 +227,43 @@ WIZARD_CHAIN_DEPS = {
         "offer": "offer_engineer",
         "mvo": "mvo_cohort",
         "persona": "vpc_fit_check",
+    },
+    # ───── BreakoutOS v3 chain deps (added 2026-06-09) ─────
+    "content_engine": {  # Tuần 5 (parallel với vpc_fit_check)
+        "customer_profile": "transformation_mapper",
+        "offer": "offer_engineer",  # nếu chưa có, agent tự handle
+    },
+    "lead_gen_engine": {  # Tuần 6
+        "customer_profile": "transformation_mapper",
+        "content_engine_output": "content_engine",
+    },
+    "fan_hub_setup": {  # Tuần 9
+        "customer_profile": "transformation_mapper",
+        "offer": "offer_engineer",
+    },
+    "ai_coo": {  # Tuần 10 (background daily, nhưng setup once)
+        "lead_gen": "lead_gen_engine",
+        "fan_hub": "fan_hub_setup",
+    },
+    "scale_coach": {  # Tuần 10
+        "offer": "offer_engineer",
+        "mvo": "mvo_cohort",
+        "referral": "referral_engine",
+        "content_engine_output": "content_engine",
+        "lead_gen_plan": "lead_gen_engine",
+    },
+    "capstone_clone": {  # Tuần 10 finale
+        "vision": "vision_clarity",
+        "niche": "niche_validator",
+        "transformation": "transformation_mapper",
+        "vpc": "vpc_fit_check",
+        "offer": "offer_engineer",
+        "mvo": "mvo_cohort",
+        "referral": "referral_engine",
+        "content_engine_output": "content_engine",
+        "lead_gen_plan": "lead_gen_engine",
+        "scale_plan": "scale_coach",
+        "fan_hub": "fan_hub_setup",
     },
 }
 
@@ -399,134 +501,210 @@ def _scheduler(request: Request):
 
 @router.get("/", response_class=HTMLResponse)
 async def cohort_index() -> HTMLResponse:
-    """BreakoutOS dashboard, premium hub center + 8 tuần orbit."""
+    """BreakoutOS v3 dashboard, premium hub center + 10 tuần orbit (5 OS layer)."""
     sorted_wizards = sorted(WIZARD_REGISTRY.items(), key=lambda x: x[1]["week"])
     # Build 8 cards: 7 wizards + 1 Tuần 4 placeholder
     cards_by_week: dict = {}
     for slug, w in sorted_wizards:
         cards_by_week[w["week"]] = (slug, w)
 
-    # Insert Tuần 4 placeholder (link to transformation_mapper for re-iteration)
+    # Build week cards (7 wizards + 1 Tuần 4 practice placeholder)
     cards_html = []
     for week in range(1, 9):
         if week == 4:
             p = WEEK_4_PLACEHOLDER
             cards_html.append(f"""
-        <div class="orbit-card orbit-card-{week} orbit-card-practice">
-          <div class="cohort-week cohort-week-practice">Tuần {week} · Thực hành</div>
+        <a class="orbit-card orbit-card-{week} orbit-card-practice" href="/cohort/wizard/{p['wizard_slug']}">
+          <div class="orbit-card-glow"></div>
+          <div class="orbit-card-num">04</div>
+          <div class="orbit-card-tag">Thực hành</div>
           <h3>{p['title']}</h3>
           <p>{p['subtitle']}</p>
-          <a class="cohort-btn" href="/cohort/wizard/{p['wizard_slug']}">Đào sâu lại →</a>
-        </div>
-        """)
+          <span class="orbit-card-cta">Đào sâu lại <svg viewBox="0 0 16 16" width="14" height="14"><path d="M1 8h12m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>""")
         elif week in cards_by_week:
             slug, w = cards_by_week[week]
             cards_html.append(f"""
-        <div class="orbit-card orbit-card-{week}">
-          <div class="cohort-week">Tuần {week}</div>
+        <a class="orbit-card orbit-card-{week}" href="/cohort/wizard/{slug}">
+          <div class="orbit-card-glow"></div>
+          <div class="orbit-card-num">{week:02d}</div>
+          <div class="orbit-card-tag">Tuần {week}</div>
           <h3>{w['title']}</h3>
           <p>{w['subtitle']}</p>
-          <a class="cohort-btn" href="/cohort/wizard/{slug}">Bắt đầu →</a>
-        </div>
-        """)
+          <span class="orbit-card-cta">Bắt đầu <svg viewBox="0 0 16 16" width="14" height="14"><path d="M1 8h12m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>""")
+
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BreakoutOS, hệ điều hành xây Solo Empire</title>
+  <meta name="description" content="Hệ điều hành xây doanh nghiệp một người với AI. 10 tuần, 10 trợ lý AI Đào Thị Hằng huấn luyện. 1 instance riêng. Lifetime kernel update.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap">
   <link rel="stylesheet" href="/cohort/static/cohort-widget.css">
 </head>
-<body>
-  <div class="cohort-container">
-    <header style="text-align:center;margin-bottom:24px">
-      <p class="hub-eyebrow">Hệ điều hành xây Solo Empire</p>
-      <p class="cohort-intro" style="font-size:16px;max-width:540px;margin:12px auto 0;color:#666">
-        8 tuần. 7 trợ lý AI trong Team Cô Hằng AI Hằng đã huấn luyện. Đi từ tầm nhìn đến cỗ máy bán hàng tự động.
-      </p>
-    </header>
+<body class="os-home">
+  <div class="os-bg-grid"></div>
+  <div class="os-bg-glow os-bg-glow-1"></div>
+  <div class="os-bg-glow os-bg-glow-2"></div>
 
-    <div class="orbit-wrapper">
-      <div class="orbit-ring orbit-ring-outer"></div>
-      <div class="orbit-ring"></div>
-      <div class="orbit-glow"></div>
+  <nav class="os-nav">
+    <div class="os-nav-inner">
+      <div class="os-logo">
+        <span class="os-logo-word">BREAKOUT</span><span class="os-logo-os">OS</span>
+      </div>
+      <div class="os-nav-meta">
+        <span class="os-nav-pill"><span class="os-nav-dot"></span> Cohort 1 · Đang vận hành</span>
+      </div>
+    </div>
+  </nav>
 
-      <div class="orbit-hub">
-        <div class="hub-inner">
-          <div class="hub-shimmer"></div>
-          <h2>BreakoutOS</h2>
-          <div class="hub-divider"></div>
-          <p class="hub-tagline">Hệ điều hành Solo Empire</p>
-          <p class="hub-meta">8 tuần · 7 AI · 1 founder</p>
+  <main class="os-main">
+
+    <section class="os-system">
+      <div class="os-system-head">
+        <div class="os-hero-eyebrow">
+          <span class="os-eyebrow-dot"></span>
+          Hệ điều hành xây doanh nghiệp một người
         </div>
+        <p class="os-system-slogan-top">Một người. Một AI. Một doanh nghiệp.</p>
       </div>
 
-      {"".join(cards_html)}
-    </div>
+      <div class="orbit-mega">
+        <div class="orbit-ring orbit-ring-mid-deco"></div>
+        <div class="orbit-ring orbit-ring-inner-deco"></div>
+        <div class="orbit-glow"></div>
 
-    <p style="text-align:center;color:#999;font-size:13px;margin-top:40px;max-width:600px;margin-left:auto;margin-right:auto">
-      Mỗi trợ lý AI là 1 chuyên gia ảo Hằng huấn luyện. Bạn cung cấp tư duy + dữ liệu thật, AI execute 10x nhanh hơn tự làm.
-    </p>
+        <div class="orbit-hub">
+          <div class="hub-inner">
+            <div class="hub-shimmer"></div>
+            <div class="hub-frame"></div>
+            <div class="hub-badge">SYSTEM CORE</div>
+            <div class="hub-wordmark">
+              <span class="hub-word-breakout">BREAKOUT</span><span class="hub-word-os">OS</span>
+            </div>
+            <div class="hub-divider"></div>
+            <p class="hub-tagline">Hệ điều hành<br>Solo Empire</p>
+            <p class="hub-meta">10 tuần · 10 trợ lý · 5 OS layer</p>
+          </div>
+        </div>
 
-    <section class="tech-stack-section">
-      <div class="tech-stack-header">
-        <p class="hub-eyebrow">BreakoutOS Tech Stack</p>
-        <h2>Template clone-ready Hằng đã build sẵn</h2>
-        <p class="tech-stack-intro">
-          Bạn KHÔNG cần build CRM từ đầu. Sau khi design strategy + offer xong, clone setup Hằng đã chạy thật cho 6 ventures. Save 100+ giờ setup, customize cho venture của bạn.
+        <div class="orbit-inner-group">{"".join(cards_html)}</div>
+      </div>
+
+      <div class="os-system-foot">
+        <div class="os-system-stats">
+          <div class="os-stat"><b>10</b><span>tuần lộ trình</span></div>
+          <div class="os-stat-rule"></div>
+          <div class="os-stat"><b>10</b><span>trợ lý AI</span></div>
+          <div class="os-stat-rule"></div>
+          <div class="os-stat"><b>6</b><span>sản phẩm tự động</span></div>
+          <div class="os-stat-rule"></div>
+          <div class="os-stat"><b>1</b><span>founder vận hành</span></div>
+        </div>
+        <p class="os-system-caption">
+          <em>BreakoutOS</em> ở trung tâm, 10 trợ lý AI vận hành xung quanh,<br>5 OS layer xếp chồng từ tầm nhìn đến scale 90 ngày sau cohort.
+        </p>
+      </div>
+    </section>
+
+    <section class="os-products">
+      <div class="os-products-head">
+        <div class="os-hero-eyebrow">
+          <span></span>
+          Sản phẩm tự động vận hành
+          <span></span>
+        </div>
+        <h2 class="os-products-title">6 sản phẩm AI sinh ra,<br><em>bạn chỉ cần share.</em></h2>
+        <p class="os-products-sub">
+          Sau 10 tuần, BreakoutOS đã sản xuất sẵn cho bạn 6 sản phẩm tự động + 1 Fan Hub riêng + 1 AI COO Dashboard + 1 Capstone AIOS instance. Tất cả chạy 24/7. Lifetime kernel update.
         </p>
       </div>
 
-      <div class="tech-stack-grid">
-        <div class="tech-tool tech-tool-live">
-          <div class="tech-tool-icon">🚀</div>
-          <div class="tech-tool-status">LIVE</div>
-          <h3>Trang bán hàng landing</h3>
-          <p>AI tự tạo HTML landing từ offer bạn design. CTA Zalo deeplink, mobile responsive, ready share.</p>
-          <a class="cohort-btn" href="/cohort/wizard/offer_engineer">Tạo landing từ Tuần 6 →</a>
-        </div>
+      <div class="os-products-grid">
+        <a class="os-product-card" href="/cohort/wizard/offer_engineer">
+          <div class="os-product-num">01</div>
+          <div class="os-product-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5L3 22l5.5-1.5L20 9 15 4z"/><path d="M14 5l5 5"/></svg>
+          </div>
+          <h4>Trang bán hàng</h4>
+          <p>HTML landing từ offer bạn design. CTA Zalo deeplink, mobile responsive, ready share.</p>
+          <span class="os-product-source">TUẦN 6</span>
+        </a>
 
-        <div class="tech-tool tech-tool-live">
-          <div class="tech-tool-icon">🎯</div>
-          <div class="tech-tool-status">LIVE</div>
-          <h3>Kho content quảng cáo</h3>
-          <p>5 headlines + 3 Reel hooks (15s/30s/60s) + 3 FB ad copy + 7 email subject lines. Ready paste FB Ads + TikTok + email blast.</p>
-          <a class="cohort-btn" href="/cohort/wizard/offer_engineer">Tạo từ Tuần 6 →</a>
-        </div>
+        <a class="os-product-card" href="/cohort/wizard/offer_engineer">
+          <div class="os-product-num">02</div>
+          <div class="os-product-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <h4>Kho ads + content</h4>
+          <p>5 headlines, 3 Reel hooks, 3 FB ad copy, 7 email subject. Ready paste FB Ads + TikTok.</p>
+          <span class="os-product-source">TUẦN 6</span>
+        </a>
 
-        <div class="tech-tool tech-tool-live">
-          <div class="tech-tool-icon">📧</div>
-          <div class="tech-tool-status">LIVE</div>
-          <h3>Chuỗi email nuôi khách</h3>
-          <p>5 email tự động: chào mừng, nhắc đơn bỏ quên, sau mua, bán thêm, kéo lại khách rời. Compatible Brevo / MailerLite / ConvertKit.</p>
-          <a class="cohort-btn" href="/cohort/wizard/mvo_cohort">Tạo từ Tuần 7 →</a>
-        </div>
+        <a class="os-product-card" href="/cohort/wizard/mvo_cohort">
+          <div class="os-product-num">03</div>
+          <div class="os-product-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+          </div>
+          <h4>Chuỗi email nuôi khách</h4>
+          <p>5 email tự động chào, giỏ hàng, sau mua, win-back. Brevo / MailerLite ready.</p>
+          <span class="os-product-source">TUẦN 7</span>
+        </a>
 
-        <div class="tech-tool tech-tool-live">
-          <div class="tech-tool-icon">💳</div>
-          <div class="tech-tool-status">LIVE</div>
-          <h3>Hệ thống thanh toán</h3>
-          <p>Trang thanh toán + hướng dẫn QR + bank info form. Customize info bank của bạn rồi share link cho khách.</p>
-          <a class="cohort-btn" href="/cohort/wizard/mvo_cohort">Tạo từ Tuần 7 →</a>
-        </div>
+        <a class="os-product-card" href="/cohort/wizard/mvo_cohort">
+          <div class="os-product-num">04</div>
+          <div class="os-product-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>
+          </div>
+          <h4>Hệ thống thu tiền</h4>
+          <p>Trang thanh toán, hướng dẫn QR, bank info form. Share link ngay cho khách.</p>
+          <span class="os-product-source">TUẦN 7</span>
+        </a>
 
-        <div class="tech-tool tech-tool-live">
-          <div class="tech-tool-icon">🤖</div>
-          <div class="tech-tool-status">LIVE</div>
-          <h3>Hệ thống chăm sóc khách hàng</h3>
-          <p>6 workflow nuôi khách tự động: Welcome, Onboarding, Cart Abandon, Post-purchase, Refund, Win-back. JSON export cho CRM.</p>
-          <a class="cohort-btn" href="/cohort/wizard/referral_engine">Tạo từ Tuần 8 →</a>
-        </div>
+        <a class="os-product-card" href="/cohort/wizard/referral_engine">
+          <div class="os-product-num">05</div>
+          <div class="os-product-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          </div>
+          <h4>Chăm sóc khách hàng</h4>
+          <p>6 workflow tự động: Welcome, Onboarding, Cart Abandon, Post-purchase, Refund, Win-back.</p>
+          <span class="os-product-source">TUẦN 8</span>
+        </a>
 
-        <div class="tech-tool tech-tool-live">
-          <div class="tech-tool-icon">📊</div>
-          <div class="tech-tool-status">LIVE</div>
-          <h3>Đánh giá khách tự động</h3>
-          <p>Framework chấm điểm khách 3 tier (Nóng/Ấm/Lạnh) + công thức + hướng dẫn implement per CRM. Tập trung khách đáng giá nhất.</p>
-          <a class="cohort-btn" href="/cohort/wizard/referral_engine">Tạo từ Tuần 8 →</a>
-        </div>
+        <a class="os-product-card" href="/cohort/wizard/referral_engine">
+          <div class="os-product-num">06</div>
+          <div class="os-product-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10m6 10V4m6 16v-8m6 8V8"/></svg>
+          </div>
+          <h4>Chấm điểm khách hàng</h4>
+          <p>Lead score 3 tier Nóng / Ấm / Lạnh tự động. Tập trung khách đáng giá nhất.</p>
+          <span class="os-product-source">TUẦN 8</span>
+        </a>
       </div>
     </section>
-  </div>
+
+    <footer class="os-footer">
+      <div class="os-footer-inner">
+        <div class="os-footer-brand">
+          <div class="os-logo">
+            <span class="os-logo-word">BREAKOUT</span><span class="os-logo-os">OS</span>
+          </div>
+          <div class="os-footer-rule"></div>
+          <p class="os-footer-slogan">Một người. Một AI. Một doanh nghiệp.</p>
+          <p class="os-footer-tagline">Đào Thị Hằng huấn luyện, vận hành thật trên 6 ventures.</p>
+        </div>
+        <div class="os-footer-meta">
+          <span>© 2026 Đào Thị Hằng</span>
+          <span class="os-footer-sep">·</span>
+          <a href="https://breakout.live">breakout.live</a>
+        </div>
+      </div>
+    </footer>
+  </main>
 </body>
 </html>""")
 
