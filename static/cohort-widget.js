@@ -75,8 +75,10 @@
       showError("Input quá ngắn, cần ≥ 10 ký tự");
       return;
     }
-    if (!token.startsWith("cohort1-")) {
-      showError("Token sai format. Format: cohort1-yourstudentid-yourhash");
+    const isCohort1 = token.startsWith("cohort1-");
+    const isWebinar = /^wk2-b[1-3]-[a-f0-9]{8}$/.test(token);
+    if (!isCohort1 && !isWebinar) {
+      showError("Token sai format. Format: cohort1-yourstudentid-yourhash hoặc wk2-b{1|2|3}-{8hex}");
       return;
     }
 
