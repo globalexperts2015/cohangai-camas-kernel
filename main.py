@@ -12,7 +12,7 @@ import os
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from agents.bc1_team_leader import BC1TeamLeader
@@ -374,6 +374,42 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     scheduler.register(healthcheck)
     log.info("Standalone Healthcheck registered (system-wide probe)")
 
+    # ───── BreakoutOS v3 agents (added 2026-06-09) ─────
+    # Sprint 1: GrowthOS
+    try:
+        from agents.c1_content_engine import C1ContentEngine
+        c1 = C1ContentEngine(llm=scheduler.llm, memory=scheduler.memory)
+        scheduler.register(c1)
+        log.info("C1 Content Engine registered (cohort.content_engine + wizard.content_engine)")
+    except Exception as exc:
+        log.warning("C1 Content Engine register fail: %r", exc)
+
+    try:
+        from agents.c2_lead_gen_engine import C2LeadGenEngine
+        c2 = C2LeadGenEngine(llm=scheduler.llm, memory=scheduler.memory)
+        scheduler.register(c2)
+        log.info("C2 Lead Gen Engine registered (cohort.lead_gen + wizard.lead_gen_engine)")
+    except Exception as exc:
+        log.warning("C2 Lead Gen Engine register fail: %r", exc)
+
+    # Sprint 2: ScaleOS daily ops
+    try:
+        from agents.e1_ai_coo import E1AICOO
+        e1 = E1AICOO(llm=scheduler.llm, memory=scheduler.memory)
+        scheduler.register(e1)
+        log.info("E1 AI COO registered (coo.daily + coo.weekly + coo.monthly + wizard.ai_coo)")
+    except Exception as exc:
+        log.warning("E1 AI COO register fail: %r", exc)
+
+    # Sprint 3: ScaleOS scale planning
+    try:
+        from agents.e2_scale_coach import E2ScaleCoach
+        e2 = E2ScaleCoach(llm=scheduler.llm, memory=scheduler.memory)
+        scheduler.register(e2)
+        log.info("E2 Scale Coach registered (cohort.scale_coach + wizard.scale_coach)")
+    except Exception as exc:
+        log.warning("E2 Scale Coach register fail: %r", exc)
+
     app.state.scheduler = scheduler
     try:
         yield
@@ -398,10 +434,27 @@ app.include_router(webhook_router, prefix="/webhook", tags=["webhook"])
 app.include_router(cohort_router, tags=["cohort"])
 mount_cohort_static(app)
 
+# BreakoutOS v3: AI COO Dashboard routes (added 2026-06-09)
+try:
+    from routes.coo_routes import router as coo_router
+    app.include_router(coo_router, tags=["coo"])
+    log.info("COO routes mounted (/coo/daily, /coo/weekly, /coo/monthly, /coo/run, /coo/reports, /coo/dashboard)")
+except Exception as exc:
+    log.warning("COO routes mount fail: %r", exc)
+
 
 @app.get("/")
-async def root() -> JSONResponse:
-    """Public probe, không trả secret."""
+async def root(request: Request) -> JSONResponse:
+    """Public probe, không trả secret.
+
+    Host-based routing `os.breakout.live`:
+    - `/` → student home `/cohort/`
+    - `/admin` (handler riêng dưới) → admin dashboard kèm key auto include
+    """
+    host = request.headers.get("host", "").lower()
+    if host.startswith("os.breakout.live"):
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse("/cohort/", status_code=302)
     return JSONResponse(
         {
             "service": "camas-kernel",
@@ -410,3 +463,14 @@ async def root() -> JSONResponse:
             "docs": "/docs",
         }
     )
+
+
+@app.get("/admin")
+async def os_admin(request: Request):
+    """Host-based shortcut: `os.breakout.live/admin` → cohort admin dashboard."""
+    host = request.headers.get("host", "").lower()
+    from fastapi.responses import RedirectResponse
+    if host.startswith("os.breakout.live"):
+        key = os.environ.get("COHORT_ADMIN_KEY", "")
+        return RedirectResponse(f"/cohort/admin/dashboard?key={key}", status_code=302)
+    return JSONResponse({"detail": "Not found"}, status_code=404)
