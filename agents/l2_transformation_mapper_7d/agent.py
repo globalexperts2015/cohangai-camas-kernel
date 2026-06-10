@@ -1,16 +1,14 @@
-"""L2.3 Transformation Mapper 7D (NEW), Cohangai cohort 1 wizard.
+"""L2.3 Transformation Mapper, Trợ Lý AI Thấu Khách (v2 B2 framework).
 
-Stage 6 framework v2. Map customer transformation across 7 dimensions:
-1. Financial (Tài chính)
-2. Time (Thời gian)
-3. Skills (Kỹ năng)
-4. Confidence (Tự tin)
-5. Identity (Định danh)
-6. Relationships (Mối quan hệ)
-7. Health (Sức khoẻ)
+Production v2 sau Buổi 2 K2 (10/6/2026), refactored để match phương pháp dạy trong Buổi 2:
+1. Ba việc khách MUA sản phẩm để đạt (Chức năng + Cảm xúc + Xã hội)
+2. Top 3 nỗi đau với Pain Scale 1-10 + khoảng giá tương ứng
+3. Phiên bản mới của khách (Từ X trở thành Y)
+4. Sản phẩm đề xuất theo công thức Pain + Phiên bản mới + Năng lực lõi founder
 
 Trigger event: cohort.transformation_map
-Output: 7D before-after map + tangible vs intangible split + emotional + financial benefit cluster.
+Input: customer_persona (mô tả 1 khách hàng cụ thể)
+Output: 4 phần như trên, markdown-rendered cho dashboard.
 """
 from __future__ import annotations
 
@@ -33,68 +31,103 @@ log = logging.getLogger("camas.l2_transformation_mapper_7d")
 EXPECTED_EVENTS = {"cohort.transformation_map"}
 
 DEFAULT_MODEL = "claude-opus-4-7"
-DEFAULT_MAX_TOKENS = 4500
+DEFAULT_MAX_TOKENS = 5000
 DEFAULT_TIMEOUT = 120.0
 
 
 SUBMIT_TRANSFORMATION_TOOL = {
     "name": "submit_transformation_7d",
-    "description": "Submit 7D transformation map cho customer của student",
+    "description": "Submit Trợ Lý AI Thấu Khách output (B2 framework) cho student",
     "input_schema": {
         "type": "object",
         "properties": {
             "student_id": {"type": "string"},
             "venture": {"type": "string"},
-            "customer_persona": {"type": "string"},
-            "d1_financial_before": {"type": "string"},
-            "d1_financial_after": {"type": "string"},
-            "d1_financial_metrics": {"type": "string", "description": "Specific number/timeline"},
-            "d2_time_before": {"type": "string"},
-            "d2_time_after": {"type": "string"},
-            "d2_time_metrics": {"type": "string"},
-            "d3_skills_before": {"type": "string"},
-            "d3_skills_after": {"type": "string"},
-            "d3_skills_metrics": {"type": "string"},
-            "d4_confidence_before": {"type": "string"},
-            "d4_confidence_after": {"type": "string"},
-            "d4_confidence_metrics": {"type": "string"},
-            "d5_identity_before": {"type": "string"},
-            "d5_identity_after": {"type": "string"},
-            "d5_identity_metrics": {"type": "string"},
-            "d6_relationships_before": {"type": "string"},
-            "d6_relationships_after": {"type": "string"},
-            "d6_relationships_metrics": {"type": "string"},
-            "d7_health_before": {"type": "string"},
-            "d7_health_after": {"type": "string"},
-            "d7_health_metrics": {"type": "string"},
-            "tangible_benefits": {
-                "type": "array",
-                "items": {"type": "string"},
-                "description": "Tangible measurable (financial + time + skills)",
+            "customer_persona": {
+                "type": "string",
+                "description": "Tóm tắt persona khách hàng theo input student",
             },
-            "intangible_benefits": {
-                "type": "array",
-                "items": {"type": "string"},
-                "description": "Intangible (confidence + identity + relationships)",
+            "three_jobs_functional": {
+                "type": "string",
+                "description": "Việc CHỨC NĂNG: khách cần làm gì cụ thể (nội dung 1-3 câu, cụ thể, không generic)",
             },
+            "three_jobs_emotional": {
+                "type": "string",
+                "description": "Việc CẢM XÚC: khách muốn cảm thấy thế nào (1-3 câu, cụ thể về cảm giác)",
+            },
+            "three_jobs_social": {
+                "type": "string",
+                "description": "Việc XÃ HỘI: khách muốn được người khác nhìn nhận thế nào (1-3 câu)",
+            },
+            "top_pain_1_description": {
+                "type": "string",
+                "description": "Nỗi đau số 1, mô tả cụ thể cảm giác và tình huống",
+            },
+            "top_pain_1_scale": {
+                "type": "integer",
+                "description": "Pain Scale 1-10 cho nỗi đau số 1 (7-10 là pain mạnh đủ để bán)",
+                "minimum": 1,
+                "maximum": 10,
+            },
+            "top_pain_1_price_range": {
+                "type": "string",
+                "description": "Khoảng giá khách sẵn sàng trả cho nỗi đau này (vd: '3-6 triệu VND')",
+            },
+            "top_pain_2_description": {"type": "string"},
+            "top_pain_2_scale": {"type": "integer", "minimum": 1, "maximum": 10},
+            "top_pain_2_price_range": {"type": "string"},
+            "top_pain_3_description": {"type": "string"},
+            "top_pain_3_scale": {"type": "integer", "minimum": 1, "maximum": 10},
+            "top_pain_3_price_range": {"type": "string"},
+            "new_version_from": {
+                "type": "string",
+                "description": "Phiên bản CŨ của khách (Từ X), mô tả cảm giác + vị thế hiện tại",
+            },
+            "new_version_to": {
+                "type": "string",
+                "description": "Phiên bản MỚI của khách (Trở thành Y), mô tả cảm giác + vị thế khao khát",
+            },
+            "recommended_product_1": {
+                "type": "string",
+                "description": "Sản phẩm đề xuất số 1: 1 câu mô tả + giải quyết pain nào + tạo phiên bản mới ra sao",
+            },
+            "recommended_product_2": {"type": "string"},
+            "recommended_product_3": {"type": "string"},
             "primary_dream_outcome": {
                 "type": "string",
-                "description": "Hormozi Dream Outcome (specific + measurable + timeline)",
+                "description": "Dream outcome cụ thể + có số + có timeline (Hormozi style)",
             },
             "transformation_arc_summary": {
                 "type": "string",
-                "description": "1-paragraph narrative arc Before → Bridge → After",
+                "description": "1-paragraph narrative: Phiên bản cũ → Bridge (offer của bạn) → Phiên bản mới",
             },
             "markdown_visual_map": {
                 "type": "string",
-                "description": "Markdown table 7D before/after cho student dashboard",
+                "description": "Markdown đầy đủ 4 phần (3 jobs + Top 3 pains + Phiên bản mới + 3 sản phẩm) cho dashboard render",
             },
-            "summary": {"type": "string"},
+            "summary": {"type": "string", "description": "Tóm tắt 1 câu cho memory log"},
         },
         "required": [
             "student_id",
             "venture",
             "customer_persona",
+            "three_jobs_functional",
+            "three_jobs_emotional",
+            "three_jobs_social",
+            "top_pain_1_description",
+            "top_pain_1_scale",
+            "top_pain_1_price_range",
+            "top_pain_2_description",
+            "top_pain_2_scale",
+            "top_pain_2_price_range",
+            "top_pain_3_description",
+            "top_pain_3_scale",
+            "top_pain_3_price_range",
+            "new_version_from",
+            "new_version_to",
+            "recommended_product_1",
+            "recommended_product_2",
+            "recommended_product_3",
             "primary_dream_outcome",
             "transformation_arc_summary",
             "markdown_visual_map",
@@ -105,98 +138,142 @@ SUBMIT_TRANSFORMATION_TOOL = {
 
 
 def build_transformation_prompt(student_id: str, customer_persona: str, vision_context: dict, niche_context: dict) -> str:
-    return f"""Bạn là Transformation Mapper Coach cho Cohangai Cohort 1 student, applying Stage 6 framework v2.
+    return f"""Bạn là Trợ Lý AI Thấu Khách của Đào Thị Hằng (Anna), apply phương pháp Buổi 2 Breakout K2 (BÁN CÁI GÌ) version 2026-06-10.
 
-Triết lý: Customer KHÔNG mua giải pháp. Customer mua TRANSFORMATION across 7 dimensions of life.
+Triết lý cốt lõi: KHÁCH HÀNG KHÔNG MUA SẢN PHẨM, HỌ MUA SỰ THOÁT KHỎI NỖI ĐAU CỦA CHÍNH HỌ. Khách trước, sản phẩm sau.
 
 # Student
 ID: {student_id}
 
-# Customer persona target
+# Mô tả khách hàng (input student)
 {customer_persona}
 
-# Vision context (L2.1 output)
-{json.dumps(vision_context, ensure_ascii=False, indent=2)[:1500]}
+# Vision context (nếu có)
+{json.dumps(vision_context, ensure_ascii=False, indent=2)[:1000]}
 
-# Niche context (L2.2 output)
-{json.dumps(niche_context, ensure_ascii=False, indent=2)[:1500]}
+# Niche context (nếu có)
+{json.dumps(niche_context, ensure_ascii=False, indent=2)[:1000]}
 
-# Task
+# Task: Phân tích khách hàng theo 4 phần khung Buổi 2
 
-Map transformation across 7 dimensions cho customer của student:
+## PHẦN 1: BA VIỆC KHÁCH MUA SẢN PHẨM ĐỂ ĐẠT
 
-## 7 Dimensions
+Khách hàng mua sản phẩm để đạt 3 nhóm kết quả:
 
-### D1: Financial (Tài chính)
-- Before: financial state hiện tại
-- After: financial state sau khi mua + áp dụng
-- Metrics: specific number + timeline
+### Việc CHỨC NĂNG (Functional Job)
+Khách cần LÀM gì cụ thể. Ví dụ: kiếm thêm 5 triệu/tháng, có nguồn thu thứ 2, dạy con học bài hiệu quả hơn.
 
-### D2: Time (Thời gian)
-- Before: time allocation hiện tại
-- After: time allocation sau khi áp dụng
-- Metrics: hours/week saved hoặc gained
+### Việc CẢM XÚC (Emotional Job)
+Khách muốn CẢM THẤY thế nào. Ví dụ: tự tin về tài chính, an toàn về tương lai, tự hào về chính mình, không lo lắng mỗi đêm.
 
-### D3: Skills (Kỹ năng)
-- Before: skill level hiện tại
-- After: skill level sau khi học
-- Metrics: skill acquired specific
+### Việc XÃ HỘI (Social Job)
+Khách muốn được NGƯỜI KHÁC NHÌN NHẬN thế nào. Ví dụ: chuyên nghiệp trong mắt đồng nghiệp, có giá trị trong mắt sếp, thành công trong mắt bạn bè, tấm gương cho con cái.
 
-### D4: Confidence (Tự tin)
-- Before: confidence level + bằng chứng (mất ngủ, tự ti, không dám pitch)
-- After: confidence level + bằng chứng (pitch confident, ngủ ngon)
-- Metrics: behavioral marker
+**Quy tắc vàng**: Khách trả tiền cho Cảm xúc và Xã hội, Chức năng chỉ là vỏ ngoài.
 
-### D5: Identity (Định danh)
-- Before: identity hiện tại ("nhân viên VP", "mẹ bỉm")
-- After: identity mới ("solo founder", "AI Solo Empire architect")
-- Metrics: how others see them differently
+## PHẦN 2: TOP 3 NỖI ĐAU CỦA KHÁCH + PAIN SCALE 1-10
 
-### D6: Relationships (Mối quan hệ)
-- Before: family/friend/peer relationship state
-- After: relationship improved/expanded
-- Metrics: specific relationship outcome
+Liệt kê 3 nỗi đau lớn nhất của khách, mỗi nỗi đau:
+- Mô tả cụ thể cảm giác + tình huống
+- Chấm điểm Pain Scale 1-10
+- Khoảng giá khách sẵn sàng trả
 
-### D7: Health (Sức khoẻ)
-- Before: physical/mental health state
-- After: improved health from less stress + better work-life
-- Metrics: sleep/energy/stress markers
+### Pain Scale tham chiếu:
+- Mức 1: Khó chịu nhỏ, than vài câu rồi quên
+- Mức 3: Bực mình rõ ràng nhưng chưa đủ động lực tìm giải pháp (giá: vài chục nghìn)
+- Mức 5: Mất ngủ một đêm, lo lắng nhưng nghĩ tự xử được
+- Mức 7: Lo lắng kéo dài một tuần, bắt đầu nghiên cứu phương án (giá: 1-3 triệu)
+- Mức 8: Tìm giải pháp ngay trong đêm, phải hành động (giá: 3-8 triệu)
+- Mức 10: Đau quá lớn, sẵn sàng cân nhắc mức đầu tư rất cao nếu tin giải pháp đúng (giá: 15-50 triệu+)
 
-## Tangible vs Intangible cluster
-- Tangible (D1-D3): measurable financial + time + skill
-- Intangible (D4-D7): confidence + identity + relationships + health
+### Nguyên tắc:
+- Pain mức 7+ mới đáng xây sản phẩm quanh nó
+- Pain mức 3 trở xuống = khách không chịu trả → bỏ qua
+- Giá tương ứng tỉ lệ thuận với mức pain
 
-## Primary Dream Outcome (Hormozi format)
-Specific + measurable + timeline. Sample:
-"Có thêm 15-20tr/tháng từ Shopify trong 6 tháng, giảm 30h/tuần ops, được gia đình ủng hộ"
+## PHẦN 3: PHIÊN BẢN MỚI CỦA KHÁCH
 
-## Transformation arc summary
-1-paragraph narrative Before → Bridge (your offer) → After.
+Khách không chỉ muốn giải pháp, khách muốn TRỞ THÀNH MỘT PHIÊN BẢN MỚI của chính họ.
 
-## Markdown visual map
-Format dashboard-friendly:
-```
-| Dimension | Before | After | Metric |
+Hoàn thành câu: Khách của bạn TỪ [phiên bản cũ với cảm giác + vị thế hiện tại] TRỞ THÀNH [phiên bản mới với cảm giác + vị thế khao khát].
+
+Ví dụ:
+- Từ một nhân viên văn phòng phụ thuộc một nguồn thu nhập, trở thành một solo founder có nhiều nguồn thu và làm chủ thời gian.
+- Từ một người ngại nói tiếng Anh trước người nước ngoài, trở thành một người tự tin chủ trì cuộc họp với đối tác quốc tế.
+
+Yêu cầu: cụ thể về cảm giác + vị thế xã hội + mối quan hệ với chính mình.
+
+## PHẦN 4: BA SẢN PHẨM ĐỀ XUẤT
+
+Công thức canonical: Sản phẩm = Giải quyết Top Pain (mức 7-10) + Tạo phiên bản mới + Dùng năng lực lõi của founder.
+
+Đề xuất 3 ý tưởng sản phẩm cụ thể cho khách hàng này:
+- Mỗi sản phẩm 1 câu mô tả ngắn gọn
+- Liên kết rõ: sản phẩm này giải quyết Pain nào (1, 2, hay 3) + tạo phiên bản mới ra sao
+- Sản phẩm phải bắt tay làm được trong vài tuần, không vaporware
+
+## PHẦN 5: MARKDOWN VISUAL MAP
+
+Output markdown đẹp cho dashboard, format như sau:
+
+```markdown
+## 🎯 Trợ Lý AI Thấu Khách
+
+### 👤 Khách hàng của bạn
+[customer_persona tóm tắt 2-3 câu]
+
+### 💼 Ba việc khách mua sản phẩm để đạt
+| Loại | Nội dung |
+|---|---|
+| **Chức năng** (làm gì) | [three_jobs_functional] |
+| **Cảm xúc** (cảm thấy thế nào) | [three_jobs_emotional] |
+| **Xã hội** (được nhìn nhận thế nào) | [three_jobs_social] |
+
+> 💡 **Khách trả tiền cho Cảm xúc và Xã hội. Chức năng chỉ là vỏ.**
+
+### 🔥 Top 3 nỗi đau của khách
+| # | Nỗi đau | Pain Scale | Khoảng giá |
 |---|---|---|---|
-| Financial | ... | ... | ... |
-...
+| 1 | [top_pain_1_description] | **{{X}}/10** | [top_pain_1_price_range] |
+| 2 | [top_pain_2_description] | **{{X}}/10** | [top_pain_2_price_range] |
+| 3 | [top_pain_3_description] | **{{X}}/10** | [top_pain_3_price_range] |
+
+> 💡 **Pain mức 7-10 mới là pain bán được.**
+
+### 🌟 Phiên bản mới của khách
+**Từ:** [new_version_from]
+**Trở thành:** [new_version_to]
+
+### 🚀 Ba sản phẩm đề xuất bạn có thể bắt tay làm ngay
+1. [recommended_product_1]
+2. [recommended_product_2]
+3. [recommended_product_3]
+
+### ✨ Dream Outcome
+[primary_dream_outcome]
+
+### 📖 Hành trình chuyển hoá
+[transformation_arc_summary]
 ```
 
 # Quality requirements
-- KHÔNG generic ("better life"), MUST cụ thể với data
-- Match customer_persona + vision/niche context
-- Numbers + timeline mọi metric
-- KHÔNG em-dash, no forbidden term
+- KHÔNG generic ("better life"), MUST cụ thể với data từ persona input
+- Tiếng Việt thuần (KHÔNG English thuật ngữ trừ khi đã thành term Việt như AI, online)
+- KHÔNG dấu em-dash, dùng dấu phẩy hoặc xuống dòng
+- KHÔNG emoji ngoài bảng visual map đã định sẵn
+- Pain Scale phải có cơ sở (mô tả pain match với mức số)
+- Sản phẩm đề xuất phải concrete + actionable, không vaporware
+- Mọi metric phải có số hoặc timeline cụ thể
 
-Output qua tool submit_transformation_7d.
+Output qua tool submit_transformation_7d, fill TẤT CẢ required fields.
 """
 
 
 class L2TransformationMapper7D(BaseBC):
-    """L2.3 Transformation Mapper 7D (NEW)."""
+    """Trợ Lý AI Thấu Khách v2 (B2 framework 2026-06-10)."""
 
     name = "l2_transformation_mapper_7d"
-    scope = "Map customer transformation 7D Stage 6 cho Cohangai cohort 1 student (NEW wizard)"
+    scope = "Trợ Lý AI Thấu Khách: phân tích 3 jobs + Pain Scale 1-10 + Phiên bản mới + 3 sản phẩm đề xuất theo phương pháp Buổi 2 K2"
     autonomy_level = AutonomyLevel.L1_AUTO
     escalate_to = EscalationTarget.NONE
     tools: list[str] = []
@@ -271,13 +348,13 @@ class L2TransformationMapper7D(BaseBC):
 
         dream = result.get("primary_dream_outcome", "")[:80]
         date_str = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
-        summary = f"transformation_7d student={student_id} dream='{dream}'"
+        summary = f"thau_khach_v2 student={student_id} dream='{dream}'"
 
         memory_entry = {
             "agent_name": self.name,
             "content_summary": json.dumps(result, ensure_ascii=False)[:800],
-            "keywords": ["transformation_7d", "cohort_1", student_id, customer_persona[:50]],
-            "tags": ["l2", "transformation_mapper", "stage_6", "cohort_1", date_str],
+            "keywords": ["thau_khach_b2", "cohort_1", student_id, customer_persona[:50]],
+            "tags": ["l2", "thau_khach", "b2_framework", "cohort_1", date_str],
             "venture": ctx.venture_context or "cohangai",
             "category": "profile",
             "context": f"cohort.transformation_map {date_str} student={student_id}",
@@ -297,4 +374,5 @@ class L2TransformationMapper7D(BaseBC):
                 and getattr(block, "name", None) == "submit_transformation_7d"
             ):
                 return block.input or {}
-        return {"error": "No tool_use block"}
+
+        return {"error": "No tool_use response from LLM"}
