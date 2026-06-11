@@ -161,14 +161,27 @@ ID: {student_id}
 Khách hàng mua sản phẩm để đạt 3 nhóm kết quả:
 
 ### Việc CHỨC NĂNG (Functional Job)
-Khách cần LÀM gì cụ thể. Ví dụ: kiếm thêm 5 triệu/tháng, có nguồn thu thứ 2, dạy con học bài hiệu quả hơn.
+Khách cần LÀM gì cụ thể. Đưa ra ĐÚNG 3 ý riêng biệt, mỗi ý 1 dòng bắt đầu bằng "- " (dash space).
+Ví dụ format:
+- Kiếm thêm 5 triệu mỗi tháng
+- Có nguồn thu nhập thứ hai bên cạnh lương cứng
+- Dạy con học bài hiệu quả hơn
 
 ### Việc CẢM XÚC (Emotional Job)
-Khách muốn CẢM THẤY thế nào. Ví dụ: tự tin về tài chính, an toàn về tương lai, tự hào về chính mình, không lo lắng mỗi đêm.
+Khách muốn CẢM THẤY thế nào. Đưa ra ĐÚNG 3 ý riêng biệt, mỗi ý 1 dòng bắt đầu bằng "- ".
+Ví dụ format:
+- Tự tin về tài chính, không còn lo lắng mỗi đêm
+- An toàn về tương lai, biết mình có năng lực kiếm tiền
+- Tự hào về chính mình, làm chủ cuộc đời
 
 ### Việc XÃ HỘI (Social Job)
-Khách muốn được NGƯỜI KHÁC NHÌN NHẬN thế nào. Ví dụ: chuyên nghiệp trong mắt đồng nghiệp, có giá trị trong mắt sếp, thành công trong mắt bạn bè, tấm gương cho con cái.
+Khách muốn được NGƯỜI KHÁC NHÌN NHẬN thế nào. Đưa ra ĐÚNG 3 ý riêng biệt, mỗi ý 1 dòng bắt đầu bằng "- ".
+Ví dụ format:
+- Chuyên nghiệp trong mắt đồng nghiệp
+- Có giá trị trong mắt sếp
+- Tấm gương cho con cái
 
+**Quy tắc format**: KHÔNG dùng dấu "..." để nối ý. Mỗi ý 1 bullet riêng để dễ đọc.
 **Quy tắc vàng**: Khách trả tiền cho Cảm xúc và Xã hội, Chức năng chỉ là vỏ ngoài.
 
 ## PHẦN 2: TOP 3 NỖI ĐAU CỦA KHÁCH + PAIN SCALE 1-10
@@ -223,11 +236,15 @@ Output markdown đẹp cho dashboard, format như sau:
 [customer_persona tóm tắt 2-3 câu]
 
 ### 💼 Ba việc khách mua sản phẩm để đạt
-| Loại | Nội dung |
-|---|---|
-| **Chức năng** (làm gì) | [three_jobs_functional] |
-| **Cảm xúc** (cảm thấy thế nào) | [three_jobs_emotional] |
-| **Xã hội** (được nhìn nhận thế nào) | [three_jobs_social] |
+
+**Việc Chức năng (khách cần LÀM gì)**
+[three_jobs_functional]
+
+**Việc Cảm xúc (khách muốn CẢM thấy gì)**
+[three_jobs_emotional]
+
+**Việc Xã hội (khách muốn được NHÌN NHẬN ra sao)**
+[three_jobs_social]
 
 > 💡 **Khách trả tiền cho Cảm xúc và Xã hội. Chức năng chỉ là vỏ.**
 

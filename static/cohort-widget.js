@@ -56,8 +56,17 @@
     localStorage.setItem(INPUT_KEY, inputEl.value);
   });
 
-  // Auto-restore output per wizard
-  const OUTPUT_KEY = `cohort_output_${wizard}`;
+  // Auto-restore output per wizard.
+  // Version key — bump when output schema/language changes to invalidate old cache.
+  const OUTPUT_SCHEMA_VERSION = "v2-vi-2026-06-11";
+  const OUTPUT_KEY = `cohort_output_${wizard}_${OUTPUT_SCHEMA_VERSION}`;
+  // Cleanup old keys from previous schema versions
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(`cohort_output_${wizard}`) && k !== OUTPUT_KEY) {
+      localStorage.removeItem(k);
+    }
+  }
   const savedOutput = localStorage.getItem(OUTPUT_KEY);
   if (savedOutput) {
     outputMdEl.innerHTML = markdownToHtml(savedOutput);

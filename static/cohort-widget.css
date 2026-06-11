@@ -1739,3 +1739,63 @@ body.os-home a { text-decoration: none; color: inherit; }
 }
 .cohort-collapse.cohort-collapse-open .cohort-collapse-body { display: block; }
 .cohort-collapse-body > *:first-child { margin-top: 12px; }
+
+/* === Green tick bullet style for wizard output lists === */
+.cohort-collapse-body ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0;
+}
+.cohort-collapse-body ul li {
+  position: relative;
+  padding: 6px 0 6px 28px;
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+.cohort-collapse-body ul li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 20px;
+  height: 20px;
+  background: #06A77D;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+/* Ordered list (1. 2. 3.) for product recommendations */
+.cohort-collapse-body ol {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0;
+  counter-reset: item;
+}
+.cohort-collapse-body ol li {
+  position: relative;
+  padding: 8px 0 8px 36px;
+  margin-bottom: 6px;
+  line-height: 1.6;
+  counter-increment: item;
+}
+.cohort-collapse-body ol li::before {
+  content: counter(item);
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 26px;
+  height: 26px;
+  background: #E63946;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+}
