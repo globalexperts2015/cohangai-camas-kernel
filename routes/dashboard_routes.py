@@ -386,6 +386,14 @@ h1{{color:#d63031}}p{{color:#5a5453}}</style></head>
     gate_btn_state = ""
     if any_locked:
         gate_btn_state = '<div class="gate-locked">🔒 Gate đã khóa. Bạn có thể tiếp tục bước sau.</div>'
+        if level == "L2":
+            gate_btn_state += (
+                f'<a class="discovery-btn" href="/sdl/students/{student_id}/discovery/report?sig={sig}">'
+                f'🚀 Khám phá cơ hội kinh doanh (Day 3 Discovery Engine)</a>'
+                f'<form method="post" action="/sdl/discovery/run?student_id={student_id}" '
+                f'style="margin-top:10px"><button type="submit" class="trigger-btn">'
+                f'Tạo Discovery Report mới (đợi 30-45s)</button></form>'
+            )
         if cfg.get("next_path"):
             gate_btn_state += f'<a class="next-btn" href="{cfg["next_path"]}?student={student_id}&sig={sig}">Mở {cfg["next_level"]} →</a>'
     elif cfg.get("gate_key"):
@@ -444,6 +452,10 @@ pre{{margin-top:14px;background:#0a0a0a;color:#fff;padding:16px;border-radius:8p
 #lock-gate-btn:hover:not(:disabled){{background:#b71c1c}}
 .gate-locked{{background:#d4f1de;border:2px solid var(--ok);border-radius:12px;padding:18px 22px;text-align:center;font-weight:700;color:#1e7e34;margin-bottom:14px}}
 .next-btn{{display:block;text-align:center;background:var(--red);color:#fff;padding:18px;border-radius:12px;text-decoration:none;font-weight:800;font-size:16px;margin-bottom:14px}}
+.discovery-btn{{display:block;text-align:center;background:linear-gradient(135deg,#0a0a0a,#2d2d2d);color:#fff;padding:22px;border-radius:14px;text-decoration:none;font-weight:800;font-size:18px;margin-bottom:10px;box-shadow:0 6px 20px rgba(0,0,0,0.25)}}
+.discovery-btn:hover{{background:linear-gradient(135deg,#1a1a1a,#3d3d3d)}}
+.trigger-btn{{display:block;width:100%;background:transparent;color:var(--red);border:2px solid var(--red);padding:14px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}}
+.trigger-btn:hover{{background:var(--red);color:#fff}}
 .zip-link{{display:inline-block;background:#0a0a0a;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin-top:20px}}
 .toast{{position:fixed;bottom:20px;right:20px;background:#0a0a0a;color:#fff;padding:14px 22px;border-radius:10px;font-weight:700;opacity:0;transition:opacity 0.3s;z-index:1000}}
 .toast.show{{opacity:1}}
