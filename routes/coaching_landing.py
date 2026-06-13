@@ -119,43 +119,149 @@ async def coaching_landing() -> HTMLResponse:
   <p>Hằng đã 12 năm coaching 33,000+ học viên Speakout. Hằng đã nhìn quá đủ số người mua xong không xây. Lần này Hằng không bán bạn khoá học. Lần này Hằng bán bạn <strong>kết quả sau 12 tuần</strong>.</p>
 </div>
 
-<div class="section">
-  <h2 class="h2">Kết quả Hằng cam kết sau 12 tuần</h2>
-
-  <ul>
-    <li><strong>Tuần 4:</strong> Bạn có 8 file Founder OS canonical (Sứ mệnh, Tầm nhìn, Bản sắc, Nguyên tắc, Anti Vision, Why Statement, Founder Assets, Founder Story). Đây là Tầng 1 của bạn, khóa cứng.</li>
-    <li><strong>Tuần 6:</strong> Bạn có 11 file Customer Intelligence canonical (Statement Một Dòng 4 vế, Opportunity Map, Empathy Map, Demand Evidence, Conversation Evidence, Buying Journey, Buying Triggers, Customer Fit Score). Đây là Tầng 2, khóa cứng.</li>
-    <li><strong>Tuần 8:</strong> Bạn có 8 file Value Proposition canonical (Core Offer 4 thành phần, Pricing Strategy, Transformation Promise, Positioning Statement, Offer Stack 5 tier, Financial Model, Value Equation Hormozi 4 lever, Guarantee Strategy 5 tier). Đây là Tầng 3, khóa cứng.</li>
-    <li><strong>Tuần 10:</strong> Bạn có AI COO chạy sáng 6h, Night Audit 11pm, Weekly Review Chủ Nhật 8pm. Bạn có Business Vault 4 namespace. Bạn có 5 automation flow chạy thực, không phải doc trên giấy.</li>
-    <li><strong>Tuần 12:</strong> Bạn có doanh thu thực từ Offer đầu tiên. Tối thiểu 1 khách hàng đã trả tiền + đang dùng + có testimonial. Bạn ra trường với <strong>một doanh nghiệp đang chạy</strong>, không phải kế hoạch trên slide.</li>
-  </ul>
-
-  <p>Đây không phải lời hứa. Đây là <strong>roadmap có lock cứng 5 cột mốc</strong>. Mỗi cột mốc Hằng và bạn cùng đứng, không qua được không đi tiếp.</p>
+<div class="callout red">
+  <p style="margin-bottom:0;font-size:18px"><strong>Khác biệt lớn nhất giữa BreakoutOS và mọi khoá kinh doanh ngoài thị trường:</strong></p>
+  <p style="margin-top:10px;margin-bottom:0;font-size:17px">Các khoá khác dạy bạn marketing, content, bán hàng, chạy quảng cáo.</p>
+  <p style="margin-top:6px;margin-bottom:0;font-size:17px">BreakoutOS bán cho bạn <strong>3 thứ thật:</strong> Sự rõ ràng của Founder + Sự thấu hiểu khách hàng + Hệ thống vận hành bằng AI <em>được huấn luyện trên chính dữ liệu doanh nghiệp của bạn</em>.</p>
 </div>
 
 <div class="section">
-  <h2 class="h2">Bạn nhận gì trong 12 tuần</h2>
+  <h2 class="h2">Sau 12 tuần, bạn sở hữu 6 nền móng của một doanh nghiệp</h2>
+  <p>Không phải kiến thức để xem. Không phải template tải về. Đây là <strong>tài sản số sở hữu mãi</strong>, được dựng riêng cho doanh nghiệp của bạn, vận hành bằng AI hiểu chính bạn và chính khách của bạn.</p>
+</div>
 
-  <h3 class="h3">1. BreakoutOS V3.5.7 — Hệ thống Founder OS bạn sở hữu mãi</h3>
-  <p>Bạn dựng 6 tầng Founder OS đến Revenue Growth (L1-L5). Không phải template chung. Đây là phiên bản canonical riêng của bạn, build từ chính Day 1 + Day 2 + Discovery Engine output bạn đã làm.</p>
+<div class="section">
+  <h2 class="h2">1. Founder Layer · Biết mình là ai và mình nên xây gì</h2>
+  <ul>
+    <li>Xác định rõ điểm mạnh, năng lực lõi, kinh nghiệm sống và lợi thế cạnh tranh riêng của bản thân</li>
+    <li>Biết chính xác mình muốn phục vụ ai và tại sao mình muốn phục vụ họ</li>
+    <li>Xác định tầm nhìn cá nhân và định hướng doanh nghiệp 3-5 năm tới</li>
+    <li>Xây dựng <strong>Founder Knowledge Database</strong>, kho lưu trữ toàn bộ kiến thức, kinh nghiệm, quy trình, bài học, phương pháp của riêng bạn</li>
+    <li>Chuyển kiến thức nằm trong đầu thành <strong>tài sản số</strong> có thể tái sử dụng, chia sẻ, nhân bản</li>
+    <li>Xây <strong>AI Founder Profile</strong> để AI hiểu bạn, hỗ trợ bạn, đưa ra đề xuất phù hợp với doanh nghiệp của bạn</li>
+    <li>Không còn tình trạng liên tục đổi ý tưởng, đổi ngách, chạy theo trend mỗi tuần</li>
+    <li>Có một hướng đi rõ ràng thay vì tiếp tục loay hoay tìm kiếm</li>
+  </ul>
+</div>
 
-  <h3 class="h3">2. AI Team thay 5 vị trí trong tuần đầu tiên</h3>
-  <p>Trợ Lý AI Đóng Gói Offer (output Grand Slam Offer 4 thành phần). Trợ Lý AI Ra Mắt Cohort (output MVO 30-day plan). AI Content Engine (1 nội dung gốc thành 50 assets). AI CSKH Haiku (trả khách 24/7). AI Night Audit (log mỗi đêm 11pm). Bạn không thuê, không quản lý nhân sự. Bạn chỉ giao việc qua chat.</p>
+<div class="section">
+  <h2 class="h2">2. Customer Layer · Biết khách nào sẵn sàng trả tiền cho bạn</h2>
+  <ul>
+    <li>Xây dựng hồ sơ khách hàng mục tiêu chi tiết</li>
+    <li>Hiểu rõ khách hàng đang gặp khó khăn gì</li>
+    <li>Hiểu rõ khách hàng thực sự mong muốn điều gì</li>
+    <li>Xác định các rào cản khiến khách hàng chưa mua hàng</li>
+    <li>Hiểu hành trình ra quyết định mua hàng của khách hàng</li>
+    <li>Xây <strong>Customer Database</strong> liên tục cập nhật và học hỏi từ khách hàng thật</li>
+    <li>Phân tích khách hàng từ survey, cuộc gọi, coaching, webinar, tin nhắn, phản hồi thực tế</li>
+    <li>Xây <strong>Customer Insight Library</strong>, kho dữ liệu giúp bạn hiểu khách hàng sâu hơn theo thời gian</li>
+    <li>Biết chính xác khách hàng nào phù hợp nhất với doanh nghiệp của mình</li>
+    <li>Ngừng đoán mò nhu cầu thị trường</li>
+  </ul>
+</div>
 
-  <h3 class="h3">3. 1-1 Mentoring 1 buổi 60 phút mỗi tuần với Hằng</h3>
-  <p>Lịch cố định mỗi tuần. Hằng nhìn vault canonical của bạn trước buổi, đến buổi không cần warm up. Hằng nói thẳng cái sai, sửa tại chỗ, không kéo dài.</p>
+<div class="section">
+  <h2 class="h2">3. Product Layer · Xây sản phẩm mà thị trường thực sự cần</h2>
+  <ul>
+    <li>Tìm ra các vấn đề có nhu cầu thật trên thị trường</li>
+    <li>Phân tích dữ liệu tìm kiếm và xu hướng thị trường</li>
+    <li>Xác định các ngách có tiềm năng tăng trưởng</li>
+    <li>Đánh giá mức độ cạnh tranh trước khi đầu tư thời gian và tiền bạc</li>
+    <li>Xây sản phẩm hoặc dịch vụ dựa trên nhu cầu thực tế thay vì cảm tính</li>
+    <li>Validate ý tưởng kinh doanh bằng dữ liệu thật</li>
+    <li>Xác định mô hình doanh thu phù hợp</li>
+    <li>Tính toán lợi nhuận kỳ vọng trước khi triển khai</li>
+    <li>Xây phễu sản phẩm từ đầu phễu, giữa phễu đến cuối phễu</li>
+    <li>Có lộ trình phát triển sản phẩm rõ ràng thay vì làm mọi thứ cùng lúc</li>
+  </ul>
+</div>
 
-  <h3 class="h3">4. Done-with-you tuần đầu tiên: dựng Founder OS Tầng 1 cùng bạn</h3>
-  <p>Hằng ngồi với bạn trong 1 buổi sáng dài tuần đầu, cùng nhau viết 5 file Tier A. Không phải bạn tự loay hoay. Không phải đợi đến buổi 60 phút kế tiếp. Trực tiếp đẩy bạn vượt qua "khúc giấy trắng" lần đầu.</p>
+<div class="section">
+  <h2 class="h2">4. Value Proposition Layer · Thông điệp bán hàng khiến khách hiểu giá trị ngay</h2>
+  <ul>
+    <li>Xây dựng thông điệp định vị rõ ràng</li>
+    <li>Xác định lý do khách hàng nên chọn bạn thay vì đối thủ</li>
+    <li>Xây Value Proposition dựa trên nỗi đau và mong muốn thật của khách hàng</li>
+    <li>Hoàn thiện thông điệp cho website, landing page, webinar, nội dung marketing</li>
+    <li>Biết cách trình bày giá trị thay vì chỉ mô tả sản phẩm</li>
+  </ul>
+</div>
 
-  <h3 class="h3">5. Group thực hành 6 founder khác cùng cohort</h3>
-  <p>Cap 10 founder, chia 2 cohort 5 người. Mỗi tuần 1 buổi group 90 phút cùng nhau dựng. Không phải tự cô đơn. Bạn nhìn 4 founder khác lóng ngóng giống bạn, bạn thấy mình không phải người ngu duy nhất.</p>
+<div class="section">
+  <h2 class="h2">5. System Layer · Hệ thống marketing và bán hàng vận hành bằng AI</h2>
+  <ul>
+    <li>Thiết lập hệ thống lưu trữ dữ liệu khách hàng tập trung</li>
+    <li>Xây hệ thống CRM quản lý khách hàng</li>
+    <li>Theo dõi toàn bộ hành trình khách hàng từ người lạ đến khách trả tiền</li>
+    <li>Thiết lập pipeline bán hàng</li>
+    <li>Xây workflow chăm sóc khách hàng tự động</li>
+    <li>Thiết lập email marketing cá nhân hoá</li>
+    <li>Xây hệ thống nuôi dưỡng khách hàng dài hạn</li>
+    <li>Thiết lập hệ thống đặt lịch, khảo sát, webinar, chăm sóc sau bán hàng</li>
+    <li>Có <strong>AI tạo nội dung marketing</strong> (huấn luyện trên data của bạn)</li>
+    <li>Có <strong>AI chăm sóc khách hàng</strong> (huấn luyện trên insight khách của bạn)</li>
+    <li>Có <strong>AI phân tích dữ liệu khách hàng</strong> (tổng hợp pattern, đề xuất quyết định)</li>
+    <li>Có <strong>AI xây tài liệu, SOP, quy trình</strong> (chuẩn hoá vận hành)</li>
+  </ul>
+</div>
 
-  <h3 class="h3">6. Lifetime access vault Anna's Library</h3>
-  <p>Bạn access toàn bộ vault Hằng đã ingest 12 năm: 50+ source, 130+ concept, 100+ people, framework Eagle Camp, Hormozi $100M Offers, Brunson Expert Secrets, Dan Lok HIC, Goldman Wealth Series, Strategyzer. Khi nào bạn cần research bạn search vault thay vì Google.</p>
+<div class="section">
+  <h2 class="h2">6. Freedom Layer · Xây tài sản kinh doanh thay vì tạo thêm việc cho bản thân</h2>
+  <ul>
+    <li>Biến kiến thức thành tài sản số</li>
+    <li>Biến quy trình thành hệ thống</li>
+    <li>Biến kinh nghiệm thành tài sản có thể tái sử dụng</li>
+    <li>Xây doanh nghiệp có khả năng hoạt động ngay cả khi bạn không trực tiếp xử lý mọi việc</li>
+    <li>Giảm sự phụ thuộc vào trí nhớ cá nhân</li>
+    <li>Giảm sự phụ thuộc vào việc làm thủ công</li>
+    <li>Tạo nền tảng để tuyển người, thuê VA, hoặc triển khai AI sâu hơn trong tương lai</li>
+    <li>Xây doanh nghiệp có khả năng mở rộng thay vì chỉ đổi thời gian lấy tiền</li>
+  </ul>
+</div>
 
-  <h3 class="h3">7. Access AI Twin Hằng 24/7 trong và sau 12 tuần</h3>
-  <p>Buổi tối bạn không ngủ được, đầu bạn loay hoay câu hỏi. Bạn mở AI Twin Hằng. Bạn gõ. Trả lời có voice + tư duy Hằng từ 50 source vault. Không phải ChatGPT generic.</p>
+<div class="callout dark">
+  <strong style="font-size:20px;display:block;margin-bottom:14px">Kết quả cuối cùng sau 12 tuần</strong>
+  <p style="margin-bottom:12px">Bạn không chỉ học cách kinh doanh. Bạn <strong>sở hữu</strong>:</p>
+  <ul style="margin-bottom:0">
+    <li style="color:#fff;border-bottom-color:#3d3d3d">Một hồ sơ Founder rõ ràng</li>
+    <li style="color:#fff;border-bottom-color:#3d3d3d">Một hồ sơ khách hàng hoàn chỉnh</li>
+    <li style="color:#fff;border-bottom-color:#3d3d3d">Một sản phẩm được kiểm chứng bởi thị trường</li>
+    <li style="color:#fff;border-bottom-color:#3d3d3d">Một thông điệp bán hàng rõ ràng</li>
+    <li style="color:#fff;border-bottom-color:#3d3d3d">Một hệ thống marketing và bán hàng vận hành bằng AI</li>
+    <li style="color:#fff;border-bottom-color:#3d3d3d">Một kho tri thức doanh nghiệp được lưu trữ và phát triển theo thời gian</li>
+    <li style="color:#fff;border-bottom:none">Một nền tảng để xây doanh nghiệp một người cùng AI trong nhiều năm tiếp theo</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2 class="h2">USP killer mà không khoá kinh doanh nào tại Việt Nam đang có</h2>
+  <div class="callout red">
+    <p style="font-size:20px;font-weight:800;margin-bottom:10px;color:var(--red)">"AI được huấn luyện trên chính dữ liệu doanh nghiệp của bạn."</p>
+    <p style="margin-bottom:0">Không phải ChatGPT chung. Không phải prompt template. Mỗi học viên BreakoutOS có riêng <strong>AI Twin của Founder</strong> + <strong>AI Twin của Customer Profile</strong> + <strong>AI Operating System</strong>. Cả 3 đều được train từ data thực của doanh nghiệp bạn, học và cải tiến mỗi tuần trong 12 tuần và sau đó.</p>
+  </div>
+</div>
+
+<div class="section">
+  <h2 class="h2">Cụ thể bạn nhận gì trong 12 tuần (hỗ trợ trực tiếp)</h2>
+  <p>6 Layer trên là <em>kết quả</em>. Đây là <em>cách Hằng giúp bạn dựng được</em>:</p>
+
+  <h3 class="h3">1-1 Mentoring 60 phút × 12 tuần với Hằng</h3>
+  <p>Lịch cố định mỗi tuần. Hằng nhìn vault canonical của bạn trước buổi, đến buổi không cần warm up. Hằng nói thẳng cái sai, sửa tại chỗ.</p>
+
+  <h3 class="h3">Done-with-you Tuần 1: dựng Founder OS Tầng 1 cùng bạn</h3>
+  <p>Hằng ngồi với bạn 4 giờ tuần đầu, cùng viết 5 file Tier A. Trực tiếp đẩy bạn vượt qua "khúc giấy trắng" lần đầu.</p>
+
+  <h3 class="h3">Group cohort 90 phút × 12 tuần (max 5 người/cohort)</h3>
+  <p>Bạn nhìn 4 founder khác lóng ngóng giống bạn. Bạn không phải người duy nhất trong hành trình này.</p>
+
+  <h3 class="h3">Lifetime access vault Anna's Library</h3>
+  <p>50+ source, 130+ concept, framework Eagle Camp, Hormozi $100M Offers, Brunson Expert Secrets, Dan Lok HIC, Goldman Wealth Series, Strategyzer. Search vault thay vì Google.</p>
+
+  <h3 class="h3">Access AI Twin Hằng 24/7 trong và sau 12 tuần</h3>
+  <p>Đêm bạn không ngủ được, gõ AI Twin Hằng. Trả lời có voice + tư duy Hằng từ 50 source vault, không phải ChatGPT generic.</p>
+
+  <h3 class="h3">BreakoutOS V3.5.7 license sở hữu mãi</h3>
+  <p>Sau 12 tuần kết thúc, bạn vẫn vận hành Founder OS + Customer OS + Value Prop OS + AI COO của mình. Không subscription. Không thuê license. Tài sản của bạn.</p>
 </div>
 
 <div class="section">
