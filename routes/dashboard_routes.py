@@ -319,17 +319,27 @@ async def export_vault_zip(
 @router.get("/sdl/students/{student_id}/output/{level}", response_class=HTMLResponse)
 async def output_page(
     student_id: UUID, level: str,
+    sig: str = "",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> HTMLResponse:
-    """Day 1 = L1, Day 2 = L2 output webinar pages."""
+    """Output page với review UI: duyệt từng file + duyệt tất cả + khóa Gate."""
     level_num = {"L1": 1, "L2": 2, "L3": 3, "L4": 4, "L5": 5, "L6a": 6}.get(level)
     if not level_num:
         raise HTTPException(404, "Unknown level")
 
+    # Gate config per level
+    gate_config = {
+        "L1": {"gate_key": "gate_1_founder", "next_level": "L2", "next_path": "/foundation/l2",
+               "expected_count": 8, "title": "Founder OS"},
+        "L2": {"gate_key": "gate_2_customer_soft", "next_level": "L3", "next_path": "/foundation/l3",
+               "expected_count": 11, "title": "Customer Intelligence"},
+    }
+    cfg = gate_config.get(level, {})
+
     async with pool.acquire() as conn:
         files = await conn.fetch(
             """
-            SELECT DISTINCT ON (file_key) file_key, markdown_content, tier, status
+            SELECT DISTINCT ON (file_key) file_key, markdown_content, tier, status, version
             FROM breakoutos.canonical_files
             WHERE student_id=$1 AND level=$2
             ORDER BY file_key, version DESC
@@ -338,26 +348,210 @@ async def output_page(
         )
 
     if not files:
-        return HTMLResponse(f"<h1>{level} chưa có output</h1>", status_code=404)
+        return HTMLResponse(f"""<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><title>{level} chưa có output</title>
+<style>body{{font-family:'Be Vietnam Pro',system-ui;background:#fafaf7;padding:60px 20px;text-align:center;color:#0a0a0a}}
+h1{{color:#d63031}}p{{color:#5a5453}}</style></head>
+<body><h1>{level} chưa có output</h1>
+<p>Bạn cần hoàn thành intake form trước.</p>
+<p><a href="/foundation/{level.lower()}?student={student_id}&sig={sig}" style="background:#d63031;color:#fff;padding:14px 22px;border-radius:10px;text-decoration:none;font-weight:700">Mở {level} intake form</a></p>
+</body></html>""", status_code=404)
+
+    # Build file cards với review controls
+    reviewed_count = sum(1 for f in files if f["status"] in ("reviewed", "locked"))
+    total_count = len(files)
+    all_reviewed = reviewed_count == total_count and total_count == cfg.get("expected_count", total_count)
+    any_locked = any(f["status"] == "locked" for f in files)
 
     files_html = ""
     for f in files:
+        is_done = f["status"] in ("reviewed", "locked")
+        is_locked = f["status"] == "locked"
+        is_error = f["status"] == "generation_failed"
+        btn = "" if is_locked else (
+            f'<button class="approve-btn" data-file-key="{f["file_key"]}" {("disabled" if is_done else "")}>{"✓ Đã duyệt" if is_done else "Duyệt file này"}</button>'
+        )
+        status_color = "ok" if is_done else ("err" if is_error else "pending")
+        content = (f["markdown_content"] or "(file rỗng, AI chưa sinh xong)")[:8000]
         files_html += (
-            f'<details class="file-card tier-{f["tier"]}"><summary>'
+            f'<details class="file-card tier-{f["tier"]} status-{status_color}"><summary>'
             f'<span class="tier-badge">{f["tier"]}</span> '
             f'<strong>{f["file_key"]}</strong> '
-            f'<span class="status">{f["status"]}</span></summary>'
-            f'<pre>{(f["markdown_content"] or "")[:5000]}</pre></details>'
+            f'<span class="status status-{status_color}">{f["status"]}</span></summary>'
+            f'<pre>{content}</pre>'
+            f'<div class="file-actions">{btn}</div>'
+            f'</details>'
         )
 
+    gate_btn_state = ""
+    if any_locked:
+        gate_btn_state = '<div class="gate-locked">🔒 Gate đã khóa. Bạn có thể tiếp tục bước sau.</div>'
+        if cfg.get("next_path"):
+            gate_btn_state += f'<a class="next-btn" href="{cfg["next_path"]}?student={student_id}&sig={sig}">Mở {cfg["next_level"]} →</a>'
+    elif cfg.get("gate_key"):
+        expected = cfg.get("expected_count", total_count)
+        if all_reviewed:
+            lock_label = f'🔒 Khóa {cfg["title"]} và mở {cfg.get("next_level", "tầng sau")}'
+            lock_disabled = ""
+        else:
+            lock_label = f'Cần duyệt đủ {expected} file để khóa Gate (hiện {reviewed_count}/{expected})'
+            lock_disabled = "disabled"
+        gate_btn_state = f'<button id="lock-gate-btn" {lock_disabled}>{lock_label}</button>'
+
+    bulk_btn = (
+        '<button id="approve-all-btn">Duyệt tất cả file còn lại</button>'
+        if reviewed_count < total_count and not any_locked else ""
+    )
+
     return HTMLResponse(f"""<!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8"><title>Output {level} · BreakoutOS</title>
-<style>body{{font-family:'Be Vietnam Pro',system-ui;background:#fafaf7;padding:30px 20px;color:#0a0a0a;max-width:880px;margin:0 auto}}
-h1{{color:#d63031}}.file-card{{background:#fff;border:1px solid #e5dfd0;border-radius:12px;padding:18px 22px;margin-bottom:12px}}
-.file-card[open]{{border-color:#d63031}}.tier-badge{{display:inline-block;background:#d63031;color:#fff;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800;margin-right:8px}}
-.tier-B .tier-badge{{background:#f4a261}}.tier-C .tier-badge{{background:#999}}
-summary{{cursor:pointer;font-size:16px}}.status{{font-size:12px;color:#888;margin-left:8px}}
-pre{{margin-top:14px;background:#0a0a0a;color:#fff;padding:16px;border-radius:8px;overflow-x:auto;font-size:13px;white-space:pre-wrap}}</style></head>
-<body><h1>Output {level} · {len(files)} canonical file</h1>{files_html}
-<p style="margin-top:30px"><a href="/sdl/students/{student_id}/vault/export.zip" style="background:#d63031;color:#fff;padding:14px 22px;border-radius:10px;text-decoration:none;font-weight:700">Tải xuống vault .zip</a></p>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>{level} · {cfg.get("title", "Output")} · BreakoutOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{{--red:#d63031;--ok:#27ae60;--warn:#f4a261;--err:#c0392b}}
+*{{box-sizing:border-box;margin:0;padding:0;font-family:'Be Vietnam Pro',system-ui}}
+body{{background:#fafaf7;padding:30px 20px;color:#0a0a0a;line-height:1.65}}
+.container{{max-width:880px;margin:0 auto}}
+.header{{margin-bottom:24px}}
+h1{{color:var(--red);font-size:30px;font-weight:800;margin-bottom:8px}}
+.progress{{background:#fff;border:1px solid #e5dfd0;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px}}
+.progress-bar{{flex:1;height:10px;background:#e5dfd0;border-radius:999px;overflow:hidden}}
+.progress-fill{{height:100%;background:var(--ok);transition:width 0.3s}}
+.progress-text{{font-weight:700;font-size:14px}}
+.file-card{{background:#fff;border:1.5px solid #e5dfd0;border-radius:12px;padding:18px 22px;margin-bottom:12px}}
+.file-card[open]{{border-color:var(--red)}}
+.file-card.status-ok{{border-left:4px solid var(--ok)}}
+.file-card.status-pending{{border-left:4px solid var(--warn)}}
+.file-card.status-err{{border-left:4px solid var(--err)}}
+summary{{cursor:pointer;font-size:16px;list-style:none;display:flex;align-items:center;gap:10px}}
+summary::-webkit-details-marker{{display:none}}
+.tier-badge{{display:inline-block;background:var(--red);color:#fff;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}}
+.tier-B .tier-badge{{background:var(--warn)}}.tier-C .tier-badge{{background:#999}}
+.status{{margin-left:auto;font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;background:#f0f0f0;color:#666}}
+.status-ok{{background:#d4f1de;color:#1e7e34}}
+.status-err{{background:#f8d7da;color:#721c24}}
+.status-pending{{background:#fff3cd;color:#856404}}
+pre{{margin-top:14px;background:#0a0a0a;color:#fff;padding:16px;border-radius:8px;overflow-x:auto;font-size:13px;white-space:pre-wrap;line-height:1.55}}
+.file-actions{{margin-top:14px}}
+.approve-btn{{background:var(--ok);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}}
+.approve-btn:disabled{{background:#bbb;cursor:not-allowed}}
+.approve-btn:hover:not(:disabled){{background:#218838}}
+#approve-all-btn{{background:var(--warn);color:#fff;border:none;padding:14px 28px;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px;width:100%;margin-bottom:14px}}
+#approve-all-btn:hover{{background:#e8941c}}
+#lock-gate-btn{{background:var(--red);color:#fff;border:none;padding:18px 28px;border-radius:12px;font-weight:800;cursor:pointer;font-size:17px;width:100%;box-shadow:0 6px 20px rgba(214,48,49,0.3)}}
+#lock-gate-btn:disabled{{background:#ccc;box-shadow:none;cursor:not-allowed}}
+#lock-gate-btn:hover:not(:disabled){{background:#b71c1c}}
+.gate-locked{{background:#d4f1de;border:2px solid var(--ok);border-radius:12px;padding:18px 22px;text-align:center;font-weight:700;color:#1e7e34;margin-bottom:14px}}
+.next-btn{{display:block;text-align:center;background:var(--red);color:#fff;padding:18px;border-radius:12px;text-decoration:none;font-weight:800;font-size:16px;margin-bottom:14px}}
+.zip-link{{display:inline-block;background:#0a0a0a;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin-top:20px}}
+.toast{{position:fixed;bottom:20px;right:20px;background:#0a0a0a;color:#fff;padding:14px 22px;border-radius:10px;font-weight:700;opacity:0;transition:opacity 0.3s;z-index:1000}}
+.toast.show{{opacity:1}}
+</style></head>
+<body><div class="container">
+
+<div class="header">
+  <h1>{level} · {cfg.get("title", "Output")}</h1>
+  <p style="color:#5a5453">Xem lại {total_count} canonical file. Duyệt từng cái khi đã chỉnh sửa OK. Đủ duyệt = mở Gate.</p>
+</div>
+
+<div class="progress">
+  <span class="progress-text" id="progress-text">{reviewed_count}/{total_count} đã duyệt</span>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:{int(reviewed_count*100/total_count) if total_count else 0}%"></div></div>
+</div>
+
+{bulk_btn}
+
+{files_html}
+
+<div style="margin-top:24px">{gate_btn_state}</div>
+
+<p><a href="/sdl/students/{student_id}/vault/export.zip" class="zip-link">⬇ Tải vault .zip</a></p>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STUDENT_ID = "{student_id}";
+const SIG = "{sig}";
+const LEVEL = "{level}";
+const GATE_KEY = "{cfg.get("gate_key", "")}";
+const NEXT_PATH = "{cfg.get("next_path", "")}";
+const NEXT_LEVEL = "{cfg.get("next_level", "")}";
+const EXPECTED_COUNT = {cfg.get("expected_count", 0)};
+
+function toast(msg, ms=2500) {{
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}}
+
+async function approveFile(fileKey) {{
+  const r = await fetch(`/sdl/students/${{STUDENT_ID}}/canonical-files/${{fileKey}}/approve`, {{
+    method: 'POST',
+    headers: {{'Content-Type': 'application/json'}}
+  }});
+  if (!r.ok) {{
+    throw new Error(`Approve ${{fileKey}} fail: ${{r.status}}`);
+  }}
+  return r.json();
+}}
+
+document.querySelectorAll('.approve-btn').forEach(btn => {{
+  btn.addEventListener('click', async (e) => {{
+    e.preventDefault();
+    const fk = btn.dataset.fileKey;
+    btn.disabled = true; btn.textContent = 'Đang duyệt...';
+    try {{
+      await approveFile(fk);
+      toast(`✓ Đã duyệt ${{fk}}`);
+      setTimeout(() => location.reload(), 600);
+    }} catch(err) {{
+      toast(`Lỗi: ${{err.message}}`, 4000);
+      btn.disabled = false; btn.textContent = 'Duyệt file này';
+    }}
+  }});
+}});
+
+const approveAllBtn = document.getElementById('approve-all-btn');
+if (approveAllBtn) {{
+  approveAllBtn.addEventListener('click', async () => {{
+    if (!confirm('Duyệt tất cả file còn lại?')) return;
+    approveAllBtn.disabled = true; approveAllBtn.textContent = 'Đang duyệt tất cả...';
+    const pending = Array.from(document.querySelectorAll('.approve-btn:not(:disabled)')).map(b => b.dataset.fileKey);
+    let ok = 0, fail = 0;
+    for (const fk of pending) {{
+      try {{ await approveFile(fk); ok++; }} catch(e) {{ fail++; }}
+    }}
+    toast(`✓ ${{ok}} duyệt, ${{fail}} lỗi`, 3500);
+    setTimeout(() => location.reload(), 700);
+  }});
+}}
+
+const lockBtn = document.getElementById('lock-gate-btn');
+if (lockBtn) {{
+  lockBtn.addEventListener('click', async () => {{
+    if (!confirm(`Khóa ${{GATE_KEY}}? Hành động không reset được.`)) return;
+    lockBtn.disabled = true; lockBtn.textContent = 'Đang khóa Gate...';
+    try {{
+      const r = await fetch(`/sdl/students/${{STUDENT_ID}}/gates/${{GATE_KEY}}/lock`, {{method: 'POST'}});
+      if (!r.ok) {{
+        const d = await r.json().catch(() => ({{}}));
+        throw new Error(d.detail?.error || d.detail || r.statusText);
+      }}
+      toast(`🔒 Gate đã khóa. Mở ${{NEXT_LEVEL}}...`);
+      setTimeout(() => {{
+        if (NEXT_PATH) location.href = `${{NEXT_PATH}}?student=${{STUDENT_ID}}&sig=${{encodeURIComponent(SIG)}}`;
+        else location.reload();
+      }}, 1200);
+    }} catch(err) {{
+      toast(`Lỗi khóa Gate: ${{err.message}}`, 5000);
+      lockBtn.disabled = false; lockBtn.textContent = `🔒 Khóa Gate`;
+    }}
+  }});
+}}
+</script>
+
 </body></html>""")

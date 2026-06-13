@@ -14,7 +14,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from routes._auth import _verify_hmac
 from routes.freedom_score_routes import has_baseline
-from routes.sdl_routes import get_pool
+from routes.sdl_routes import check_gate_passed, get_pool
 
 
 router = APIRouter(tags=["intake-forms"])
@@ -195,11 +195,21 @@ def _scale(name: str, max_val: int = 10) -> str:
 
 
 @router.get("/foundation/l2", response_class=HTMLResponse)
-async def l2_form(student: str = "", sig: str = "") -> HTMLResponse:
-    if _validated_student(student, sig) is None:
+async def l2_form(
+    student: str = "",
+    sig: str = "",
+    pool=Depends(get_pool),
+) -> HTMLResponse:
+    student_uuid = _validated_student(student, sig)
+    if student_uuid is None:
         return HTMLResponse(
             _error_page("Đường link không hợp lệ. Liên hệ Hằng qua Zalo."),
             status_code=403,
+        )
+    if not await check_gate_passed(pool, student_uuid, "gate_1_founder"):
+        return RedirectResponse(
+            f"/sdl/students/{student_uuid}/output/L1?sig={sig}",
+            status_code=303,
         )
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -378,11 +388,21 @@ document.getElementById('l2-form').addEventListener('submit', async (e) => {{
 # L3 Value Proposition form
 # ============================================================
 @router.get("/foundation/l3", response_class=HTMLResponse)
-async def l3_form(student: str = "", sig: str = "") -> HTMLResponse:
-    if _validated_student(student, sig) is None:
+async def l3_form(
+    student: str = "",
+    sig: str = "",
+    pool=Depends(get_pool),
+) -> HTMLResponse:
+    student_uuid = _validated_student(student, sig)
+    if student_uuid is None:
         return HTMLResponse(
             _error_page("Đường link không hợp lệ. Liên hệ Hằng qua Zalo."),
             status_code=403,
+        )
+    if not await check_gate_passed(pool, student_uuid, "gate_2_customer_soft"):
+        return RedirectResponse(
+            f"/sdl/students/{student_uuid}/output/L2?sig={sig}",
+            status_code=303,
         )
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
