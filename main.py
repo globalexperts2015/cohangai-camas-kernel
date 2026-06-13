@@ -118,6 +118,8 @@ from routes.intake_forms import router as intake_forms_router
 from routes.validation_routes import router as validation_router, log_system_error
 from routes.discovery_routes import router as discovery_router
 from routes.discovery_view import router as discovery_view_router
+from routes.day3_challenge import router as day3_router
+from routes.day3_view import router as day3_view_router
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
@@ -533,6 +535,8 @@ app.include_router(intake_forms_router, tags=["intake-forms"])
 app.include_router(validation_router, tags=["validation"])
 app.include_router(discovery_router, tags=["sdl-discovery"])
 app.include_router(discovery_view_router, tags=["discovery-view"])
+app.include_router(day3_router, tags=["day3-challenge"])
+app.include_router(day3_view_router, tags=["day3-view"])
 mount_cohort_static(app)
 
 
