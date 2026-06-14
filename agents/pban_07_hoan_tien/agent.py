@@ -40,7 +40,7 @@ from kernel.memory_layer import MemoryLayer
 
 log = logging.getLogger("camas.pban_07_hoan_tien")
 
-DEFAULT_LLM_MODEL = "claude-opus-4-7"  # high stakes refund
+DEFAULT_LLM_MODEL = "claude-haiku-4-5"  # high stakes refund
 DEFAULT_MAX_TOKENS = 1200
 DEFAULT_LLM_TIMEOUT = 90.0
 DEFAULT_TELEGRAM_TIMEOUT = 30.0

@@ -45,7 +45,7 @@ log = logging.getLogger("camas.pban_10_chien_luoc")
 
 DEFAULT_DEBATE_PRO_MODEL = "claude-sonnet-4-6"
 DEFAULT_DEBATE_CON_MODEL = "claude-sonnet-4-6"
-DEFAULT_SYNTHESIZER_MODEL = "claude-opus-4-7"
+DEFAULT_SYNTHESIZER_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 1500
 DEFAULT_LLM_TIMEOUT = 90.0
 DEFAULT_TELEGRAM_TIMEOUT = 30.0

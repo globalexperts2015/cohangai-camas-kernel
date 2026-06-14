@@ -22,7 +22,7 @@ from kernel.memory_layer import MemoryLayer
 
 log = logging.getLogger("camas.l2_offer_engineer_student")
 EXPECTED_EVENTS = {"cohort.offer_engineer"}
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 5000
 DEFAULT_TIMEOUT = 150.0
 
@@ -138,8 +138,22 @@ class L2OfferEngineerStudent(BaseBC):
         payload = ctx.payload or {}
         student_id = payload.get("student_id", "unknown")
         persona = payload.get("persona", {})
-        mvo = payload.get("mvo", {})
         transformation = payload.get("transformation", {})
+
+        # Bridge: support mvo string from /run-wizard route
+        mvo_raw = payload.get("mvo", {})
+        if isinstance(mvo_raw, str) and mvo_raw.strip():
+            try:
+                mvo = json.loads(mvo_raw)
+                if not isinstance(mvo, dict):
+                    mvo = {"description": mvo_raw[:500]}
+            except (json.JSONDecodeError, ValueError):
+                mvo = {"description": mvo_raw[:500]}
+        else:
+            mvo = mvo_raw or {}
+
+        if not persona:
+            persona = {"raw_description": mvo.get("description", ""), "_fallback": True}
 
         if not self.llm.ready:
             return AgentResult(success=False, output_text="LLM not ready", output_payload={"error": "LLM not ready"})

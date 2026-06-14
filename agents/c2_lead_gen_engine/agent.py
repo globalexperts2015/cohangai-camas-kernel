@@ -35,9 +35,9 @@ from .prompt_template import (
 
 log = logging.getLogger("camas.c2_lead_gen_engine")
 
-DEFAULT_MODEL = "claude-opus-4-7"
-DEFAULT_MAX_TOKENS = 8192
-DEFAULT_TIMEOUT = 240.0
+DEFAULT_MODEL = "claude-haiku-4-5"
+DEFAULT_MAX_TOKENS = 16384
+DEFAULT_TIMEOUT = 480.0
 
 EXPECTED_EVENTS = {"cohort.lead_gen", "wizard.lead_gen_engine"}
 
@@ -99,10 +99,27 @@ class C2LeadGenEngine(BaseBC):
 
         payload = ctx.payload or {}
         student_id = payload.get("student_id", "unknown")
-        customer_profile = payload.get("customer_profile", {}) or {}
-        content_engine_output = payload.get("content_engine_output", {}) or {}
-        student_advantages = payload.get("student_advantages", {}) or {}
-        budget_monthly_vnd = int(payload.get("budget_monthly_vnd", 0) or 0)
+
+        # Bridge: support lead_gen_input string from /run-wizard route
+        lead_gen_input = payload.get("lead_gen_input")
+        if isinstance(lead_gen_input, str) and lead_gen_input.strip():
+            import json as _json
+            try:
+                parsed = _json.loads(lead_gen_input)
+                customer_profile = parsed.get("customer_profile", {}) or {}
+                content_engine_output = parsed.get("content_engine_output", {}) or {}
+                student_advantages = parsed.get("student_advantages", {}) or {}
+                budget_monthly_vnd = int(parsed.get("budget_monthly_vnd", 0) or 0)
+            except _json.JSONDecodeError:
+                customer_profile = {"raw_description": lead_gen_input[:500]}
+                content_engine_output = {}
+                student_advantages = {"raw_description": lead_gen_input[:500]}
+                budget_monthly_vnd = 0
+        else:
+            customer_profile = payload.get("customer_profile", {}) or {}
+            content_engine_output = payload.get("content_engine_output", {}) or {}
+            student_advantages = payload.get("student_advantages", {}) or {}
+            budget_monthly_vnd = int(payload.get("budget_monthly_vnd", 0) or 0)
         venture = ctx.venture_context or "cohangai"
 
         if not self.llm.ready:

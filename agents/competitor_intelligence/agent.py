@@ -37,7 +37,7 @@ log = logging.getLogger("camas.competitor_intelligence")
 
 EXPECTED_EVENTS = {"competitor.intel_research"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 5500
 DEFAULT_TIMEOUT = 180.0
 

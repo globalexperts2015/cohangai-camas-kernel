@@ -28,7 +28,7 @@ log = logging.getLogger("camas.perfect_webinar_designer")
 
 EXPECTED_EVENTS = {"webinar.design_perfect_90min"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 7000
 DEFAULT_TIMEOUT = 240.0
 

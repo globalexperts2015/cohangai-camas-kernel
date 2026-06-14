@@ -68,6 +68,9 @@ WIZARD_REGISTRY = {
         "input_label": "Mô tả thị trường/ngách bạn đang nghĩ tới (bạn muốn phục vụ AI, giải vấn đề gì)",
         "input_placeholder": "Ví dụ: Dạy mẹ bỉm 25-40 tuổi cách bán hàng decor handmade online từ nhà, mục tiêu thu thêm 10tr/tháng mà không cần thuê mặt bằng",
         "input_field": "niche_statement",
+        "deprecated": "2026-06-11",
+        "replaced_by": "customer_problem",
+        "deprecation_note": "Wizard này được thay bởi Module CHỌN ĐÚNG CÁI ĐỂ BÁN (Engine 2 Customer Problem + Engine 3 Desire). Dùng /cohort/chon-module/run thay vì wizard này.",
     },
     "transformation_mapper": {
         "agent": "l2_transformation_mapper_7d",
@@ -78,6 +81,9 @@ WIZARD_REGISTRY = {
         "input_label": "Mô tả 1 khách hàng cụ thể bạn muốn phục vụ (càng chi tiết càng tốt)",
         "input_placeholder": "Ví dụ: Chị Lan 32 tuổi, kế toán văn phòng, 2 con nhỏ, lương 14tr. Mỗi tháng cuối khó co kéo, lo tương lai con học trường tư. Chồng làm xa, ủng hộ nhưng không phụ được. Muốn kiếm thêm tại nhà nhưng không biết bắt đầu từ đâu, sợ bị lừa khi học các khoá online...",
         "input_field": "customer_persona",
+        "deprecated": "2026-06-11",
+        "replaced_by": "customer_problem",
+        "deprecation_note": "Wizard này được thay bởi Module CHỌN (Engine 2 Customer Problem 6-axis loss map + Engine 3 Desire). Dùng /cohort/chon-module/run.",
     },
     "vpc_fit_check": {
         "agent": "l2_vpc_fit_checker",
@@ -88,6 +94,9 @@ WIZARD_REGISTRY = {
         "input_label": "Ý tưởng sản phẩm/khoá học của bạn (giá, format, deliverable chính)",
         "input_placeholder": "Ví dụ: Khoá 6 tuần dạy mẹ bỉm bán decor handmade online từ A-Z. Giá 3 triệu, có group hỗ trợ 6 tháng + 1-on-1 audit sản phẩm đầu tiên...",
         "input_field": "product_idea",
+        "deprecated": "2026-06-11",
+        "replaced_by": "solution_design",
+        "deprecation_note": "Wizard này được thay bởi Module CHỌN (Engine 5 Solution Design 7 product type matrix). Dùng /cohort/chon-module/run.",
     },
     "offer_engineer": {
         "agent": "l2_offer_engineer_student",
@@ -98,6 +107,9 @@ WIZARD_REGISTRY = {
         "input_label": "Tóm tắt giải pháp + persona khách hàng đã design",
         "input_placeholder": "Tóm tắt khoá/sản phẩm (tên + giá + format) + nỗi đau lớn nhất khách + transformation bạn cam kết...",
         "input_field": "mvo",
+        "deprecated": "2026-06-11",
+        "replaced_by": "recommendation",
+        "deprecation_note": "Wizard này được thay bởi Module CHỌN (Engine 9 Recommendation Value Ladder 5 tier + Action Plan 30 ngày). Dùng /cohort/chon-module/run.",
     },
     "mvo_cohort": {
         "agent": "l2_mvo_cohort_launcher",
@@ -183,6 +195,144 @@ WIZARD_REGISTRY = {
         "input_placeholder": "Confirm: Tôi đã có {N} khách trả tiền và sẵn sàng vận hành BreakoutOS instance riêng.",
         "input_field": "capstone_confirm",
         "requires": ["scale_coach_completed", "min_customers_3"],
+    },
+    # ───── BreakoutOS CHỌN module (What To Sell Engine), spec chốt 2026-06-11 ─────
+    # Engine 1/9: Founder Fit (Phase 1)
+    "founder_fit": {
+        "agent": "e3_founder_fit",
+        "event": "wizard.founder_fit",
+        "week": 2,
+        "title": "Trợ Lý AI Founder Fit",
+        "subtitle": (
+            "Đánh giá HONEST mức độ phù hợp giữa bạn và 1 cơ hội kinh doanh. "
+            "Score 0-100 + 8 sub-scores (experience + skill + expertise + story + "
+            "network + assets + content + customer list) + strengths + gaps + unfair advantages."
+        ),
+        "input_label": (
+            "Mô tả founder profile + opportunity hypothesis (JSON hoặc text dài). "
+            "Em sẽ extract: kinh nghiệm + kỹ năng + chuyên môn + câu chuyện + network + "
+            "tài sản + content + khách hiện có + cơ hội bạn đang cân nhắc."
+        ),
+        "input_placeholder": (
+            "Em 38t, founder dược mỹ phẩm Việt 5 năm + website công ty + 12 khách B2B + "
+            "30tr/tháng. Skill: R&D công thức, sale 1-1, viết content FB. Network: 200 "
+            "founder Việt overseas. Story: Mắm Thuyền Nan từ 0 + Speakout 33K leads. "
+            "Cơ hội đang cân nhắc: scale dược mỹ phẩm sang Úc thị trường mẹ Việt."
+        ),
+        "input_field": "founder_fit_input",
+    },
+    # Engine 2/9: Customer Problem
+    "customer_problem": {
+        "agent": "e4_customer_problem",
+        "event": "wizard.customer_problem",
+        "week": 2,
+        "title": "Trợ Lý AI Customer Problem",
+        "subtitle": (
+            "Pain Map 6 trục mất mát (Tiền + Thời gian + Cơ hội + Sức khỏe + Quan hệ + Tự tin) "
+            "+ Top 3 Pain với Pain Scale 1-10 + willingness-to-pay signal."
+        ),
+        "input_label": "JSON {customer_hypothesis, opportunity_hypothesis}",
+        "input_placeholder": '{"customer_hypothesis": "...", "opportunity_hypothesis": "..."}',
+        "input_field": "customer_problem_input",
+    },
+    # Engine 3/9: Desire
+    "desire": {
+        "agent": "e5_desire",
+        "event": "wizard.desire",
+        "week": 2,
+        "title": "Trợ Lý AI Desire",
+        "subtitle": (
+            "Desire Map 5 chiều: surface wants + deep aspirations + identity transformation + "
+            "social status + lifestyle mong muốn. Output buying trigger phrase dùng được trong sales copy."
+        ),
+        "input_label": "JSON {customer_hypothesis, problem_map}",
+        "input_placeholder": '{"customer_hypothesis": "...", "problem_map": {...}}',
+        "input_field": "desire_input",
+    },
+    # Engine 5/9: Solution Design
+    "solution_design": {
+        "agent": "e7_solution_design",
+        "event": "wizard.solution_design",
+        "week": 3,
+        "title": "Trợ Lý AI Solution Design",
+        "subtitle": (
+            "7 product type fit (physical/digital/service/coaching/membership/saas/marketplace) "
+            "+ primary + secondary + anti-recommendations + price range + time to MVP."
+        ),
+        "input_label": "JSON {founder_profile, customer_hypothesis, problem_map, desire_map, lifestyle_choice}",
+        "input_placeholder": '{"founder_profile": {...}, "customer_hypothesis": "...", "lifestyle_choice": "solo_ai"}',
+        "input_field": "solution_design_input",
+    },
+    # Engine 6/9: Financial Feasibility
+    "financial": {
+        "agent": "e8_financial",
+        "event": "wizard.financial",
+        "week": 3,
+        "title": "Trợ Lý AI Financial Feasibility",
+        "subtitle": (
+            "Chain: profit target → AOV → orders → customers → leads → traffic → ad budget. "
+            "Deterministic calc + Haiku narrative + GO/NO-GO verdict."
+        ),
+        "input_label": "JSON {profit_target_vnd, aov_vnd, margin_pct, conversion_rate_pct, optin_rate_pct, repeat_purchase_ratio}",
+        "input_placeholder": '{"profit_target_vnd": 3000000000, "aov_vnd": 1500000, "margin_pct": 60, "conversion_rate_pct": 2.5, "optin_rate_pct": 18, "repeat_purchase_ratio": 1.5}',
+        "input_field": "financial_input",
+    },
+    # Engine 7/9: Lifestyle Fit
+    "lifestyle_fit": {
+        "agent": "e9_lifestyle_fit",
+        "event": "wizard.lifestyle_fit",
+        "week": 3,
+        "title": "Trợ Lý AI Lifestyle Fit",
+        "subtitle": (
+            "Simulate 'opportunity thành công gấp 10 lần' và assess fit với lifestyle target "
+            "(solo_ai / lean_team / growth_team). 5 match dimensions + deal breakers + pivots."
+        ),
+        "input_label": "JSON {opportunity_hypothesis, solution_design, lifestyle_choice, founder_profile}",
+        "input_placeholder": '{"opportunity_hypothesis": "...", "lifestyle_choice": "solo_ai", "founder_profile": {...}}',
+        "input_field": "lifestyle_fit_input",
+    },
+    # Engine 4/9: Market Demand (external API)
+    "market_demand": {
+        "agent": "e6_market_demand",
+        "event": "wizard.market_demand",
+        "week": 3,
+        "title": "Trợ Lý AI Market Demand",
+        "subtitle": (
+            "Verify nhu cầu thật bằng data live: DataForSEO Search Volume + Competition + "
+            "YouTube discussion count + Google Trends 12 tháng. Score 0-100 + GO/NO-GO."
+        ),
+        "input_label": "JSON {keywords: ['kw1', 'kw2', ...]} (tối đa 10 keyword Vietnamese)",
+        "input_placeholder": '{"keywords": ["dược mỹ phẩm việt", "kem trị nám", "mỹ phẩm thảo dược"]}',
+        "input_field": "market_demand_input",
+    },
+    # Engine 8/9: Decision (aggregator)
+    "decision": {
+        "agent": "e10_decision",
+        "event": "wizard.decision",
+        "week": 3,
+        "title": "Trợ Lý AI Decision",
+        "subtitle": (
+            "Aggregate 5 sub-scores với weights chốt từ spec (Founder 20% + Problem 25% + "
+            "Demand 25% + Financial 20% + Lifestyle 10%) → Opportunity Score 0-100 + "
+            "GO/NO-GO classification."
+        ),
+        "input_label": "JSON {sub_scores: {founder_fit, customer_problem, market_demand, financial, lifestyle_fit}}",
+        "input_placeholder": '{"sub_scores": {"founder_fit": 68, "customer_problem": 80, "market_demand": 65, "financial": 75, "lifestyle_fit": 60}}',
+        "input_field": "decision_input",
+    },
+    # Engine 9/9: Recommendation (Value Ladder + Action Plan)
+    "recommendation": {
+        "agent": "e11_recommendation",
+        "event": "wizard.recommendation",
+        "week": 3,
+        "title": "Trợ Lý AI Recommendation",
+        "subtitle": (
+            "Value Ladder 5 tier (Lead Magnet → Workshop → Foundation → Growth → Coaching) "
+            "+ first offer to launch + Action Plan 30 ngày + acquisition 3 khách đầu."
+        ),
+        "input_label": "JSON tổng hợp toàn bộ output 8 engines trước",
+        "input_placeholder": '{"founder_fit": {...}, "customer_problem": {...}, "desire": {...}, "market_demand": {...}, "solution_design": {...}, "financial": {...}, "lifestyle_fit": {...}, "decision": {...}}',
+        "input_field": "recommendation_input",
     },
 }
 
@@ -366,13 +516,38 @@ async def _store_chain_output(
 # Webinar K2 9-11/6/2026 guest token config
 WEBINAR_TOKEN_PATTERN = re.compile(r"^wk2-b([1-3])-([a-f0-9]{8})$")
 WEBINAR_GUEST_QUOTA_PER_WIZARD = 5
-WEBINAR_GUEST_EXPIRES_AT = "2026-06-18T23:59:59+07:00"
+WEBINAR_GUEST_EXPIRES_AT = "2026-06-12T19:00:00+07:00"  # 24h sau khi blast 7pm VN 11/06
 
 WEBINAR_WIZARDS_PER_BUOI = {
-    1: ["vision_clarity", "niche_validator"],
-    2: ["transformation_mapper", "vpc_fit_check"],
-    3: ["mvo_cohort", "offer_engineer"],
+    1: ["vision_clarity", "niche_validator"],  # buổi 1 đã qua, giữ legacy
+    2: ["transformation_mapper", "vpc_fit_check"],  # buổi 2 đã qua, giữ legacy
+    3: [
+        # Legacy wizards (KHÔNG deprecate)
+        "vision_clarity",  # Tuần 1 BreakoutOS, vẫn dùng cho CLARIFY
+        "mvo_cohort",      # Tuần 7, vẫn dùng cho CONVERT
+        "referral_engine", # Tuần 8, vẫn dùng cho CONVERT
+        "content_engine",  # Tuần 5, vẫn dùng cho GROW
+        "lead_gen_engine", # Tuần 6, vẫn dùng cho GROW
+        "ai_coo",          # Tuần 10, vẫn dùng cho SCALE
+        "scale_coach",     # Tuần 10, vẫn dùng cho SCALE
+        # CHỌN ĐÚNG CÁI ĐỂ BÁN module (Anna chốt MERGE 2026-06-11)
+        # 9 engines mới THAY 4 wizard cũ (niche_validator + transformation_mapper + vpc_fit_check + offer_engineer)
+        "founder_fit",       # CHỌN Engine 1
+        "customer_problem",  # CHỌN Engine 2 (thay niche_validator + transformation_mapper)
+        "desire",            # CHỌN Engine 3
+        "market_demand",     # CHỌN Engine 4
+        "solution_design",   # CHỌN Engine 5 (thay vpc_fit_check)
+        "financial",         # CHỌN Engine 6
+        "lifestyle_fit",     # CHỌN Engine 7
+        "decision",          # CHỌN Engine 8
+        "recommendation",    # CHỌN Engine 9 (thay offer_engineer)
+        # 4 wizard deprecated 2026-06-11 (vẫn callable trực tiếp qua URL nếu student có link cũ,
+        # NHƯNG không list trong unlock = student mới không thấy)
+    ],
 }
+
+# Deprecated wizards: 2026-06-11 sau khi MERGE vào Module CHỌN ĐÚNG CÁI ĐỂ BÁN
+DEPRECATED_WIZARDS = {"niche_validator", "transformation_mapper", "vpc_fit_check", "offer_engineer"}
 
 
 def _wizards_for_buoi(buoi: int) -> list[str]:
@@ -824,6 +999,19 @@ async def webinar_demo_page(wizard_name: str, request: Request) -> HTMLResponse:
     utm_campaign = request.query_params.get("utm_campaign", f"b{buoi}" if buoi else "")
     utm_content = request.query_params.get("utm_content", token)
 
+    # Prefill: decode base64 from ?prefill= query param (data từ Tally B2 bake into email URL)
+    prefill_b64 = request.query_params.get("prefill", "")
+    prefill_text = ""
+    if prefill_b64:
+        try:
+            import base64 as _b64
+            prefill_text = _b64.urlsafe_b64decode(prefill_b64.encode("ascii")).decode("utf-8")
+        except Exception:
+            prefill_text = ""
+    # Escape for HTML attribute/text content
+    import html as _html
+    prefill_escaped = _html.escape(prefill_text) if prefill_text else ""
+
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -866,11 +1054,13 @@ async def webinar_demo_page(wizard_name: str, request: Request) -> HTMLResponse:
 
     {"<div class='wd-token-warn'>⚠️ Token không hợp lệ. Bạn cần nhắn <strong>K2BUOI" + str(buoi or 1) + "</strong> đến Zalo 0932093593 để nhận token truy cập.</div>" if not webinar_info else ""}
 
+    {"<div style='background:#e8f8f5;border-left:4px solid #2a9d8f;padding:12px 14px;border-radius:0 8px 8px 0;margin-bottom:14px;font-size:13px;color:#1d6a5d;'><strong>Trợ lý AI đã pre-fill data buổi 2 bạn nộp tối qua.</strong> Bạn xem lại bên dưới, click 'Nhờ trợ lý AI phân tích' để chạy ngay. Hoặc chỉnh sửa thêm nếu muốn.</div>" if prefill_text else ""}
+
     <div class="wd-form" id="wd-form">
       <label for="wd-input">{w['input_label']}</label>
       <textarea id="wd-input"
                 placeholder="{w['input_placeholder']}"
-                rows="8"></textarea>
+                rows="{12 if prefill_text else 8}">{prefill_escaped}</textarea>
       <button class="wd-btn" id="wd-run-btn" {"disabled" if not webinar_info else ""}>
         Nhờ trợ lý AI phân tích
       </button>
@@ -984,6 +1174,277 @@ async def webinar_demo_page(wizard_name: str, request: Request) -> HTMLResponse:
 </html>""")
 
 
+@router.get("/demo/{wizard_name}", response_class=HTMLResponse)
+async def demo_wizard_page(wizard_name: str, request: Request) -> HTMLResponse:
+    """Public demo page for BreakoutOS wizard — pure server-side render.
+
+    Used for K2 Buổi 3 LIVE demo (11/06/2026). No token, no AJAX, instant load.
+    Shows realistic pre-generated output for Wendy Tran persona so audience
+    can see the FULL pack without waiting 60-90s LLM.
+
+    URL: /cohort/demo/{wizard_name}
+    Example: /cohort/demo/content_engine
+    """
+    from .demo_data import DEMO_OUTPUTS
+    if wizard_name not in WIZARD_REGISTRY:
+        raise HTTPException(status_code=404, detail=f"Wizard '{wizard_name}' not found")
+    if wizard_name not in DEMO_OUTPUTS:
+        raise HTTPException(status_code=404, detail=f"No demo data for '{wizard_name}'")
+
+    w = WIZARD_REGISTRY[wizard_name]
+    data = DEMO_OUTPUTS[wizard_name]
+    persona = data.get("_persona", {})
+    rendered = _render_demo_output(wizard_name, data)
+
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{w['title']} | BreakoutOS Demo · Chị Nhiên</title>
+  <style>
+    body {{ background:#fafafa; margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:#222; }}
+    .container {{ max-width:760px; margin:0 auto; padding:20px; }}
+    .banner {{ background:linear-gradient(135deg,#ff7e5f,#d63031); color:white; padding:24px 20px; border-radius:16px; margin-bottom:20px; }}
+    .banner .label {{ font-size:11px; letter-spacing:1px; text-transform:uppercase; opacity:0.9; margin-bottom:8px; }}
+    .banner h1 {{ margin:0 0 6px; font-size:24px; font-weight:700; }}
+    .banner p {{ margin:0; font-size:14px; opacity:0.95; }}
+    .demo-note {{ background:#fff8e1; border:2px dashed #ffc107; padding:14px 16px; border-radius:12px; margin-bottom:20px; font-size:13px; color:#7a5a00; }}
+    .persona-card {{ background:#e8f8f5; border-left:4px solid #2a9d8f; padding:14px 18px; border-radius:0 12px 12px 0; margin-bottom:16px; }}
+    .persona-label {{ font-size:10px; letter-spacing:1px; text-transform:uppercase; color:#2a9d8f; font-weight:600; margin-bottom:6px; }}
+    .card {{ background:white; border-radius:14px; padding:20px 22px; margin-bottom:14px; box-shadow:0 2px 10px rgba(0,0,0,0.04); }}
+    .card h2 {{ font-size:17px; margin:0 0 12px; color:#d63031; }}
+    .card h3 {{ font-size:15px; margin:14px 0 6px; color:#444; }}
+    .card ul {{ padding-left:22px; line-height:1.7; font-size:14px; }}
+    .card ol {{ padding-left:22px; line-height:1.7; font-size:14px; }}
+    .card .item {{ border-left:3px solid #ff7e5f; padding:10px 14px; margin:10px 0; background:#fffaf8; border-radius:0 8px 8px 0; }}
+    .card .item .meta {{ font-size:12px; color:#999; margin-top:4px; }}
+    .card .body {{ white-space:pre-wrap; font-size:13px; line-height:1.7; color:#333; }}
+    .cta-block {{ background:#fff8e1; border:2px solid #ffc107; padding:20px; border-radius:16px; text-align:center; margin:20px 0; }}
+    .cta-block h3 {{ color:#c08a00; margin:0 0 8px; }}
+    .cta-block .price {{ font-size:32px; font-weight:700; color:#d63031; margin:8px 0; }}
+    .cta-block .price s {{ color:#999; font-weight:400; font-size:20px; margin-right:8px; }}
+    .cta-block a {{ display:inline-block; background:linear-gradient(135deg,#ff7e5f,#d63031); color:white; padding:14px 32px; border-radius:12px; text-decoration:none; font-weight:600; font-size:15px; margin-top:10px; }}
+    .footer {{ text-align:center; color:#aaa; font-size:12px; padding:24px 0 40px; }}
+    .footer a {{ color:#666; }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="banner">
+      <div class="label">BreakoutOS · Cohort 1 Founding · Demo</div>
+      <h1>{w['title']}</h1>
+      <p>{w.get('subtitle', '')}</p>
+    </div>
+    <div class="persona-card">
+      <div class="persona-label">Chân dung khách hàng demo</div>
+      <h3 style="margin:0 0 8px;color:#2a9d8f;">{persona.get('name', 'Chị Nhiên')} — {persona.get('business', '')}</h3>
+      <p style="margin:0 0 6px;font-size:13px;color:#666;">
+        <strong>Stage:</strong> {persona.get('stage', '')}<br>
+        <strong>State hiện tại:</strong> {persona.get('current_state', '')}<br>
+        <strong>Goal:</strong> {persona.get('next_goal', '')}
+      </p>
+      <p style="margin:8px 0 0;font-size:13px;color:#555;font-style:italic;">
+        <strong>Pain (verified K2 survey buổi 1):</strong><br>
+        "{persona.get('pain_verified_survey', '')}"
+      </p>
+    </div>
+    <div class="demo-note">
+      <strong>Đây là output 4 wizard chạy cho chị Nhiên.</strong>
+      Khi bạn vào Cohort 1, wizard chạy LIVE với <strong>customer profile của BẠN</strong>, output tailored riêng theo dược mỹ phẩm/Hospitality/B2B/F&B... tuỳ ngành.
+    </div>
+    {rendered}
+    <div class="cta-block">
+      <h3>BreakoutOS Cohort 1 Founding · 100 slot</h3>
+      <div class="price"><s>3.000.000₫</s>1.500.000₫</div>
+      <p style="margin:0; font-size:14px; color:#666;">10 tuần · 7 AI agent huấn luyện trên dữ liệu của BẠN · Refund 14 ngày</p>
+      <a href="https://app.breakout.live/dang-ky?source=k2_buoi3_demo">Vào Cohort 1 ngay</a>
+    </div>
+    <div class="footer">
+      Cohangai · BreakoutOS · K2 Buổi 3 · 11/06/2026<br>
+      <a href="/cohort/demo/content_engine">Content</a> ·
+      <a href="/cohort/demo/lead_gen_engine">Lead Gen</a> ·
+      <a href="/cohort/demo/scale_coach">Scale</a> ·
+      <a href="/cohort/demo/ai_coo">AI COO</a>
+    </div>
+  </div>
+</body>
+</html>""")
+
+
+def _render_demo_output(wizard_name: str, data: dict) -> str:
+    """Render pre-gen demo output dict to HTML cards by wizard type."""
+    import html as _html
+
+    def esc(s):
+        return _html.escape(str(s)) if s is not None else ""
+
+    if wizard_name == "content_engine":
+        pack = data.get("pack", {})
+        out = []
+        # 7 pillars
+        pillars = pack.get("pillars", [])
+        if pillars:
+            out.append('<div class="card"><h2>7 Trụ cột content</h2><ol>')
+            for p in pillars:
+                out.append(f'<li><strong>{esc(p.get("name"))}</strong><br><span style="color:#666;font-size:13px;">{esc(p.get("summary"))}</span></li>')
+            out.append("</ol></div>")
+        # Reel ideas
+        reels = pack.get("reel_ideas", [])
+        if reels:
+            out.append(f'<div class="card"><h2>{len(reels)} ý tưởng Reel</h2>')
+            for r in reels[:12]:
+                out.append(f'<div class="item"><strong>{esc(r.get("hook"))}</strong><div class="meta">Pillar {esc(r.get("pillar"))} · CTA: {esc(r.get("cta"))}</div></div>')
+            out.append("</div>")
+        # FB posts (sample 2)
+        fb = pack.get("fb_posts", [])
+        if fb:
+            out.append(f'<div class="card"><h2>{len(fb)} bài FB long-form (sample)</h2>')
+            for p in fb[:2]:
+                out.append(f'<div class="item"><strong>{esc(p.get("title"))}</strong><div class="body">{esc(p.get("body"))}</div><div class="meta">CTA: {esc(p.get("cta"))}</div></div>')
+            out.append("</div>")
+        # Emails (sample 1)
+        emails = pack.get("emails", [])
+        if emails:
+            out.append(f'<div class="card"><h2>{len(emails)} email nurture (sample)</h2>')
+            for e in emails[:1]:
+                out.append(f'<div class="item"><strong>Subject: {esc(e.get("subject_line"))}</strong><div class="meta">Preview: {esc(e.get("preview"))}</div><div class="body">{esc(e.get("body"))}</div></div>')
+            out.append("</div>")
+        # Lead magnets
+        lm = pack.get("lead_magnets", [])
+        if lm:
+            out.append('<div class="card"><h2>Lead magnets</h2>')
+            for m in lm:
+                out.append(f'<div class="item"><strong>{esc(m.get("title"))}</strong><div class="meta">Format: {esc(m.get("format"))} · {esc(m.get("promise"))}</div></div>')
+            out.append("</div>")
+        # Calendar summary
+        cal = pack.get("calendar_30d_summary")
+        if cal:
+            out.append(f'<div class="card"><h2>Calendar 30 ngày (tóm tắt)</h2><p style="font-size:14px;line-height:1.7;">{esc(cal)}</p></div>')
+        return "".join(out)
+
+    if wizard_name == "lead_gen_engine":
+        out = []
+        channels = data.get("primary_channels", [])
+        if channels:
+            out.append(f'<div class="card"><h2>3 kênh chính</h2><ul>')
+            for c in channels:
+                out.append(f"<li>{esc(c)}</li>")
+            out.append("</ul>")
+            rationale = data.get("channel_rationale")
+            if rationale:
+                out.append(f'<p style="font-size:13px;line-height:1.7;color:#555;margin-top:8px;"><strong>Tại sao 3 kênh này:</strong> {esc(rationale)}</p>')
+            out.append("</div>")
+        magnets = data.get("lead_magnets_final", [])
+        if magnets:
+            out.append('<div class="card"><h2>4 Lead Magnets final</h2>')
+            for m in magnets:
+                leads = m.get("estimated_leads_30d")
+                leads_str = f" · est {leads} leads/30d" if leads else ""
+                out.append(f'<div class="item"><strong>{esc(m.get("title"))}</strong><div class="meta">Channel: {esc(m.get("channel"))} · Opt-in: {esc(m.get("expected_optin_rate"))}{leads_str}</div></div>')
+            out.append("</div>")
+        ref = data.get("referral_strategy")
+        if ref:
+            out.append(f'<div class="card"><h2>Referral strategy</h2><p style="font-size:14px;line-height:1.7;">{esc(ref)}</p></div>')
+        daily = data.get("daily_plan_30d_summary")
+        if daily:
+            out.append(f'<div class="card"><h2>Daily plan 30 ngày</h2><p style="font-size:14px;line-height:1.7;">{esc(daily)}</p></div>')
+        funnel = data.get("funnel_map", {})
+        if funnel:
+            out.append('<div class="card"><h2>Funnel Map</h2><ul>')
+            for stage, info in funnel.items():
+                out.append(f"<li><strong>{esc(stage).capitalize()}</strong>: {esc(info.get('channel'))} · target {esc(info.get('target_volume'))}</li>")
+            out.append("</ul></div>")
+        tagging = data.get("tagging_logic", {})
+        if tagging:
+            out.append('<div class="card"><h2>Tagging logic (auto-segment)</h2><ul>')
+            for k, v in tagging.items():
+                out.append(f"<li><code>{esc(k)}</code> → {esc(v)}</li>")
+            out.append("</ul></div>")
+        return "".join(out)
+
+    if wizard_name == "scale_coach":
+        out = []
+        cs = data.get("current_state", {})
+        out.append(f'<div class="card"><h2>State hiện tại của bạn</h2><ul>'
+                   f'<li>Khách: <strong>{esc(cs.get("current_customers"))}</strong></li>'
+                   f'<li>Revenue 30 ngày: <strong>{esc(cs.get("revenue_vnd_30d"))} VND</strong></li>'
+                   f'<li>List size: <strong>{esc(cs.get("list_size"))}</strong></li>'
+                   f'<li>NPS: <strong>{esc(cs.get("nps"))}</strong></li>'
+                   f'</ul></div>')
+        out.append(f'<div class="card"><h2>Đòn bẩy được chọn: {esc(data.get("recommended_lever", "")).upper()}</h2>'
+                   f'<p style="font-size:14px;line-height:1.7;">{esc(data.get("rationale"))}</p></div>')
+        plan = data.get("plan_90_days", {})
+        if plan:
+            out.append('<div class="card"><h2>Plan 90 ngày</h2>')
+            for month_key, tasks in plan.items():
+                out.append(f"<h3>{esc(month_key).replace('_', ' ').title()}</h3><ul>")
+                for t in tasks:
+                    out.append(f"<li>{esc(t)}</li>")
+                out.append("</ul>")
+            out.append("</div>")
+        templates = data.get("templates_available", [])
+        if templates:
+            out.append('<div class="card"><h2>Templates kèm theo</h2><ul>')
+            for t in templates:
+                out.append(f"<li><code>{esc(t)}</code></li>")
+            out.append("</ul></div>")
+        warnings = data.get("anti_pattern_warnings", [])
+        if warnings:
+            out.append('<div class="card" style="background:#fff5f5;border-left:4px solid #d63031;"><h2 style="color:#c0392b;">Anti-pattern: TUYỆT ĐỐI KHÔNG làm</h2><ul>')
+            for w_item in warnings:
+                out.append(f"<li>{esc(w_item)}</li>")
+            out.append("</ul></div>")
+        return "".join(out)
+
+    if wizard_name == "ai_coo":
+        out = []
+        out.append(f'<div class="card"><h2>AI COO Daily Brief · {esc(data.get("date"))}</h2>')
+        greeting = data.get("morning_greeting")
+        if greeting:
+            out.append(f'<p style="font-size:14px;line-height:1.7;color:#444;font-style:italic;">"{esc(greeting)}"</p>')
+        out.append(f'<p style="color:#666;font-size:13px;margin-top:10px;">Mỗi sáng 6h AM, AI COO gửi bạn Telegram bản brief 3 việc cần làm + 3 việc nên skip + recap hôm qua.</p></div>')
+        actions = data.get("top_3_actions", [])
+        if actions:
+            out.append('<div class="card"><h2>Top 3 việc cần làm hôm nay</h2>')
+            for a in actions:
+                link = a.get("action_link")
+                link_html = f'<a href="{esc(link)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;padding:8px 14px;background:#2a9d8f;color:white;text-decoration:none;border-radius:8px;font-size:13px;">Book ngay →</a>' if link else ""
+                out.append(f'<div class="item"><strong>#{esc(a.get("rank"))} {esc(a.get("title"))}</strong>'
+                           f'<div class="body">{esc(a.get("why"))}</div>'
+                           f'<div class="meta">Thời gian: {esc(a.get("estimated_time"))} · Revenue at risk: {esc(a.get("blocking_revenue_vnd"))} VND</div>'
+                           f'{link_html}</div>')
+            out.append("</div>")
+        north_star = data.get("weekly_north_star")
+        if north_star:
+            out.append(f'<div class="card" style="background:#fff8e1;border-left:4px solid #ffc107;"><h2 style="color:#c08a00;">North Star tuần này</h2><p style="font-size:14px;line-height:1.7;">{esc(north_star)}</p></div>')
+        skip = data.get("skip_today", [])
+        if skip:
+            out.append('<div class="card"><h2>3 việc skip hôm nay</h2><ul>')
+            for s in skip:
+                out.append(f"<li>{esc(s)}</li>")
+            out.append("</ul></div>")
+        rec = data.get("yesterday_recap", {})
+        if rec:
+            out.append('<div class="card"><h2>Recap hôm qua</h2>')
+            done = rec.get("completed", [])
+            if done:
+                out.append('<h3 style="color:#2a9d8f;">✓ Hoàn thành</h3><ul>')
+                for d in done:
+                    out.append(f"<li>{esc(d)}</li>")
+                out.append("</ul>")
+            inc = rec.get("incomplete", [])
+            if inc:
+                out.append('<h3 style="color:#e76f51;">⚠ Chưa xong</h3><ul>')
+                for d in inc:
+                    out.append(f"<li>{esc(d)}</li>")
+                out.append("</ul>")
+            out.append("</div>")
+        return "".join(out)
+
+    return f'<div class="card"><pre>{esc(json.dumps(data, ensure_ascii=False, indent=2))}</pre></div>'
+
+
 @router.post("/run-wizard")
 async def run_wizard(
     request: Request,
@@ -1004,8 +1465,32 @@ async def run_wizard(
     if not wizard_name or wizard_name not in WIZARD_REGISTRY:
         raise HTTPException(status_code=400, detail=f"Invalid wizard. Available: {list(WIZARD_REGISTRY.keys())}")
 
-    # Webinar K2 guest gate: allowed_wizards per buổi + quota 5 runs/wizard
+    # Deprecation warning log + replacement hint
+    if wizard_name in DEPRECATED_WIZARDS:
+        w_info = WIZARD_REGISTRY.get(wizard_name, {})
+        log.warning(
+            "DEPRECATED wizard called: student=%s wizard=%s replaced_by=%s",
+            student_id, wizard_name, w_info.get("replaced_by", "chon-module"),
+        )
+
+    # Webinar K2 guest gate: expire check + allowed_wizards per buổi + quota 5 runs/wizard
     if webinar_info:
+        # Hard expire: 24h sau khi token issued cho K2 B3 attendees
+        from datetime import datetime
+        try:
+            expires_dt = datetime.fromisoformat(webinar_info["expires_at"])
+            now_dt = datetime.now(expires_dt.tzinfo)
+            if now_dt >= expires_dt:
+                raise HTTPException(
+                    status_code=410,
+                    detail=(
+                        f"Mã thử đã hết hạn lúc {webinar_info['expires_at'][:16].replace('T', ' ')}. "
+                        "Bạn cần vào Cohort 1 Founding 1.5tr để tiếp tục dùng 12 tuần unlimited. "
+                        "Inbox Hằng để được giữ slot."
+                    ),
+                )
+        except (ValueError, KeyError):
+            pass  # malformed expire field, fail open
         if wizard_name not in webinar_info["allowed_wizards"]:
             raise HTTPException(
                 status_code=403,
@@ -1028,6 +1513,20 @@ async def run_wizard(
     input_value = body.get("input", "").strip()
     if not input_value or len(input_value) < 10:
         raise HTTPException(status_code=400, detail="Input quá ngắn, cần ≥ 10 chars")
+
+    # Demo bypass: student token "cohort1-demo-*" → instant pre-gen sample (no LLM)
+    from .demo_data import is_demo_token, get_demo_output
+    if is_demo_token(student_id):
+        demo_out = get_demo_output(wizard_name)
+        if demo_out is not None:
+            log.info("Cohort wizard DEMO bypass: student=%s wizard=%s", student_id, wizard_name)
+            return JSONResponse(content={
+                "success": True,
+                "output_payload": demo_out,
+                "output_text": f"demo wizard={wizard_name} pre-generated sample",
+                "wizard": wizard_name,
+                "demo_mode": True,
+            })
 
     # Build agent payload với student_id + input field
     payload = {
@@ -1071,6 +1570,89 @@ async def run_wizard(
                 success=False,
                 utm=body.get("utm") or {},
             )
+
+        # CRITICAL: detect Anthropic API limit / rate limit errors → alert + user-friendly msg
+        error_text = (result.error or result.output_text or "")
+        error_lower = error_text.lower()
+        is_api_limit = any(s in error_lower for s in [
+            "api usage limits", "usage limit", "rate limit", "429",
+            "specified api usage", "regain access",
+        ])
+        if is_api_limit:
+            # Fire-and-forget Telegram alert to BreakoutOps
+            import asyncio as _asyncio
+            import httpx as _httpx
+            import os as _os
+            _tg_token = _os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+            _tg_chat = _os.environ.get("TELEGRAM_OPS_GROUP_ID", "-1003813280155")
+
+            async def _alert():
+                if not _tg_token:
+                    return
+                try:
+                    async with _httpx.AsyncClient(timeout=10.0) as client:
+                        await client.post(
+                            f"https://api.telegram.org/bot{_tg_token}/sendMessage",
+                            json={
+                                "chat_id": _tg_chat,
+                                "text": (
+                                    f"🚨 *Anthropic API LIMIT HIT*\n\n"
+                                    f"Student `{student_id}` cố chạy wizard `{wizard_name}` nhưng API limit reached.\n\n"
+                                    f"*Error:* {error_text[:300]}\n\n"
+                                    f"*Action:* Anna vào console.anthropic.com/settings/limits raise cap NGAY."
+                                ),
+                                "parse_mode": "Markdown",
+                            },
+                        )
+                except Exception:
+                    pass
+            _asyncio.create_task(_alert())
+
+            # User-friendly fallback message
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "success": False,
+                    "error": (
+                        "Hệ thống AI đang quá tải. Hằng đã được thông báo và đang fix gấp. "
+                        "Bạn thử lại sau 15 phút. Nếu vẫn lỗi, nhắn Zalo Hằng 0932093593."
+                    ),
+                    "wizard": wizard_name,
+                    "internal_error_code": "anthropic_limit_hit",
+                },
+            )
+
+        # CRITICAL ALERT 2026-06-11: Student wizard fail (other than API limit)
+        # Anna explicit: "học viên không làm được bài thì phải báo"
+        if webinar_info:  # Only alert real students, not dev test
+            import asyncio as _asyncio
+            import httpx as _httpx
+            import os as _os
+            _tg_token = _os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+            _tg_chat = _os.environ.get("TELEGRAM_OPS_GROUP_ID", "-1003813280155")
+
+            async def _alert_wizard_fail():
+                if not _tg_token:
+                    return
+                try:
+                    async with _httpx.AsyncClient(timeout=10.0) as client:
+                        await client.post(
+                            f"https://api.telegram.org/bot{_tg_token}/sendMessage",
+                            json={
+                                "chat_id": _tg_chat,
+                                "text": (
+                                    f"❌ *Học viên KHÔNG làm được bài*\n\n"
+                                    f"Student `{student_id}` cố chạy wizard `{wizard_name}` nhưng FAIL.\n\n"
+                                    f"*Error:* {(result.error or result.output_text or 'unknown')[:300]}\n\n"
+                                    f"*Action Anna:* check Zalo/email student này, có thể cần guide 1-1 hoặc fix data."
+                                ),
+                                "parse_mode": "Markdown",
+                            },
+                        )
+                except Exception:
+                    pass
+            _asyncio.create_task(_alert_wizard_fail())
+
         return JSONResponse(
             status_code=500,
             content={

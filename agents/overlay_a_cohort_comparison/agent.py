@@ -28,7 +28,7 @@ log = logging.getLogger("camas.overlay_a_cohort_comparison")
 
 EXPECTED_EVENTS = {"overlay_a.cohort_compare"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 3500
 DEFAULT_TIMEOUT = 120.0
 

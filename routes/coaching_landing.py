@@ -1,8 +1,9 @@
-"""Coaching Landing Page, Breakout Founder 12 tuần.
+"""Mentoring Landing Page, Breakout Founder 12 tuần.
 
-GET /coaching       Long-form sales page (Anna voice + Hormozi/Brunson stack)
-GET /coaching/apply Application form (Tally embed or inline)
-POST /coaching/apply Save application
+GET /mentoring       Canonical long-form sales page
+GET /coaching        Backward-compatible route
+GET /mentoring/apply Canonical application form
+GET /coaching/apply  Backward-compatible route
 
 Per Anna 2026-06-13 post-K2 Buổi 3 webinar:
 "Tôi sẽ làm việc cùng họ sau 12 tuần sẽ có hệ thống này và họ vận hành với AI."
@@ -16,7 +17,7 @@ from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 
 
-router = APIRouter(tags=["coaching-landing"])
+router = APIRouter(tags=["mentoring-landing"])
 
 
 _CSS = """
@@ -82,12 +83,13 @@ blockquote{border-left:4px solid var(--red);padding:16px 24px;margin:24px 0;font
 """
 
 
-@router.get("/coaching", response_class=HTMLResponse)
+@router.get("/coaching", response_class=HTMLResponse, include_in_schema=False)
+@router.get("/mentoring", response_class=HTMLResponse)
 async def coaching_landing() -> HTMLResponse:
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<title>Breakout Founder Coaching · 12 tuần · 1-1 với Hằng</title>
+<title>Breakout Founder Mentoring · 12 tuần · 1-1 với Hằng</title>
 <meta name="description" content="12 tuần 1-1 với Hằng để dựng Founder rõ, Khách hàng rõ, Hệ thống chạy được với hỗ trợ của các trợ lý AI sử dụng canonical context bạn đã duyệt. Cap 10 founder. Application only.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -97,12 +99,12 @@ async def coaching_landing() -> HTMLResponse:
 <div class="container">
 
 <div class="section">
-  <div class="pre-headline">Breakout Founder Coaching · Cap 10</div>
+  <div class="pre-headline">Breakout Founder Mentoring · Cap 10</div>
   <h1 class="h1">12 tuần 1-1 với Hằng để dựng <em>Founder rõ, Khách hàng rõ, Hệ thống chạy được</em>.</h1>
   <p class="sub">Không phải khoá học để xem. Không phải template để tải về. Đây là chương trình done-with-you 12 tuần. Sau 12 tuần bạn ra trường với hồ sơ Founder, hồ sơ khách hàng và một hệ thống marketing/bán hàng được hỗ trợ bởi các trợ lý AI sử dụng canonical context bạn đã viết và duyệt.</p>
 </div>
 
-<a href="/coaching/apply" class="cta-btn">Nộp đơn ứng tuyển ngay →</a>
+<a href="/mentoring/apply" class="cta-btn">Nộp đơn ứng tuyển ngay →</a>
 <p class="cta-sub">Hằng đọc kỹ từng đơn. Cap 10 founder cohort 1 khai giảng 22/06/2026.</p>
 
 <div class="callout dark">
@@ -124,6 +126,13 @@ async def coaching_landing() -> HTMLResponse:
   <p style="margin-bottom:0;font-size:18px"><strong>Khác biệt của BreakoutOS so với khoá kinh doanh thông thường:</strong></p>
   <p style="margin-top:10px;margin-bottom:0;font-size:17px">Các khoá khác dạy bạn marketing, content, bán hàng, chạy quảng cáo.</p>
   <p style="margin-top:6px;margin-bottom:0;font-size:17px">BreakoutOS giúp bạn dựng <strong>3 tài sản thật</strong> bằng chính dữ liệu của bạn: Founder rõ, Khách hàng rõ, Hệ thống có thể chạy. Các trợ lý AI làm việc trên canonical context mà bạn đã viết và duyệt để hỗ trợ bạn ở từng bước.</p>
+</div>
+
+<div class="section">
+  <h2 class="h2">Vì sao đây là Mentoring, không phải Coaching thuần?</h2>
+  <p>Coaching chủ yếu dùng câu hỏi, phản chiếu và accountability để giúp bạn tự tìm câu trả lời.</p>
+  <p>Trong chương trình này, Hằng còn trực tiếp chia sẻ kinh nghiệm đã vận hành, chẩn đoán chỗ sai, đề xuất hướng đi, review deliverable và cùng bạn dựng phần đầu tiên. Vì vậy tên đúng là <strong>Mentoring kết hợp done-with-you implementation</strong>.</p>
+  <p>Các kỹ thuật coaching vẫn được dùng để giúp bạn chịu trách nhiệm với quyết định của mình, nhưng Hằng không chỉ đứng ngoài đặt câu hỏi.</p>
 </div>
 
 <div class="section">
@@ -158,7 +167,7 @@ async def coaching_landing() -> HTMLResponse:
   <p style="margin-top:10px;margin-bottom:0">Bạn duyệt từng canonical file trước khi đưa vào hệ thống. Trợ lý AI sử dụng canonical context đã được bạn duyệt để hỗ trợ, không thay bạn quyết định. Danh sách trợ lý cụ thể cho cohort 1 sẽ được Hằng xác nhận khi onboarding.</p>
 </div>
 
-<a href="/coaching/apply" class="cta-btn">Nộp đơn ứng tuyển ngay →</a>
+<a href="/mentoring/apply" class="cta-btn">Nộp đơn ứng tuyển ngay →</a>
 <p class="cta-sub">Cap 10 founder. Hằng phản hồi trong 24 giờ.</p>
 
 <div class="section">
@@ -243,7 +252,7 @@ async def coaching_landing() -> HTMLResponse:
 <div class="section">
   <h2 class="h2">Đầu tư của bạn</h2>
 
-  <p>Trọn gói 12 tuần coaching, bao gồm:</p>
+  <p>Trọn gói 12 tuần mentoring và done-with-you, bao gồm:</p>
   <ul>
     <li>1-1 Mentoring 60 phút × 12 tuần với Hằng</li>
     <li>Done-with-you Tuần 1 (4 giờ ngồi cùng Hằng dựng Tầng 1)</li>
@@ -274,11 +283,11 @@ async def coaching_landing() -> HTMLResponse:
     <li>Nêu rõ đầu ra cốt lõi chưa đạt được, kèm bài làm, ảnh chụp hoặc dữ liệu liên quan</li>
     <li>Cho Breakout một lần hỗ trợ sửa hoặc hướng dẫn lại. Nếu sau lần hỗ trợ này nội dung vẫn không giúp bạn tạo được đầu ra cốt lõi, Hằng hoàn 100% học phí</li>
   </ul>
-  <p>Gửi yêu cầu qua email <strong>support@daothihang.com</strong> với tiêu đề "REFUND Coaching [Họ tên]". Hằng phản hồi trong 3 ngày làm việc. Khi đủ điều kiện, khoản hoàn được xử lý qua kênh thanh toán gốc trong 7 ngày tiếp theo.</p>
+  <p>Gửi yêu cầu qua email <strong>support@daothihang.com</strong> với tiêu đề "REFUND Mentoring [Họ tên]". Hằng phản hồi trong 3 ngày làm việc. Khi đủ điều kiện, khoản hoàn được xử lý qua kênh thanh toán gốc trong 7 ngày tiếp theo.</p>
   <p>Chính sách này là cam kết tự nguyện bổ sung, không giới hạn quyền bắt buộc của khách hàng theo luật bảo vệ người tiêu dùng hiện hành.</p>
 </div>
 
-<a href="/coaching/apply" class="cta-btn">Nộp đơn ứng tuyển ngay →</a>
+<a href="/mentoring/apply" class="cta-btn">Nộp đơn ứng tuyển ngay →</a>
 <p class="cta-sub">Hằng review trong 24 giờ. Chỉ 10 suất.</p>
 
 <div class="section">
@@ -307,7 +316,7 @@ async def coaching_landing() -> HTMLResponse:
 
   <details class="faq-item">
     <summary>Có Founder nào đã vào cohort trước chưa? Có testimonial không?</summary>
-    <p>Cohort 1 khai giảng 22/06/2026 là cohort đầu tiên của Breakout Founder Coaching. Bạn đang đọc trang này là ứng viên đợt founding 10 founder đầu tiên. Hằng <strong>không có testimonial</strong> cho chương trình Coaching này vì đây là lần đầu Hằng public.</p>
+    <p>Cohort 1 khai giảng 22/06/2026 là cohort đầu tiên của Breakout Founder Mentoring. Bạn đang đọc trang này là ứng viên đợt founding 10 founder đầu tiên. Hằng <strong>không có testimonial</strong> cho chương trình Mentoring này vì đây là lần đầu Hằng public.</p>
     <p>Hằng không mượn testimonial từ Speakout làm proof cho kết quả BreakoutOS vì hai chương trình khác đối tượng, khác đầu ra. Bạn đánh giá Hằng qua phương pháp được dạy, qua thứ Hằng đang vận hành thật cho 6 ventures, và qua chính sách hoàn tiền theo đầu ra cốt lõi ở trên.</p>
   </details>
 
@@ -318,7 +327,7 @@ async def coaching_landing() -> HTMLResponse:
   </details>
 </div>
 
-<a href="/coaching/apply" class="cta-btn">Nộp đơn ứng tuyển ngay →</a>
+<a href="/mentoring/apply" class="cta-btn">Nộp đơn ứng tuyển ngay →</a>
 <p class="cta-sub">Application form 5 phút. Hằng review trong 24 giờ. Cap 10.</p>
 
 <div class="ps">
@@ -330,10 +339,10 @@ async def coaching_landing() -> HTMLResponse:
   <p>Cohort 1 khai giảng <strong>22/06/2026</strong>. Form đóng khi đủ 10 founder phù hợp.</p>
 </div>
 
-<a href="/coaching/apply" class="cta-btn">Nộp đơn ngay →</a>
+<a href="/mentoring/apply" class="cta-btn">Nộp đơn ngay →</a>
 
 <div class="footer">
-  Breakout Founder Coaching · BreakoutOS V3.5.7 · Cohort 1 · 22/06/2026<br>
+  Breakout Founder Mentoring · BreakoutOS V3.5.7 · Cohort 1 · 22/06/2026<br>
   Đào Thị Hằng (Anna) · Global Experts · ABN 99 668 347 939<br>
   Liên hệ: support@daothihang.com · Zalo 0932093593
 </div>
@@ -343,11 +352,12 @@ async def coaching_landing() -> HTMLResponse:
 </body></html>""")
 
 
-@router.get("/coaching/apply", response_class=HTMLResponse)
+@router.get("/coaching/apply", response_class=HTMLResponse, include_in_schema=False)
+@router.get("/mentoring/apply", response_class=HTMLResponse)
 async def coaching_apply() -> HTMLResponse:
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Application · Breakout Founder Coaching</title>
+<title>Application · Breakout Founder Mentoring</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>{_CSS}
 input,textarea{{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:14px;font-size:16px;font-family:inherit;line-height:1.5;margin-bottom:18px}}
@@ -357,11 +367,11 @@ label{{display:block;font-weight:700;margin-bottom:6px;font-size:14px}}
 </style></head>
 <body><div class="container">
 
-<a href="/coaching" style="color:var(--muted);text-decoration:none;font-size:14px">← Quay lại trang chương trình</a>
+<a href="/mentoring" style="color:var(--muted);text-decoration:none;font-size:14px">← Quay lại trang chương trình</a>
 
 <div class="section" style="margin-top:20px">
   <div class="pre-headline">Application · Cap 10</div>
-  <h1 class="h1">Nộp đơn Breakout Founder Cohort 1</h1>
+  <h1 class="h1">Nộp đơn Breakout Founder Mentoring Cohort 1</h1>
   <p class="sub">Hằng đọc kỹ từng đơn. Trả lời thẳng thắn, không cần đẹp. Hằng quan tâm bạn THẬT là ai và bạn muốn gì THẬT.</p>
 </div>
 

@@ -65,7 +65,7 @@ from kernel.memory_layer import MemoryLayer
 
 log = logging.getLogger("camas.bc10_coaching_delivery")
 
-DEFAULT_OPUS_MODEL = "claude-opus-4-7"
+DEFAULT_OPUS_MODEL = "claude-haiku-4-5"
 DEFAULT_HAIKU_MODEL = "claude-haiku-4-5-20251001"
 DEFAULT_MAX_TOKENS_BRIEF = 2000
 DEFAULT_MAX_TOKENS_POSTCALL = 2500

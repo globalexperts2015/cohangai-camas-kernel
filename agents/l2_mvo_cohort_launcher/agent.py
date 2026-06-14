@@ -24,7 +24,7 @@ from kernel.memory_layer import MemoryLayer
 
 log = logging.getLogger("camas.l2_mvo_cohort_launcher")
 EXPECTED_EVENTS = {"cohort.mvo_launch_plan"}
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 5000
 DEFAULT_TIMEOUT = 150.0
 
@@ -179,7 +179,18 @@ class L2MVOCohortLauncher(BaseBC):
         vision = payload.get("vision", {})
         niche = payload.get("niche", {})
         transformation = payload.get("transformation", {})
-        vpc = payload.get("vpc", {})
+
+        # Bridge: support vpc string from /run-wizard route
+        vpc_raw = payload.get("vpc", {})
+        if isinstance(vpc_raw, str) and vpc_raw.strip():
+            try:
+                vpc = json.loads(vpc_raw)
+                if not isinstance(vpc, dict):
+                    vpc = {"description": vpc_raw[:500]}
+            except (json.JSONDecodeError, ValueError):
+                vpc = {"description": vpc_raw[:500]}
+        else:
+            vpc = vpc_raw or {}
 
         if not self.llm.ready:
             return AgentResult(success=False, output_text="LLM not ready", output_payload={"error": "LLM not ready"})

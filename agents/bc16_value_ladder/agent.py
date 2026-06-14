@@ -26,7 +26,7 @@ from .prompt_template import (
 
 log = logging.getLogger("camas.bc16_value_ladder")
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 6000
 DEFAULT_TIMEOUT = 180.0
 

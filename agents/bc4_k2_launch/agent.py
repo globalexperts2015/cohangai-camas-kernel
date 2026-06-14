@@ -66,7 +66,7 @@ from kernel.memory_layer import MemoryLayer
 log = logging.getLogger("camas.bc4_k2_launch")
 
 DEFAULT_HAIKU_MODEL = "claude-haiku-4-5-20251001"
-DEFAULT_OPUS_MODEL = "claude-opus-4-7"
+DEFAULT_OPUS_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS_STATS = 400
 DEFAULT_MAX_TOKENS_OUTCOME = 2500
 DEFAULT_LLM_TIMEOUT = 60.0

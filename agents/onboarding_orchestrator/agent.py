@@ -35,7 +35,7 @@ log = logging.getLogger("camas.onboarding_orchestrator")
 
 EXPECTED_EVENTS = {"onboarding.welcome_sequence", "onboarding.progress_check"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 5500
 DEFAULT_TIMEOUT = 180.0
 

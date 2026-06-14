@@ -53,7 +53,7 @@ from .telegram_formatter import (
 
 log = logging.getLogger("camas.e1_ai_coo")
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 1500
 DEFAULT_LLM_TIMEOUT = 120.0
 DEFAULT_HTTP_TIMEOUT = 30.0

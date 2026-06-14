@@ -36,7 +36,7 @@ from .prompt_template import (
 
 log = logging.getLogger("camas.bc2_voice_guardian")
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 2500
 DEFAULT_TIMEOUT = 60.0
 

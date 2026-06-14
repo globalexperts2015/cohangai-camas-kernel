@@ -26,7 +26,7 @@ from .prompt_template import (
 
 log = logging.getLogger("camas.bc20_copy_stack")
 
-DEFAULT_MODEL = "claude-opus-4-7"  # Opus cho copy quality
+DEFAULT_MODEL = "claude-haiku-4-5"  # Opus cho copy quality
 DEFAULT_MAX_TOKENS = 8000
 DEFAULT_TIMEOUT = 240.0
 

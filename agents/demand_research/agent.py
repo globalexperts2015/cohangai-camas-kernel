@@ -41,7 +41,7 @@ log = logging.getLogger("camas.demand_research")
 
 EXPECTED_EVENTS = {"demand.research"}
 
-DEFAULT_MODEL = "claude-opus-4-7"  # Opus cho deep research synthesis
+DEFAULT_MODEL = "claude-haiku-4-5"  # Opus cho deep research synthesis
 DEFAULT_MAX_TOKENS = 6000
 DEFAULT_TIMEOUT = 240.0
 

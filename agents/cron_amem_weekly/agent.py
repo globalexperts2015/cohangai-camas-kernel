@@ -313,11 +313,13 @@ class CronAmemWeekly(BaseBC):
                     date_vn=date_vn,
                     stats=stats,
                 )
-                sent_ok = await send_telegram(msg)
-                stats["telegram_sent"] = sent_ok
+                # Telegram DISABLED 2026-06-11 (Anna chốt im lặng weekly digest)
+                # Memory evolve vẫn chạy + DB log, KHÔNG send Telegram noise.
+                # Original: sent_ok = await send_telegram(msg)
+                stats["telegram_sent"] = False
             except Exception as exc:  # noqa: BLE001
-                log.warning("cron_amem_weekly Telegram fail: %r", exc)
-                stats["warnings"].append(f"telegram fail: {exc!r}")
+                log.warning("cron_amem_weekly process fail: %r", exc)
+                stats["warnings"].append(f"process fail: {exc!r}")
 
         return stats
 

@@ -29,7 +29,7 @@ log = logging.getLogger("camas.l2_vision_clarity")
 
 EXPECTED_EVENTS = {"cohort.vision_clarity"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 4000
 DEFAULT_TIMEOUT = 120.0
 

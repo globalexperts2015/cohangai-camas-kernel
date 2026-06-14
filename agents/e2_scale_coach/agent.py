@@ -42,9 +42,9 @@ log = logging.getLogger("camas.e2_scale_coach")
 
 EXPECTED_EVENTS = {"cohort.scale_coach", "wizard.scale_coach"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
-DEFAULT_MAX_TOKENS = 8192
-DEFAULT_TIMEOUT = 240.0
+DEFAULT_MODEL = "claude-haiku-4-5"
+DEFAULT_MAX_TOKENS = 16384
+DEFAULT_TIMEOUT = 480.0
 
 FOUNDATION_LOCK_THRESHOLD = 15
 
@@ -86,7 +86,25 @@ class E2ScaleCoach(BaseBC):
         payload = ctx.payload or {}
         student_id = payload.get("student_id", "unknown")
         venture = ctx.venture_context or payload.get("venture", "cohangai")
-        state = payload.get("state") or {}
+
+        # Bridge: support scale_input string from /run-wizard route
+        scale_input = payload.get("scale_input")
+        if isinstance(scale_input, str) and scale_input.strip():
+            import json as _json
+            try:
+                parsed = _json.loads(scale_input)
+                state = parsed.get("state") or parsed
+            except _json.JSONDecodeError:
+                state = {"raw_description": scale_input[:500]}
+                import re
+                m = re.search(r'(\d+)\s*kh(?:á|a)ch', scale_input.lower())
+                if m: state["current_customers"] = int(m.group(1))
+                m = re.search(r'(\d+)\s*(?:tr|triệu|m)\s*/?\s*tháng', scale_input.lower())
+                if m: state["revenue_vnd_30d"] = int(m.group(1)) * 1_000_000
+                m = re.search(r'list\s*size[:\s]*(\d+)', scale_input.lower())
+                if m: state["list_size"] = int(m.group(1))
+        else:
+            state = payload.get("state") or {}
 
         # Ensure state has required keys, default 0 if missing
         state.setdefault("current_customers", 0)

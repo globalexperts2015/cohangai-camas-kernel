@@ -164,8 +164,22 @@ class L2ReferralEngineTemplate(BaseBC):
         payload = ctx.payload or {}
         student_id = payload.get("student_id", "unknown")
         venture = ctx.venture_context or "cohangai"
-        offer = payload.get("offer", {})
         persona = payload.get("persona", {})
+
+        # Bridge: support offer string from /run-wizard route
+        offer_raw = payload.get("offer", {})
+        if isinstance(offer_raw, str) and offer_raw.strip():
+            try:
+                offer = json.loads(offer_raw)
+                if not isinstance(offer, dict):
+                    offer = {"description": offer_raw[:500]}
+            except (json.JSONDecodeError, ValueError):
+                offer = {"description": offer_raw[:500]}
+        else:
+            offer = offer_raw or {}
+
+        if not persona:
+            persona = {"raw_description": offer.get("description", ""), "_fallback": True}
 
         if not self.llm.ready:
             return AgentResult(success=False, output_text="LLM not ready", output_payload={"error": "LLM not ready"})

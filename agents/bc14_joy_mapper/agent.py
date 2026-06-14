@@ -26,7 +26,7 @@ from .prompt_template import (
 
 log = logging.getLogger("camas.bc14_joy_mapper")
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 3000
 DEFAULT_TIMEOUT = 90.0
 

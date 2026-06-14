@@ -1,15 +1,20 @@
 """Prompt + tool schema for C1 Content Engine.
 
-BreakoutOS v3 Week 5. Generates a full content pack per student:
-- 7 pillars
-- 100 reel ideas
-- 30 FB posts
-- 30 emails
-- 30 blog topics
-- 12 webinar topics
-- 4 lead magnets
-- 30-day calendar
+BreakoutOS v3 Week 5. Generates a LIVE-demo content pack per student
+(scope reduced for K2 demo 11/06/2026 to fit max_tokens budget):
+- 5 pillars
+- 20 reel ideas
+- 8 FB posts
+- 5 emails
+- 5 blog topics
+- 3 webinar topics
+- 3 lead magnets
+- 14-day calendar
 - CTA by 5 awareness levels (Schwartz)
+
+Original full pack (100 reel + 30 fb + 30 email + 30 blog + 12 webinar + 4 magnet
++ 30-day calendar) requires ~25K tokens output, exceeds Opus single-call budget.
+Full pack runs via multi-call orchestration in production (TODO post-K2).
 """
 from __future__ import annotations
 
@@ -20,9 +25,9 @@ from typing import Any
 SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
     "name": "submit_content_pack",
     "description": (
-        "Submit full BreakoutOS v3 content pack: 7 pillars + 100 reel ideas + "
-        "30 FB posts + 30 emails + 30 blog topics + 12 webinar topics + 4 lead magnets "
-        "+ 30-day calendar + CTA by awareness level. KHÔNG generic, phải tham chiếu "
+        "Submit BreakoutOS v3 content pack (LIVE demo scope): 5 pillars + 20 reel ideas + "
+        "8 FB posts + 5 emails + 5 blog topics + 3 webinar topics + 3 lead magnets "
+        "+ 14-day calendar + CTA by awareness level. KHÔNG generic, phải tham chiếu "
         "customer profile + offer + voice cụ thể."
     ),
     "input_schema": {
@@ -30,8 +35,8 @@ SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
         "properties": {
             "pillars": {
                 "type": "array",
-                "minItems": 7,
-                "maxItems": 7,
+                "minItems": 5,
+                "maxItems": 5,
                 "items": {
                     "type": "object",
                     "properties": {
@@ -46,8 +51,8 @@ SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
             },
             "reel_ideas": {
                 "type": "array",
-                "minItems": 100,
-                "maxItems": 100,
+                "minItems": 20,
+                "maxItems": 20,
                 "items": {
                     "type": "object",
                     "properties": {
@@ -64,8 +69,8 @@ SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
             },
             "fb_posts": {
                 "type": "array",
-                "minItems": 30,
-                "maxItems": 30,
+                "minItems": 8,
+                "maxItems": 8,
                 "items": {
                     "type": "object",
                     "properties": {
@@ -81,8 +86,8 @@ SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
             },
             "emails": {
                 "type": "array",
-                "minItems": 30,
-                "maxItems": 30,
+                "minItems": 5,
+                "maxItems": 5,
                 "items": {
                     "type": "object",
                     "properties": {
@@ -97,8 +102,8 @@ SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
             },
             "blog_topics": {
                 "type": "array",
-                "minItems": 30,
-                "maxItems": 30,
+                "minItems": 5,
+                "maxItems": 5,
                 "items": {
                     "type": "object",
                     "properties": {
@@ -113,8 +118,8 @@ SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
             },
             "webinar_topics": {
                 "type": "array",
-                "minItems": 12,
-                "maxItems": 12,
+                "minItems": 3,
+                "maxItems": 3,
                 "items": {
                     "type": "object",
                     "properties": {
@@ -128,8 +133,8 @@ SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
             },
             "lead_magnets": {
                 "type": "array",
-                "minItems": 4,
-                "maxItems": 4,
+                "minItems": 3,
+                "maxItems": 3,
                 "items": {
                     "type": "object",
                     "properties": {
@@ -147,8 +152,8 @@ SUBMIT_CONTENT_PACK_TOOL: dict[str, Any] = {
             },
             "calendar_30d": {
                 "type": "array",
-                "minItems": 30,
-                "maxItems": 30,
+                "minItems": 14,
+                "maxItems": 14,
                 "items": {
                     "type": "object",
                     "properties": {

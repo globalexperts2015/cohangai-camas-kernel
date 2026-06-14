@@ -31,7 +31,7 @@ log = logging.getLogger("camas.trust_capital_tracker")
 
 EXPECTED_EVENTS = {"trust.quarterly_audit"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 4000
 DEFAULT_TIMEOUT = 120.0
 

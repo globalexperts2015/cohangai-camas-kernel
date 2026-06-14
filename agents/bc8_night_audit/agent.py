@@ -55,7 +55,7 @@ from kernel.memory_layer import MemoryLayer
 
 log = logging.getLogger("camas.bc8_night_audit")
 
-DEFAULT_LLM_MODEL = "claude-opus-4-7"
+DEFAULT_LLM_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 800
 DEFAULT_LLM_TIMEOUT = 120.0
 DEFAULT_HTTP_TIMEOUT = 30.0
@@ -163,15 +163,12 @@ class BC8NightAudit(BaseBC):
                 log.warning("BC8 email send fail: %r", exc)
                 email_sent = False
 
-            # Telegram backup, truncate vì Telegram limit 4096 chars
-            telegram_body = report
-            if len(telegram_body) > 3800:
-                telegram_body = telegram_body[:3700] + "\n\n...(cắt bớt, xem email)"
-            try:
-                telegram_sent = await send_telegram(telegram_body)
-            except Exception as exc:  # noqa: BLE001
-                log.warning("BC8 Telegram send fail: %r", exc)
-                telegram_sent = False
+            # Telegram DISABLED 2026-06-11 (Anna chốt im lặng cho daily audit, chỉ giữ email)
+            # Anna receive nightly report via email Brevo, KHÔNG cần spam Telegram.
+            telegram_sent = False
+            # Original code preserved nếu cần re-enable:
+            # telegram_body = report[:3700] + "...(xem email)" if len(report) > 3800 else report
+            # telegram_sent = await send_telegram(telegram_body)
 
         # 5. Emit memory
         alert_count = stats.get("alerts_count", 0)

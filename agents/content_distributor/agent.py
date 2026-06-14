@@ -34,7 +34,7 @@ log = logging.getLogger("camas.content_distributor")
 
 EXPECTED_EVENTS = {"content.distribute_pyramid"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 8000
 DEFAULT_TIMEOUT = 240.0
 

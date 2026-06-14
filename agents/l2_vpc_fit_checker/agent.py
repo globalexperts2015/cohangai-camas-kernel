@@ -22,7 +22,7 @@ from kernel.memory_layer import MemoryLayer
 log = logging.getLogger("camas.l2_vpc_fit_checker")
 
 EXPECTED_EVENTS = {"cohort.vpc_fit_check"}
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 4000
 DEFAULT_TIMEOUT = 120.0
 
@@ -129,8 +129,23 @@ class L2VPCFitChecker(BaseBC):
         payload = ctx.payload or {}
         student_id = payload.get("student_id", "unknown")
         persona = payload.get("persona", {})
-        product_idea = payload.get("product_idea", {})
         transformation = payload.get("transformation_context", {})
+
+        # Bridge: support product_idea string from /run-wizard route
+        product_idea_raw = payload.get("product_idea", {})
+        if isinstance(product_idea_raw, str) and product_idea_raw.strip():
+            try:
+                product_idea = json.loads(product_idea_raw)
+                if not isinstance(product_idea, dict):
+                    product_idea = {"description": product_idea_raw[:500]}
+            except (json.JSONDecodeError, ValueError):
+                product_idea = {"description": product_idea_raw[:500]}
+        else:
+            product_idea = product_idea_raw or {}
+
+        # Fallback persona nếu chain chưa chạy (LIVE student test, first wizard)
+        if not persona:
+            persona = {"raw_description": product_idea.get("description", ""), "_fallback": True}
 
         if not self.llm.ready:
             return AgentResult(success=False, output_text="LLM not ready", output_payload={"error": "LLM not ready"})

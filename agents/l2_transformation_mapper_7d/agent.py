@@ -30,7 +30,7 @@ log = logging.getLogger("camas.l2_transformation_mapper_7d")
 
 EXPECTED_EVENTS = {"cohort.transformation_map"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 5000
 DEFAULT_TIMEOUT = 120.0
 

@@ -31,7 +31,7 @@ log = logging.getLogger("camas.market_signal_scraper")
 
 EXPECTED_EVENTS = {"market.signal_aggregate"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 5000
 DEFAULT_TIMEOUT = 150.0
 

@@ -55,7 +55,7 @@ from kernel.memory_layer import MemoryLayer, MemoryRecord
 
 log = logging.getLogger("camas.bc3_profile_extractor")
 
-DEFAULT_OPUS_MODEL = "claude-opus-4-7"
+DEFAULT_OPUS_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS_PROFILE = 1500
 DEFAULT_LLM_TIMEOUT = 120.0
 

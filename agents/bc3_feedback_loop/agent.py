@@ -63,7 +63,7 @@ from kernel.memory_layer import MemoryLayer
 
 log = logging.getLogger("camas.bc3_feedback_loop")
 
-DEFAULT_OPUS_MODEL = "claude-opus-4-7"
+DEFAULT_OPUS_MODEL = "claude-haiku-4-5"
 DEFAULT_HAIKU_MODEL = "claude-haiku-4-5-20251001"
 DEFAULT_MAX_TOKENS_DIGEST = 4000
 DEFAULT_MAX_TOKENS_CLASSIFY = 800
@@ -420,11 +420,10 @@ class BC3FeedbackLoop(BaseBC):
             log.info("BC3 DRY_RUN, skip Telegram send")
             sent_ok = True
         else:
-            try:
-                sent_ok = await send_telegram(markdown)
-            except Exception as exc:  # noqa: BLE001
-                log.warning("BC3 Telegram send fail: %r", exc)
-                sent_ok = False
+            # Telegram DISABLED 2026-06-11 (Anna chốt im lặng feedback loop digest)
+            # Em vẫn lưu DB memory + log, KHÔNG send Telegram noise.
+            sent_ok = False
+            # Original: sent_ok = await send_telegram(markdown)
 
         # Emit memories: 1 digest summary + N auto-feed records cho Mac cron
         emitted_memories: list[dict[str, Any]] = [

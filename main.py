@@ -121,6 +121,10 @@ from routes.discovery_view import router as discovery_view_router
 from routes.day3_challenge import router as day3_router
 from routes.day3_view import router as day3_view_router
 from routes.coaching_landing import router as coaching_router
+from routes.challenge_k3 import (
+    challenge_worker_loop,
+    router as challenge_k3_router,
+)
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
@@ -501,9 +505,18 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         log.warning("E11 Recommendation register fail: %r", exc)
 
     app.state.scheduler = scheduler
+    challenge_stop = __import__("asyncio").Event()
+    challenge_worker = __import__("asyncio").create_task(
+        challenge_worker_loop(challenge_stop)
+    )
     try:
         yield
     finally:
+        challenge_stop.set()
+        try:
+            await __import__("asyncio").wait_for(challenge_worker, timeout=10)
+        except __import__("asyncio").TimeoutError:
+            challenge_worker.cancel()
         log.info("CAMAS Kernel shutdown, drain queues")
         await scheduler.stop()
         try:
@@ -538,6 +551,7 @@ app.include_router(discovery_router, tags=["sdl-discovery"])
 app.include_router(discovery_view_router, tags=["discovery-view"])
 app.include_router(day3_router, tags=["day3-challenge"])
 app.include_router(day3_view_router, tags=["day3-view"])
+app.include_router(challenge_k3_router, tags=["challenge-k3"])
 app.include_router(coaching_router, tags=["coaching-landing"])
 mount_cohort_static(app)
 

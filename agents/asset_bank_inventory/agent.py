@@ -41,7 +41,7 @@ log = logging.getLogger("camas.asset_bank_inventory")
 
 EXPECTED_EVENTS = {"asset.inventory_build"}
 
-DEFAULT_MODEL = "claude-opus-4-7"
+DEFAULT_MODEL = "claude-haiku-4-5"
 DEFAULT_MAX_TOKENS = 5000
 DEFAULT_TIMEOUT = 150.0
 
