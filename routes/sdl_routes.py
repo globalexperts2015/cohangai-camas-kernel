@@ -24,7 +24,7 @@ import asyncpg
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 
-from routes._auth import sign_student
+from routes._auth import sign_student, require_student_access, require_service_key
 from routes.sdl_schemas import (
     GATE_REQUIREMENTS,
     CanonicalFileCreate,
@@ -82,7 +82,7 @@ def _decode_jsonb(value: Any) -> Any:
 # ============================================================
 # 1. Student lifecycle
 # ============================================================
-@router.post("/students", status_code=201)
+@router.post("/students", status_code=201, dependencies=[Depends(require_service_key)])
 async def create_student(body: StudentCreate, pool: asyncpg.Pool = Depends(get_pool)) -> dict:
     """Create new student. Upsert by email when person_id null."""
     async with pool.acquire() as conn:
@@ -116,7 +116,7 @@ async def create_student(body: StudentCreate, pool: asyncpg.Pool = Depends(get_p
             raise HTTPException(409, "Student already exists")
 
 
-@router.get("/students/by-email/{email}")
+@router.get("/students/by-email/{email}", dependencies=[Depends(require_service_key)])
 async def get_student_by_email(
     email: str, program_id: str = "foundation", cohort_id: str = "cohort_1",
     pool: asyncpg.Pool = Depends(get_pool),
@@ -221,7 +221,7 @@ async def webhook_payment_completed(
     }
 
 
-@router.get("/students/{student_id}")
+@router.get("/students/{student_id}", dependencies=[Depends(require_student_access)])
 async def get_student(student_id: UUID, pool: asyncpg.Pool = Depends(get_pool)) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
@@ -232,7 +232,7 @@ async def get_student(student_id: UUID, pool: asyncpg.Pool = Depends(get_pool)) 
         return {**dict(row), "metadata_json": _decode_jsonb(row["metadata_json"])}
 
 
-@router.get("/students/{student_id}/progress")
+@router.get("/students/{student_id}/progress", dependencies=[Depends(require_student_access)])
 async def get_student_progress(student_id: UUID, pool: asyncpg.Pool = Depends(get_pool)) -> dict:
     """Summary: gates passed + files locked + freedom score (when L6a active)."""
     async with pool.acquire() as conn:
@@ -276,7 +276,7 @@ async def get_student_progress(student_id: UUID, pool: asyncpg.Pool = Depends(ge
 # ============================================================
 # 2. Canonical Files
 # ============================================================
-@router.post("/students/{student_id}/canonical-files", status_code=201)
+@router.post("/students/{student_id}/canonical-files", status_code=201, dependencies=[Depends(require_student_access)])
 async def create_canonical_file(
     student_id: UUID, body: CanonicalFileCreate,
     pool: asyncpg.Pool = Depends(get_pool),
@@ -312,7 +312,7 @@ async def create_canonical_file(
         return dict(row)
 
 
-@router.get("/students/{student_id}/canonical-files")
+@router.get("/students/{student_id}/canonical-files", dependencies=[Depends(require_student_access)])
 async def list_canonical_files(
     student_id: UUID,
     level: int | None = Query(None, ge=1, le=6),
@@ -353,7 +353,7 @@ async def list_canonical_files(
         return [dict(r) for r in rows]
 
 
-@router.get("/students/{student_id}/canonical-files/{file_key}")
+@router.get("/students/{student_id}/canonical-files/{file_key}", dependencies=[Depends(require_student_access)])
 async def get_canonical_file_latest(
     student_id: UUID, file_key: str,
     pool: asyncpg.Pool = Depends(get_pool),
@@ -372,7 +372,7 @@ async def get_canonical_file_latest(
         return {**dict(row), "structured_data_json": _decode_jsonb(row["structured_data_json"])}
 
 
-@router.post("/students/{student_id}/canonical-files/{file_key}/approve")
+@router.post("/students/{student_id}/canonical-files/{file_key}/approve", dependencies=[Depends(require_student_access)])
 async def approve_canonical_file(
     student_id: UUID, file_key: str,
     pool: asyncpg.Pool = Depends(get_pool),
@@ -419,7 +419,7 @@ async def _check_gate_files(
     return missing, [dict(found[k]) for k in required_files if k in found]
 
 
-@router.get("/students/{student_id}/gates/{gate_key}/validate", response_model=GateValidation)
+@router.get("/students/{student_id}/gates/{gate_key}/validate", response_model=GateValidation, dependencies=[Depends(require_student_access)])
 async def validate_gate(
     student_id: UUID, gate_key: str,
     pool: asyncpg.Pool = Depends(get_pool),
@@ -482,7 +482,7 @@ async def validate_gate(
         raise HTTPException(400, f"Gate {gate_key} validation not implemented")
 
 
-@router.post("/students/{student_id}/gates/{gate_key}/lock")
+@router.post("/students/{student_id}/gates/{gate_key}/lock", dependencies=[Depends(require_student_access)])
 async def lock_gate(
     student_id: UUID, gate_key: str,
     pool: asyncpg.Pool = Depends(get_pool),
@@ -612,7 +612,7 @@ async def lock_gate(
         }
 
 
-@router.get("/students/{student_id}/gates")
+@router.get("/students/{student_id}/gates", dependencies=[Depends(require_student_access)])
 async def list_gates(student_id: UUID, pool: asyncpg.Pool = Depends(get_pool)) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
@@ -648,7 +648,7 @@ async def check_gate_passed(
         return row["unlocked_at"] is None and row["lock_status"] in ("soft", "hard")
 
 
-@router.get("/students/{student_id}/gates/{gate_key}/passed")
+@router.get("/students/{student_id}/gates/{gate_key}/passed", dependencies=[Depends(require_student_access)])
 async def gate_passed_check(
     student_id: UUID, gate_key: str,
     pool: asyncpg.Pool = Depends(get_pool),
@@ -660,7 +660,7 @@ async def gate_passed_check(
 # ============================================================
 # 5. Events ledger
 # ============================================================
-@router.post("/events", status_code=201)
+@router.post("/events", status_code=201, dependencies=[Depends(require_service_key)])
 async def append_event(
     body: StudentEventCreate, pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
@@ -679,7 +679,7 @@ async def append_event(
         return dict(row)
 
 
-@router.get("/students/{student_id}/events")
+@router.get("/students/{student_id}/events", dependencies=[Depends(require_student_access)])
 async def list_events(
     student_id: UUID,
     source: str | None = None,

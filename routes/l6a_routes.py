@@ -15,10 +15,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from routes.sdl_routes import get_pool, check_gate_passed
+from routes._auth import require_service_key
 
 
 log = logging.getLogger("camas.l6a")
-router = APIRouter(prefix="/sdl/l6a", tags=["sdl-l6a"])
+router = APIRouter(prefix="/sdl/l6a", tags=["sdl-l6a"], dependencies=[Depends(require_service_key)])
 
 
 L6A_FILES = [

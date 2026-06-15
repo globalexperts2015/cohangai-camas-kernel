@@ -42,3 +42,36 @@ def require_student_signature(student_id: str, sig: str) -> None:
             status_code=403,
             detail="Đường link không hợp lệ. Liên hệ Hằng qua Zalo.",
         )
+
+
+SERVICE_KEY_HEADER = "X-Internal-Service-Key"
+
+
+def _service_key_ok(request: Request) -> bool:
+    """True nếu request mang service key hợp lệ (gọi nội bộ: webhook, admin, cron)."""
+    expected = os.environ.get("INTERNAL_SERVICE_KEY", "") or os.environ.get(
+        "BREAKOUTOS_ADMIN_KEY", ""
+    )
+    if not expected:
+        return False
+    provided = request.headers.get(SERVICE_KEY_HEADER, "") or request.query_params.get(
+        "key", ""
+    )
+    return bool(provided) and hmac.compare_digest(provided, expected)
+
+
+def require_service_key(request: Request) -> None:
+    """Dependency cho route hệ thống (create student, lookup, event ingest)."""
+    if not _service_key_ok(request):
+        raise HTTPException(status_code=401, detail="Service authentication required.")
+
+
+def require_student_access(student_id, request: Request, sig: str = "") -> None:
+    """Dependency cho route student-scoped.
+
+    Cho qua nếu có service key hợp lệ (nội bộ), nếu không thì bắt buộc signed link
+    khớp đúng student_id. Khóa toàn bộ SDL + L4-L6a theo yêu cầu launch.
+    """
+    if _service_key_ok(request):
+        return
+    require_student_signature(str(student_id), request_signature(request, sig))

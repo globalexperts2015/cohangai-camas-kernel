@@ -28,6 +28,10 @@ if not ADMIN_KEY:
 
 
 def call(method: str, url: str, body=None, headers=None) -> tuple[int, dict]:
+    # SDL + L4-L6a routes giờ khóa bằng service auth; gắn key tự động (trừ khi
+    # url đã có key= để giữ test wrong-key cố ý).
+    if "/sdl/" in url and "key=" not in url and ADMIN_KEY:
+        url += ("&" if "?" in url else "?") + f"key={ADMIN_KEY}"
     full = url if url.startswith("http") else BASE + url
     data = None
     h = {"User-Agent": "smoke-test/1.0"}

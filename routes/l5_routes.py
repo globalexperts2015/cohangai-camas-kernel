@@ -15,10 +15,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from routes.sdl_routes import get_pool, check_gate_passed
+from routes._auth import require_service_key
 
 
 log = logging.getLogger("camas.l5")
-router = APIRouter(prefix="/sdl/l5", tags=["sdl-l5"])
+router = APIRouter(prefix="/sdl/l5", tags=["sdl-l5"], dependencies=[Depends(require_service_key)])
 
 
 class L5IntakePayload(BaseModel):

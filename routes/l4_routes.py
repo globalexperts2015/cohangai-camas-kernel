@@ -19,10 +19,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from routes.sdl_routes import get_pool, check_gate_passed
+from routes._auth import require_service_key
 
 
 log = logging.getLogger("camas.l4")
-router = APIRouter(prefix="/sdl/l4", tags=["sdl-l4"])
+router = APIRouter(prefix="/sdl/l4", tags=["sdl-l4"], dependencies=[Depends(require_service_key)])
 
 
 class L4IntakePayload(BaseModel):
