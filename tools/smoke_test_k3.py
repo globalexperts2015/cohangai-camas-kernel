@@ -57,7 +57,7 @@ async def _complete_job(pool: asyncpg.Pool, job_id: str) -> None:
 
 
 async def run_profile(pool: asyncpg.Pool, index: int) -> None:
-    email = f"k3-smoke-{index:02d}@example.test"
+    email = f"k3-smoke-{index:02d}@daothihang.com"
     registration = await register(
         RegisterRequest(
             email=email,
@@ -141,10 +141,13 @@ async def main() -> int:
         return 1
     os.environ["K3_FAKE_AI"] = "1"
     pool = await asyncpg.create_pool(dsn, min_size=1, max_size=4)
+    cleanup_sql = (
+        "DELETE FROM breakout_challenge.integration_outbox WHERE session_id IN "
+        "(SELECT id FROM breakout_challenge.sessions WHERE cohort_id='k3-smoke-2026-06');"
+        "DELETE FROM breakout_challenge.sessions WHERE cohort_id='k3-smoke-2026-06'"
+    )
     try:
-        await pool.execute(
-            "DELETE FROM breakout_challenge.sessions WHERE cohort_id='k3-smoke-2026-06'"
-        )
+        await pool.execute(cleanup_sql)
         for index in range(1, 11):
             await run_profile(pool, index)
             print(f"profile {index:02d}: passed")
@@ -160,9 +163,7 @@ async def main() -> int:
         assert totals["completed"] == 10
         print("10/10 profiles completed")
     finally:
-        await pool.execute(
-            "DELETE FROM breakout_challenge.sessions WHERE cohort_id='k3-smoke-2026-06'"
-        )
+        await pool.execute(cleanup_sql)
         await pool.close()
     return 0
 
