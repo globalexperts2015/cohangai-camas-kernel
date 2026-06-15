@@ -24,6 +24,8 @@ import asyncpg
 import httpx
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.responses import HTMLResponse
+
+from routes._auth import require_service_key
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from agents.e6_market_demand.agent import compute_demand_score
@@ -331,7 +333,7 @@ async def _record_event(
     return event_id
 
 
-@router.post("/challenge/k3/register", status_code=201)
+@router.post("/challenge/k3/register", status_code=201, dependencies=[Depends(require_service_key)])
 async def register(
     body: RegisterRequest,
     pool: asyncpg.Pool = Depends(get_pool),
