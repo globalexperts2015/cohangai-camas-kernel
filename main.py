@@ -552,6 +552,8 @@ app.include_router(discovery_view_router, tags=["discovery-view"])
 app.include_router(day3_router, tags=["day3-challenge"])
 app.include_router(day3_view_router, tags=["day3-view"])
 app.include_router(challenge_k3_router, tags=["challenge-k3"])
+from routes.k3_bridge import router as k3_bridge_router
+app.include_router(k3_bridge_router, tags=["k3-bridge"])
 app.include_router(coaching_router, tags=["coaching-landing"])
 mount_cohort_static(app)
 
