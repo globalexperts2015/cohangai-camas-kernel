@@ -509,6 +509,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     challenge_worker = __import__("asyncio").create_task(
         challenge_worker_loop(challenge_stop)
     )
+    from routes.k3_bridge import bridge_scheduler_loop
+    bridge_task = __import__("asyncio").create_task(
+        bridge_scheduler_loop(challenge_stop)
+    )
     try:
         yield
     finally:
@@ -517,6 +521,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             await __import__("asyncio").wait_for(challenge_worker, timeout=10)
         except __import__("asyncio").TimeoutError:
             challenge_worker.cancel()
+        try:
+            await __import__("asyncio").wait_for(bridge_task, timeout=10)
+        except __import__("asyncio").TimeoutError:
+            bridge_task.cancel()
         log.info("CAMAS Kernel shutdown, drain queues")
         await scheduler.stop()
         try:

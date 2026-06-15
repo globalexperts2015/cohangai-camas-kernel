@@ -120,17 +120,10 @@ def _fetch_registrants() -> list[dict]:
     return rows
 
 
-@router.post("/cron/k3-bridge")
-async def cron_k3_bridge(
-    x_camas_cron_secret: Optional[str] = Header(None, alias="x-camas-cron-secret"),
-) -> dict:
-    """Poll WK registrants K3 -> tạo session CAMAS in-process (idempotent)."""
-    if _CRON_SECRET:
-        if not x_camas_cron_secret or not _secrets.compare_digest(
-            x_camas_cron_secret, _CRON_SECRET
-        ):
-            raise HTTPException(status_code=401, detail="cron secret required")
-    # Lazy import tránh circular.
+async def run_bridge() -> dict:
+    """Poll WK registrants K3 -> tạo session CAMAS in-process (idempotent).
+    Dùng chung cho cron endpoint lẫn self-scheduler.
+    """
     from routes.challenge_k3 import register, RegisterRequest
     from routes.sdl_routes import get_pool
 
@@ -170,3 +163,41 @@ async def cron_k3_bridge(
         "registered": registered,
         "errors": errors[:10],
     }
+
+
+@router.post("/cron/k3-bridge")
+async def cron_k3_bridge(
+    x_camas_cron_secret: Optional[str] = Header(None, alias="x-camas-cron-secret"),
+) -> dict:
+    """Trigger thủ công/ngoài (cron-job.org). Self-scheduler bên dưới chạy tự động."""
+    if _CRON_SECRET:
+        if not x_camas_cron_secret or not _secrets.compare_digest(
+            x_camas_cron_secret, _CRON_SECRET
+        ):
+            raise HTTPException(status_code=401, detail="cron secret required")
+    return await run_bridge()
+
+
+async def bridge_scheduler_loop(stop_event) -> None:
+    """Tự chạy bridge định kỳ TRONG camas — không cần cron-job.org.
+    Bật khi K3_BRIDGE_AUTO=1 (mặc định off để an toàn). Interval mặc định 600s.
+    """
+    if os.getenv("K3_BRIDGE_AUTO", "0") != "1":
+        log.info("k3-bridge scheduler: tắt (K3_BRIDGE_AUTO != 1)")
+        return
+    if not os.environ.get("WEBINARKIT_EMAIL"):
+        log.info("k3-bridge scheduler: WK creds chưa set, skip")
+        return
+    interval = int(os.getenv("K3_BRIDGE_INTERVAL_SEC", "600"))
+    await asyncio.sleep(30)  # chờ app ổn định
+    log.info("k3-bridge scheduler started (interval=%ds)", interval)
+    while not stop_event.is_set():
+        try:
+            result = await run_bridge()
+            log.info("k3-bridge auto: %s", result)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("k3-bridge auto fail: %r", exc)
+        try:
+            await asyncio.wait_for(stop_event.wait(), timeout=interval)
+        except asyncio.TimeoutError:
+            pass
