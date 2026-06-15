@@ -372,6 +372,17 @@ async def register(
                     "ghl_contact_id": body.ghl_contact_id,
                 },
             )
+            await _enqueue_outbox(
+                conn,
+                row["id"],
+                f"webinarkit:register:{row['id']}",
+                "webinarkit",
+                "webinar.register",
+                {
+                    "email": body.email,
+                    "full_name": body.full_name,
+                },
+            )
             await _record_event(
                 conn,
                 row,
@@ -1218,10 +1229,61 @@ async def _sync_ghl(pool: asyncpg.Pool, item: dict[str, Any]) -> None:
         )
 
 
+async def _sync_webinarkit(pool: asyncpg.Pool, item: dict[str, Any]) -> None:
+    """Đăng ký người tham gia vào webinar WebinarKit, lưu join link.
+
+    Env: WEBINARKIT_API_KEY + WEBINARKIT_WEBINAR_ID (+ WEBINARKIT_API_BASE).
+    Nếu chưa cấu hình webinar id thì no-op (đánh dấu completed) để không chặn flow.
+    Contract: POST {base}/webinar/registration/{webinarId} body {email,firstName,lastName},
+    header apikey; response chứa join/watch link.
+    """
+    payload = _json(item["payload_json"])
+    api_key = os.getenv("WEBINARKIT_API_KEY", "")
+    webinar_id = os.getenv("WEBINARKIT_WEBINAR_ID", "")
+    base = os.getenv("WEBINARKIT_API_BASE", "https://api.webinarkit.com").rstrip("/")
+    if not api_key or not webinar_id:
+        log.info("WebinarKit chưa cấu hình (api_key/webinar_id), bỏ qua register")
+        return
+    full_name = (payload.get("full_name") or "").strip()
+    first, _, last = full_name.partition(" ")
+    body = {
+        "email": payload["email"],
+        "firstName": first or full_name or "Founder",
+        "lastName": last,
+    }
+    async with httpx.AsyncClient(timeout=20) as client:
+        response = await client.post(
+            f"{base}/webinar/registration/{webinar_id}",
+            headers={"apikey": api_key, "Content-Type": "application/json"},
+            json=body,
+        )
+        response.raise_for_status()
+        data = response.json() if response.content else {}
+    join_url = (
+        data.get("link")
+        or data.get("watchLink")
+        or data.get("joinLink")
+        or data.get("url")
+    )
+    if join_url:
+        async with pool.acquire() as conn:
+            await conn.execute(
+                """
+                UPDATE breakout_challenge.sessions
+                SET metadata_json = metadata_json || jsonb_build_object('webinar_join_url', $1::text)
+                WHERE id=$2
+                """,
+                join_url,
+                item["session_id"],
+            )
+
+
 async def _process_outbox(pool: asyncpg.Pool, item: dict[str, Any]) -> None:
     try:
         if item["target"] == "fanhub":
             await _sync_fanhub(pool, item)
+        elif item["target"] == "webinarkit":
+            await _sync_webinarkit(pool, item)
         else:
             await _sync_ghl(pool, item)
         async with pool.acquire() as conn:
