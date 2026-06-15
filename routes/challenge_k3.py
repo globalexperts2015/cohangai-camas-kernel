@@ -61,7 +61,9 @@ def _derive_token(session_id: Any) -> str:
     """Resume token xác định từ session_id (HMAC). Cùng session luôn ra cùng token,
     nên đăng ký lại KHÔNG đổi link. Không lưu plaintext, chỉ lưu hash để lookup.
     """
-    secret = os.getenv("HMAC_SECRET", "").encode() or b"k3-resume-fallback-secret-32bytes!"
+    secret = os.getenv("HMAC_SECRET", "").encode()
+    if len(secret) < 32:
+        raise RuntimeError("HMAC_SECRET must be set (>=32 bytes) for resume token derivation")
     digest = hmac.new(secret, str(session_id).encode(), hashlib.sha256).digest()
     return base64.urlsafe_b64encode(digest).decode().rstrip("=")
 
@@ -429,11 +431,46 @@ async def register(
     }
 
 
+def _k3_config_checks() -> dict[str, Any]:
+    """Kiểm credential/config bắt buộc cho luồng K3 (không trả giá trị secret)."""
+    def has(key: str, minlen: int = 1) -> bool:
+        return len(os.getenv(key, "")) >= minlen
+    try:
+        ghl_fields = len(json.loads(os.getenv("GHL_K3_CUSTOM_FIELD_IDS", "") or "{}"))
+    except Exception:
+        ghl_fields = 0
+    return {
+        "hmac_secret": has("HMAC_SECRET", 32),
+        "internal_service_key": has("INTERNAL_SERVICE_KEY"),
+        "fan_hub_url": has("FAN_HUB_INTERNAL_URL"),
+        "ghl_api_key": has("GHL_API_KEY"),
+        "ghl_location_id": has("GHL_LOCATION_ID"),
+        "ghl_custom_fields": ghl_fields,
+        "webinarkit_api_key": has("WEBINARKIT_API_KEY"),
+        "webinarkit_webinar_id": has("WEBINARKIT_WEBINAR_ID"),
+    }
+
+
+async def _fan_hub_reachable() -> bool:
+    base = os.getenv("FAN_HUB_INTERNAL_URL", "").strip()
+    if not base:
+        return False
+    root = base.split("/internal", 1)[0].rstrip("/")
+    try:
+        async with httpx.AsyncClient(timeout=4) as client:
+            r = await client.get(f"{root}/health")
+            return r.status_code == 200
+    except Exception:
+        return False
+
+
 @router.get("/challenge/k3/readiness")
 async def k3_readiness(pool: asyncpg.Pool = Depends(get_pool)) -> dict[str, Any]:
-    """Launch-readiness gate (item 13): ready chỉ khi không có dead job, không có
-    outbox lỗi/stuck. Public, chỉ trả số đếm + boolean, không PII.
+    """Launch-readiness gate THẬT (item 13): kiểm credential + integration + outbox/jobs.
+    ready chỉ true khi ĐỦ config VÀ Fan Hub reachable VÀ không có dead/stuck.
+    Public, không trả PII hay giá trị secret.
     """
+    cfg = _k3_config_checks()
     async with pool.acquire() as conn:
         ob = {r["status"]: r["n"] for r in await conn.fetch(
             "SELECT status, count(*) n FROM breakout_challenge.integration_outbox GROUP BY status"
@@ -452,17 +489,29 @@ async def k3_readiness(pool: asyncpg.Pool = Depends(get_pool)) -> dict[str, Any]
     outbox_dead = int(ob.get("dead", 0))
     outbox_stuck = int(stuck or 0)
     jobs_dead = int(jb.get("dead", 0))
-    checks = {
-        "db": True,
-        "outbox_dead": outbox_dead,
-        "outbox_stuck": outbox_stuck,
-        "outbox_completed": int(ob.get("completed", 0)),
-        "jobs_dead": jobs_dead,
-        "sessions_total": int(sessions or 0),
-        "sessions_completed": int(completed or 0),
+    fanhub_ok = await _fan_hub_reachable()
+    config_ok = (
+        cfg["hmac_secret"] and cfg["internal_service_key"] and cfg["fan_hub_url"]
+        and cfg["ghl_api_key"] and cfg["ghl_location_id"] and cfg["ghl_custom_fields"] >= 6
+        and cfg["webinarkit_api_key"] and cfg["webinarkit_webinar_id"]
+    )
+    pipeline_ok = outbox_dead == 0 and outbox_stuck == 0 and jobs_dead == 0
+    ready = bool(config_ok and pipeline_ok and fanhub_ok)
+    return {
+        "ready": ready,
+        "config_ok": config_ok,
+        "pipeline_ok": pipeline_ok,
+        "fan_hub_reachable": fanhub_ok,
+        "checks": {
+            **cfg,
+            "outbox_dead": outbox_dead,
+            "outbox_stuck": outbox_stuck,
+            "outbox_completed": int(ob.get("completed", 0)),
+            "jobs_dead": jobs_dead,
+            "sessions_total": int(sessions or 0),
+            "sessions_completed": int(completed or 0),
+        },
     }
-    ready = outbox_dead == 0 and outbox_stuck == 0 and jobs_dead == 0
-    return {"ready": ready, "checks": checks}
 
 
 async def _enqueue_generation(
