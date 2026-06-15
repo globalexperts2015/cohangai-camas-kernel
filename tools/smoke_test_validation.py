@@ -8,7 +8,7 @@ import urllib.error
 import urllib.request
 
 
-BASE = "https://os.breakout.live"
+BASE = os.environ.get("SMOKE_BASE_URL", "https://os.breakout.live")
 ADMIN_KEY = os.environ.get("BREAKOUTOS_ADMIN_KEY")
 if not ADMIN_KEY:
     sys.exit("ERROR: BREAKOUTOS_ADMIN_KEY env var required. Set in .env or shell before running.")
@@ -23,7 +23,12 @@ def call(method: str, url: str, body=None, headers=None):
     req = urllib.request.Request(full, data=data, headers=h, method=method)
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return r.status, json.loads(r.read().decode("utf-8") or "{}")
+            text = r.read().decode("utf-8")
+            try:
+                return r.status, json.loads(text or "{}")
+            except json.JSONDecodeError:
+                # HTML dashboard endpoints return text/html, not JSON.
+                return r.status, {"raw": text[:200]}
     except urllib.error.HTTPError as e:
         try:
             return e.code, json.loads(e.read().decode("utf-8") or "{}")

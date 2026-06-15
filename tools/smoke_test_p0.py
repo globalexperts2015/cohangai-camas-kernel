@@ -21,7 +21,7 @@ import urllib.error
 import urllib.request
 
 
-BASE = "https://os.breakout.live"
+BASE = os.environ.get("SMOKE_BASE_URL", "https://os.breakout.live")
 ADMIN_KEY = os.environ.get("BREAKOUTOS_ADMIN_KEY")
 if not ADMIN_KEY:
     sys.exit("ERROR: BREAKOUTOS_ADMIN_KEY env var required. Set in .env or shell before running.")
