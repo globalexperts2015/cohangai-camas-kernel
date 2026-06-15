@@ -10,9 +10,21 @@ from routes.challenge_k3 import (
     Day2Request,
     EVENT_CONFIG,
     RegisterRequest,
+    _derive_token,
     _fake_output,
     _token_hash,
 )
+
+
+def test_derive_token_is_deterministic_per_session() -> None:
+    sid = "4041d9e6-5ab6-417b-8fd2-fc40bf1cfbb2"
+    # Cùng session_id → cùng token (đăng ký lại giữ nguyên link).
+    assert _derive_token(sid) == _derive_token(sid)
+    # Session khác → token khác.
+    assert _derive_token(sid) != _derive_token("00000000-0000-0000-0000-000000000000")
+    # URL-safe, không padding.
+    assert "=" not in _derive_token(sid)
+    assert "/" not in _derive_token(sid) and "+" not in _derive_token(sid)
 
 
 def test_resume_token_is_hashed() -> None:

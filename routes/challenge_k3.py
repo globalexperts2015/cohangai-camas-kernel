@@ -7,7 +7,9 @@ integration outbox for Fan Hub and GHL.
 from __future__ import annotations
 
 import asyncio
+import base64
 import hashlib
+import hmac
 import html
 import json
 import logging
@@ -53,6 +55,15 @@ def _client() -> anthropic.AsyncAnthropic:
 
 def _token_hash(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _derive_token(session_id: Any) -> str:
+    """Resume token xác định từ session_id (HMAC). Cùng session luôn ra cùng token,
+    nên đăng ký lại KHÔNG đổi link. Không lưu plaintext, chỉ lưu hash để lookup.
+    """
+    secret = os.getenv("HMAC_SECRET", "").encode() or b"k3-resume-fallback-secret-32bytes!"
+    digest = hmac.new(secret, str(session_id).encode(), hashlib.sha256).digest()
+    return base64.urlsafe_b64encode(digest).decode().rstrip("=")
 
 
 def _json(value: Any) -> Any:
@@ -343,7 +354,6 @@ async def register(
                         ELSE breakout_challenge.sessions.access_tier
                       END,
                       ghl_contact_id=COALESCE(EXCLUDED.ghl_contact_id, breakout_challenge.sessions.ghl_contact_id),
-                      resume_token_hash=EXCLUDED.resume_token_hash,
                       expires_at=EXCLUDED.expires_at,
                       updated_at=now()
                 RETURNING *
@@ -358,6 +368,16 @@ async def register(
                 json.dumps({"challenge_data": body.consent}),
                 json.dumps({"registration_idempotency_key": idempotency_key or None}),
             )
+            # Resume token xác định từ session_id: đăng ký lại giữ NGUYÊN link
+            # (token ngẫu nhiên ở INSERT chỉ là giá trị tạm cho hàng mới).
+            token = _derive_token(row["id"])
+            token_hash = _token_hash(token)
+            if row["resume_token_hash"] != token_hash:
+                await conn.execute(
+                    "UPDATE breakout_challenge.sessions SET resume_token_hash=$1 WHERE id=$2",
+                    token_hash,
+                    row["id"],
+                )
             await _enqueue_outbox(
                 conn,
                 row["id"],
@@ -407,6 +427,42 @@ async def register(
         "resume_url": f"{PUBLIC_BASE_URL}/sprint/k3/{token}",
         "token": token,
     }
+
+
+@router.get("/challenge/k3/readiness")
+async def k3_readiness(pool: asyncpg.Pool = Depends(get_pool)) -> dict[str, Any]:
+    """Launch-readiness gate (item 13): ready chỉ khi không có dead job, không có
+    outbox lỗi/stuck. Public, chỉ trả số đếm + boolean, không PII.
+    """
+    async with pool.acquire() as conn:
+        ob = {r["status"]: r["n"] for r in await conn.fetch(
+            "SELECT status, count(*) n FROM breakout_challenge.integration_outbox GROUP BY status"
+        )}
+        stuck = await conn.fetchval(
+            "SELECT count(*) FROM breakout_challenge.integration_outbox "
+            "WHERE status='queued' AND scheduled_at < now() - INTERVAL '10 minutes'"
+        )
+        jb = {r["status"]: r["n"] for r in await conn.fetch(
+            "SELECT status, count(*) n FROM breakout_challenge.generation_jobs GROUP BY status"
+        )}
+        sessions = await conn.fetchval("SELECT count(*) FROM breakout_challenge.sessions")
+        completed = await conn.fetchval(
+            "SELECT count(*) FROM breakout_challenge.sessions WHERE current_state='completed'"
+        )
+    outbox_dead = int(ob.get("dead", 0))
+    outbox_stuck = int(stuck or 0)
+    jobs_dead = int(jb.get("dead", 0))
+    checks = {
+        "db": True,
+        "outbox_dead": outbox_dead,
+        "outbox_stuck": outbox_stuck,
+        "outbox_completed": int(ob.get("completed", 0)),
+        "jobs_dead": jobs_dead,
+        "sessions_total": int(sessions or 0),
+        "sessions_completed": int(completed or 0),
+    }
+    ready = outbox_dead == 0 and outbox_stuck == 0 and jobs_dead == 0
+    return {"ready": ready, "checks": checks}
 
 
 async def _enqueue_generation(
