@@ -515,13 +515,14 @@ async def _enqueue_generation(
     key_source = json.dumps(inputs, ensure_ascii=False, sort_keys=True)
     key = f"{session['id']}:{artifact_type}:{hashlib.sha256(key_source.encode()).hexdigest()[:16]}"
     state = {1: "d1_generating", 2: "d2_generating", 3: "d3_generating"}[day_number]
+    initial_status = "processing" if os.getenv("K3_FAKE_AI", "").lower() in ("1", "true", "yes") else "queued"
     async with pool.acquire() as conn:
         async with conn.transaction():
             job_id = await conn.fetchval(
                 """
                 INSERT INTO breakout_challenge.generation_jobs
-                  (idempotency_key, session_id, day_number, artifact_type, input_json)
-                VALUES ($1,$2,$3,$4,$5::jsonb)
+                  (idempotency_key, session_id, day_number, artifact_type, input_json, status)
+                VALUES ($1,$2,$3,$4,$5::jsonb,$6)
                 ON CONFLICT (idempotency_key) DO UPDATE
                   SET scheduled_at=LEAST(breakout_challenge.generation_jobs.scheduled_at, now())
                 RETURNING id
@@ -531,6 +532,7 @@ async def _enqueue_generation(
                 day_number,
                 artifact_type,
                 json.dumps(inputs, ensure_ascii=False),
+                initial_status,
             )
             await conn.execute(
                 "UPDATE breakout_challenge.sessions SET current_state=$1 WHERE id=$2",
@@ -758,6 +760,11 @@ Trả JSON thuần:
     "what_we_know": ["..."],
     "what_is_missing": ["..."]
   }},
+  "willingness_to_pay_verdict": {{
+    "verdict": "yes|unclear|no",
+    "reason": "...",
+    "minimum_next_proof": "..."
+  }},
   "opportunity_score": {{
     "founder_fit": 0,
     "market_demand": {market_score},
@@ -809,10 +816,11 @@ Trả JSON thuần:
     "proof": "...",
     "cta": "..."
   }},
-  "launch_content": [
-    {{"hook": "...", "body": "...", "cta": "..."}},
-    {{"hook": "...", "body": "...", "cta": "..."}},
-    {{"hook": "...", "body": "...", "cta": "..."}}
+  "facebook_posts": [
+    {{"post_number": 1, "angle": "...", "hook": "...", "body": "...", "cta": "..."}}
+  ],
+  "email_sequence": [
+    {{"email_number": 1, "subject": "...", "body": "...", "cta": "..."}}
   ],
   "dm_script": "...",
   "follow_up_messages": ["...", "...", "..."],
@@ -820,18 +828,22 @@ Trả JSON thuần:
   "validation_sprint_7_days": [
     {{"day": 1, "action": "...", "evidence_to_capture": "..."}}
   ],
-  "roadmap_30_days": {{
-    "week_1": ["..."],
-    "week_2": ["..."],
-    "week_3": ["..."],
-    "week_4": ["..."]
-  }},
+  "roadmap_30_days": [
+    {{"day": 1, "action": "...", "output": "...", "time_box_minutes": 60}}
+  ],
   "validation_targets": {{
     "customer_conversations": 5,
     "expressions_of_interest": 3,
     "paid_pilot_target": 1
   }}
-}}"""
+}}
+
+Bắt buộc:
+- facebook_posts phải có đúng 30 phần tử, đánh số 1 đến 30.
+- email_sequence phải có đúng 10 phần tử, đánh số 1 đến 10.
+- roadmap_30_days phải có đúng 30 phần tử, đánh số 1 đến 30.
+- Mỗi post và email chỉ có 1 CTA.
+- Viết thực tế, không hứa doanh thu, không dùng dấu gạch ngang dài."""
 
 
 async def _llm_json(prompt: str) -> dict[str, Any]:
@@ -892,6 +904,11 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
                 "what_we_know": [inputs["observed_evidence"]],
                 "what_is_missing": ["Phỏng vấn và tín hiệu thanh toán thật."],
             },
+            "willingness_to_pay_verdict": {
+                "verdict": "unclear",
+                "reason": "Có tín hiệu vấn đề nhưng chưa có thanh toán thật.",
+                "minimum_next_proof": "Mời 1 khách pilot trả phí.",
+            },
             "opportunity_score": scores,
             "offer_v0": {
                 "name": "Pilot giải pháp 7 ngày",
@@ -924,9 +941,24 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
             "proof": "Chương trình pilot giới hạn.",
             "cta": "Đặt lịch trao đổi.",
         },
-        "launch_content": [
-            {"hook": f"Nội dung {i + 1}", "body": "Chia sẻ vấn đề thật.", "cta": "Nhắn tin để trao đổi."}
-            for i in range(3)
+        "facebook_posts": [
+            {
+                "post_number": i + 1,
+                "angle": "nỗi đau" if i % 3 == 0 else "câu chuyện" if i % 3 == 1 else "offer",
+                "hook": f"Facebook post {i + 1}",
+                "body": "Chia sẻ vấn đề thật và mời đối thoại.",
+                "cta": "Nhắn tin để trao đổi.",
+            }
+            for i in range(30)
+        ],
+        "email_sequence": [
+            {
+                "email_number": i + 1,
+                "subject": f"Email pilot {i + 1}",
+                "body": "Một email ngắn giúp khách hiểu vấn đề, giải pháp và bước tiếp theo.",
+                "cta": "Trả lời email này để trao đổi.",
+            }
+            for i in range(10)
         ],
         "dm_script": "Chào bạn, tôi đang thử nghiệm một giải pháp nhỏ cho vấn đề này.",
         "follow_up_messages": ["Bạn đã xem thông tin chưa?", "Điều gì khiến bạn còn phân vân?", "Tôi đóng nhóm pilot hôm nay."],
@@ -935,18 +967,38 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
             {"day": day, "action": "Thực hiện một cuộc trò chuyện hoặc follow-up.", "evidence_to_capture": "Câu nói, phản hồi và hành động."}
             for day in range(1, 8)
         ],
-        "roadmap_30_days": {
-            "week_1": ["Phỏng vấn 5 khách"],
-            "week_2": ["Chạy pilot"],
-            "week_3": ["Cải tiến offer"],
-            "week_4": ["Mở vòng bán tiếp theo"],
-        },
+        "roadmap_30_days": [
+            {
+                "day": day,
+                "action": "Làm một hành động bán hàng hoặc học từ khách hàng.",
+                "output": "Một bằng chứng cụ thể.",
+                "time_box_minutes": 60,
+            }
+            for day in range(1, 31)
+        ],
         "validation_targets": {
             "customer_conversations": 5,
             "expressions_of_interest": 3,
             "paid_pilot_target": 1,
         },
     }
+
+
+def _assert_output_contract(day_number: int, output: dict[str, Any]) -> None:
+    if day_number == 1 and len(output.get("ideas") or []) != 10:
+        raise ValueError("Day 1 output must contain exactly 10 ideas")
+    if day_number == 2:
+        if not output.get("willingness_to_pay_verdict"):
+            raise ValueError("Day 2 output must include willingness_to_pay_verdict")
+    if day_number == 3:
+        requirements = {
+            "facebook_posts": 30,
+            "email_sequence": 10,
+            "roadmap_30_days": 30,
+        }
+        for key, expected in requirements.items():
+            if len(output.get(key) or []) != expected:
+                raise ValueError(f"Day 3 output must contain exactly {expected} items in {key}")
 
 
 async def _market_signals(pool: asyncpg.Pool, keywords: list[str]) -> dict[str, Any]:
@@ -1034,6 +1086,7 @@ async def _generate_for_job(
             ))
         )
         confidence = 0.6
+    _assert_output_contract(job["day_number"], output)
     return output, evidence, evidence_status, confidence
 
 
