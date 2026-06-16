@@ -846,10 +846,10 @@ Bắt buộc:
 - Viết thực tế, không hứa doanh thu, không dùng dấu gạch ngang dài."""
 
 
-async def _llm_json(prompt: str) -> dict[str, Any]:
+async def _llm_json(prompt: str, max_tokens: int = 6000) -> dict[str, Any]:
     response = await _client().messages.create(
         model=MODEL,
-        max_tokens=6000,
+        max_tokens=max_tokens,
         messages=[{"role": "user", "content": prompt}],
     )
     raw = response.content[0].text.strip()
@@ -1083,7 +1083,7 @@ async def _generate_for_job(
             if fake_ai
             else await _llm_json(DAY3_PROMPT.replace(
                 "{inputs}", json.dumps(inputs, ensure_ascii=False, indent=2)
-            ))
+            ), max_tokens=16000)
         )
         confidence = 0.6
     _assert_output_contract(job["day_number"], output)
