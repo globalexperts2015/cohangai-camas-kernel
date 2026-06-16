@@ -1083,7 +1083,7 @@ async def _generate_for_job(
             if fake_ai
             else await _llm_json(DAY3_PROMPT.replace(
                 "{inputs}", json.dumps(inputs, ensure_ascii=False, indent=2)
-            ), max_tokens=16000)
+            ), max_tokens=32000)
         )
         confidence = 0.6
     _assert_output_contract(job["day_number"], output)
