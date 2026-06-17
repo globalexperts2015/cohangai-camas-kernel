@@ -1442,7 +1442,7 @@ async def get_session(
     async with pool.acquire() as conn:
         artifacts = await conn.fetch(
             """
-            SELECT day_number, artifact_type, output_json, evidence_status,
+            SELECT day_number, artifact_type, input_json, output_json, evidence_json, evidence_status,
                    confidence_score, status, updated_at
             FROM breakout_challenge.artifacts
             WHERE session_id=$1 ORDER BY day_number
@@ -1456,7 +1456,12 @@ async def get_session(
         "selected_idea": _json(session["selected_idea_json"]),
         "selected_offer": _json(session["selected_offer_json"]),
         "artifacts": [
-            {**dict(row), "output_json": _json(row["output_json"])}
+            {
+                **dict(row),
+                "input_json": _json(row["input_json"]),
+                "output_json": _json(row["output_json"]),
+                "evidence_json": _json(row["evidence_json"]),
+            }
             for row in artifacts
         ],
     }
