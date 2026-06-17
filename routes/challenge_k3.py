@@ -14,6 +14,7 @@ import html
 import json
 import logging
 import os
+import re
 import secrets
 from datetime import date, datetime, timezone
 from typing import Any
@@ -79,10 +80,32 @@ def _json(value: Any) -> Any:
     return value
 
 
+# RFC 6761 reserved + IETF documentation TLDs + common test domains.
+# Chặn TRƯỚC khi enqueue outbox/sync Fan Hub để giữ production pipeline sạch.
+_RESERVED_TEST_TLDS = {".invalid", ".test", ".example", ".localhost"}
+_RESERVED_TEST_DOMAINS = {
+    "example.com", "example.org", "example.net",
+    "test.com", "localhost", "nowhere.invalid",
+    "nowhere.test", "nowhere.example",
+}
+
+
 def _normalize_email(value: str) -> str:
     normalized = value.strip().lower()
     if "@" not in normalized or normalized.startswith("@") or normalized.endswith("@"):
         raise ValueError("Email không hợp lệ")
+    try:
+        local, domain = normalized.rsplit("@", 1)
+    except ValueError:
+        raise ValueError("Email không hợp lệ")
+    if not domain or "." not in domain:
+        raise ValueError("Email không hợp lệ")
+    # Block RFC 6761 reserved + documentation TLDs
+    for tld in _RESERVED_TEST_TLDS:
+        if domain.endswith(tld):
+            raise ValueError("Email thuộc dải test reserved, không nhận")
+    if domain in _RESERVED_TEST_DOMAINS:
+        raise ValueError("Email thuộc danh sách test reserved, không nhận")
     return normalized
 
 
@@ -188,6 +211,20 @@ async def _latest_artifact(
     )
 
 
+# Domain test/reserved (RFC 2606/6761): Fan Hub validate EmailStr -> 422 -> dead job.
+# Chặn tại nguồn, KHÔNG enqueue sync Fan Hub cho email loại này (GHL vẫn sync).
+_RESERVED_EMAIL_RE = re.compile(r"@(?:.*\.)?(?:invalid|test|example|localhost)$", re.I)
+
+
+def _is_reserved_email(email: str | None) -> bool:
+    e = (email or "").strip().lower()
+    if "@" not in e:
+        return True
+    dom = e.rsplit("@", 1)[1]
+    return bool(_RESERVED_EMAIL_RE.search("@" + dom)) or dom in (
+        "example.com", "example.org", "example.net")
+
+
 async def _enqueue_outbox(
     conn: asyncpg.Connection,
     session_id: UUID,
@@ -196,6 +233,9 @@ async def _enqueue_outbox(
     operation: str,
     payload: dict[str, Any],
 ) -> None:
+    # Gate: không đẩy sang Fan Hub nếu email là domain test/reserved (tránh 422 -> dead).
+    if target == "fanhub" and _is_reserved_email(payload.get("email")):
+        return
     await conn.execute(
         """
         INSERT INTO breakout_challenge.integration_outbox
