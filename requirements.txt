@@ -14,6 +14,7 @@ python-multipart==0.0.12
 
 # BreakoutOS CHỌN Engine 4 Market Demand (Google Trends)
 pytrends==4.9.2
+urllib3<2
 
 # BreakoutOS CHỌN PDF export (Gap 3)
 weasyprint==62.3

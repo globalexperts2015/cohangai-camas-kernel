@@ -470,6 +470,11 @@ def _k3_config_checks() -> dict[str, Any]:
         ghl_fields = len(json.loads(os.getenv("GHL_K3_CUSTOM_FIELD_IDS", "") or "{}"))
     except Exception:
         ghl_fields = 0
+    try:
+        import pytrends.request  # noqa: F401
+        pytrends_available = True
+    except Exception:
+        pytrends_available = False
     return {
         "hmac_secret": has("HMAC_SECRET", 32),
         "internal_service_key": has("INTERNAL_SERVICE_KEY"),
@@ -479,6 +484,10 @@ def _k3_config_checks() -> dict[str, Any]:
         "ghl_custom_fields": ghl_fields,
         "webinarkit_api_key": has("WEBINARKIT_API_KEY"),
         "webinarkit_webinar_id": has("WEBINARKIT_WEBINAR_ID"),
+        "dataforseo_login": has("DATAFORSEO_LOGIN"),
+        "dataforseo_password": has("DATAFORSEO_PASSWORD"),
+        "youtube_api_key": has("YOUTUBE_API_KEY"),
+        "pytrends_available": pytrends_available,
     }
 
 
@@ -525,6 +534,8 @@ async def k3_readiness(pool: asyncpg.Pool = Depends(get_pool)) -> dict[str, Any]
         cfg["hmac_secret"] and cfg["internal_service_key"] and cfg["fan_hub_url"]
         and cfg["ghl_api_key"] and cfg["ghl_location_id"] and cfg["ghl_custom_fields"] >= 6
         and cfg["webinarkit_api_key"] and cfg["webinarkit_webinar_id"]
+        and cfg["dataforseo_login"] and cfg["dataforseo_password"]
+        and cfg["youtube_api_key"] and cfg["pytrends_available"]
     )
     pipeline_ok = outbox_dead == 0 and outbox_stuck == 0 and jobs_dead == 0
     ready = bool(config_ok and pipeline_ok and fanhub_ok)
@@ -542,6 +553,52 @@ async def k3_readiness(pool: asyncpg.Pool = Depends(get_pool)) -> dict[str, Any]
             "sessions_total": int(sessions or 0),
             "sessions_completed": int(completed or 0),
         },
+    }
+
+
+@router.get("/challenge/k3/market-readiness", dependencies=[Depends(require_service_key)])
+async def k3_market_readiness(
+    keyword: str = "kinh doanh online",
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> dict[str, Any]:
+    """Internal live probe for Day 2 market APIs. Uses real API calls, so keep protected."""
+    keyword = (keyword or "kinh doanh online").strip()[:80]
+    market = await _market_signals(pool, [keyword])
+    signals = market.get("signals") or {}
+    volume_data = signals.get("volume_data") or {}
+    youtube_data = signals.get("youtube_data") or {}
+    trends_data = signals.get("trends_data") or {}
+    youtube_one = youtube_data.get(keyword) or {}
+    trends_one = trends_data.get(keyword) or {}
+    dataforseo_ok = bool(volume_data.get(keyword))
+    youtube_ok = isinstance(youtube_one, dict) and "_error" not in youtube_one
+    google_trends_ok = isinstance(trends_one, dict) and "_error" not in trends_one
+    return {
+        "ready": bool(dataforseo_ok and youtube_ok and google_trends_ok),
+        "keyword": keyword,
+        "market_score": market.get("market_score"),
+        "raw_score": market.get("raw_score"),
+        "verdict": market.get("verdict"),
+        "evidence_status": market.get("evidence_status"),
+        "available_sources": market.get("available_sources"),
+        "sources": {
+            "dataforseo": {
+                "ok": dataforseo_ok,
+                "volume_present": bool((volume_data.get(keyword) or {}).get("volume") is not None),
+                "competition_present": bool((volume_data.get(keyword) or {}).get("competition_index") is not None),
+            },
+            "youtube": {
+                "ok": youtube_ok,
+                "result_count_present": bool(youtube_one.get("total_results_estimated") is not None),
+                "error": None if youtube_ok else str(youtube_one.get("_error", "unknown"))[:120],
+            },
+            "google_trends": {
+                "ok": google_trends_ok,
+                "growth_present": bool(trends_one.get("growth_pct_12m") is not None),
+                "error": None if google_trends_ok else str(trends_one.get("_error", "unknown"))[:160],
+            },
+        },
+        "flags": market.get("flags") or [],
     }
 
 
