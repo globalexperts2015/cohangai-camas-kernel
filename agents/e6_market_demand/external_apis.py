@@ -46,7 +46,13 @@ async def _get_cached(pool: asyncpg.Pool, keyword: str, source: str,
             keyword, source, location_code, language_code,
         )
         if row:
-            return row["signal_json"]
+            value = row["signal_json"]
+            if isinstance(value, str):
+                try:
+                    return json.loads(value)
+                except json.JSONDecodeError:
+                    return None
+            return value
     return None
 
 
