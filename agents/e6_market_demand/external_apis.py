@@ -68,7 +68,7 @@ async def _set_cached(pool: asyncpg.Pool, keyword: str, source: str,
             "INSERT INTO market_signal_cache (keyword, location_code, language_code, source, signal_json) "
             "VALUES ($1, $2, $3, $4, $5::jsonb) "
             "ON CONFLICT (keyword, location_code, language_code, source) DO UPDATE "
-            "SET signal_json = $5::jsonb, fetched_at = NOW(), expires_at = NOW() + INTERVAL '7 days'",
+            "SET signal_json = $5::jsonb, fetched_at = NOW(), expires_at = NOW() + INTERVAL '60 days'",
             keyword, location_code, language_code, source, json.dumps(signal_json, ensure_ascii=False),
         )
 

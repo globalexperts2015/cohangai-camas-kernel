@@ -42,7 +42,19 @@ log = logging.getLogger("camas.challenge_k3")
 router = APIRouter(tags=["challenge-k3"])
 
 MODEL = os.getenv("K3_AI_MODEL", "claude-sonnet-4-6")
+MODEL_FREE = os.getenv("K3_AI_MODEL_FREE", "claude-haiku-4-5-20251001")
+MODEL_VIP = os.getenv("K3_AI_MODEL_VIP", MODEL)
 PUBLIC_BASE_URL = os.getenv("K3_PUBLIC_BASE_URL", "https://os.breakout.live").rstrip("/")
+
+# Pricing constants (USD per 1M tokens) - update khi model price thay doi
+_MODEL_PRICING_USD = {
+    "claude-haiku-4-5-20251001": {"in": 1.0, "out": 5.0},
+    "claude-sonnet-4-6": {"in": 3.0, "out": 15.0},
+    "claude-opus-4-7": {"in": 15.0, "out": 75.0},
+}
+_DATAFORSEO_COST_PER_KW = 0.003  # USD per keyword search volume call
+_YOUTUBE_COST_PER_CALL = 0.0  # free tier
+_TRENDS_COST_PER_CALL = 0.0  # pytrends free
 _CLIENT: anthropic.AsyncAnthropic | None = None
 
 
@@ -526,6 +538,26 @@ async def k3_readiness(pool: asyncpg.Pool = Depends(get_pool)) -> dict[str, Any]
         completed = await conn.fetchval(
             "SELECT count(*) FROM breakout_challenge.sessions WHERE current_state='completed'"
         )
+        # API spend rollup (D): aggregate tu sessions.metadata_json.api_spend_log
+        spend_rollup = await conn.fetchrow(
+            """
+            WITH spend_entries AS (
+              SELECT
+                s.access_tier,
+                (entry->>'kind') AS kind,
+                ((entry->>'cost_usd')::numeric) AS cost_usd
+              FROM breakout_challenge.sessions s,
+              jsonb_array_elements(COALESCE(s.metadata_json->'api_spend_log', '[]'::jsonb)) entry
+            )
+            SELECT
+              COALESCE(SUM(cost_usd), 0)::float AS total_usd,
+              COALESCE(SUM(cost_usd) FILTER (WHERE access_tier='free'), 0)::float AS free_usd,
+              COALESCE(SUM(cost_usd) FILTER (WHERE access_tier='vip'), 0)::float AS vip_usd,
+              COALESCE(SUM(cost_usd) FILTER (WHERE kind LIKE 'llm_%%'), 0)::float AS llm_usd,
+              COALESCE(SUM(cost_usd) FILTER (WHERE kind='dataforseo'), 0)::float AS dataforseo_usd
+            FROM spend_entries
+            """
+        )
     outbox_dead = int(ob.get("dead", 0))
     outbox_stuck = int(stuck or 0)
     jobs_dead = int(jb.get("dead", 0))
@@ -552,6 +584,16 @@ async def k3_readiness(pool: asyncpg.Pool = Depends(get_pool)) -> dict[str, Any]
             "jobs_dead": jobs_dead,
             "sessions_total": int(sessions or 0),
             "sessions_completed": int(completed or 0),
+        },
+        "api_spend_usd": {
+            "total": round(spend_rollup["total_usd"], 4),
+            "free_tier": round(spend_rollup["free_usd"], 4),
+            "vip_tier": round(spend_rollup["vip_usd"], 4),
+            "llm": round(spend_rollup["llm_usd"], 4),
+            "dataforseo": round(spend_rollup["dataforseo_usd"], 4),
+            "per_completed_session": round(
+                spend_rollup["total_usd"] / max(int(completed or 0), 1), 4
+            ) if completed else None,
         },
     }
 
@@ -931,9 +973,11 @@ Trả JSON thuần:
 }}"""
 
 
-async def _llm_json(prompt: str) -> dict[str, Any]:
+async def _llm_json(prompt: str, model: str | None = None) -> tuple[dict[str, Any], float]:
+    """Goi LLM, return (parsed_json, cost_usd). Cost tinh tu usage tokens."""
+    use_model = model or MODEL
     response = await _client().messages.create(
-        model=MODEL,
+        model=use_model,
         max_tokens=6000,
         messages=[{"role": "user", "content": prompt}],
     )
@@ -941,7 +985,46 @@ async def _llm_json(prompt: str) -> dict[str, Any]:
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1]
         raw = raw.rsplit("```", 1)[0].strip()
-    return json.loads(raw)
+    # Tinh cost theo usage tokens
+    cost = 0.0
+    try:
+        usage = getattr(response, "usage", None)
+        if usage:
+            in_tok = getattr(usage, "input_tokens", 0) or 0
+            out_tok = getattr(usage, "output_tokens", 0) or 0
+            pricing = _MODEL_PRICING_USD.get(use_model, {"in": 3.0, "out": 15.0})
+            cost = (in_tok * pricing["in"] + out_tok * pricing["out"]) / 1_000_000
+    except Exception:
+        pass
+    return json.loads(raw), cost
+
+
+async def _track_api_spend(pool: asyncpg.Pool, session_id, kind: str, cost_usd: float, meta: dict | None = None) -> None:
+    """Append spend log vao sessions.metadata_json.api_spend_log."""
+    if cost_usd <= 0 and not meta:
+        return
+    entry = {
+        "kind": kind,  # "llm_day1" | "llm_day2" | "llm_day3" | "dataforseo" | "youtube" | "trends"
+        "cost_usd": round(cost_usd, 6),
+        "at": datetime.now(timezone.utc).isoformat(),
+    }
+    if meta:
+        entry["meta"] = meta
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """
+            UPDATE breakout_challenge.sessions
+            SET metadata_json = jsonb_set(
+                COALESCE(metadata_json, '{}'::jsonb),
+                '{api_spend_log}',
+                COALESCE(metadata_json->'api_spend_log', '[]'::jsonb) || $1::jsonb,
+                true
+            )
+            WHERE id=$2
+            """,
+            json.dumps(entry, ensure_ascii=False),
+            session_id,
+        )
 
 
 def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -1088,6 +1171,7 @@ async def _market_signals(pool: asyncpg.Pool, keywords: list[str]) -> dict[str, 
 async def _generate_for_job(
     pool: asyncpg.Pool,
     job: dict[str, Any],
+    access_tier: str = "free",
 ) -> tuple[dict[str, Any], dict[str, Any], str, float | None]:
     inputs = _json(job["input_json"])
     evidence: dict[str, Any] = {}
@@ -1095,41 +1179,63 @@ async def _generate_for_job(
     confidence: float | None = None
     fake_ai = os.getenv("K3_FAKE_AI", "").lower() in ("1", "true", "yes")
 
+    # Tier-based model: free -> Haiku, vip -> Sonnet (or per MODEL_VIP env)
+    model_for_tier = MODEL_VIP if access_tier == "vip" else MODEL_FREE
+    sid = job["session_id"]
+
     if job["day_number"] == 1:
-        output = (
-            _fake_output(1, inputs)
-            if fake_ai
-            else await _llm_json(DAY1_PROMPT.format(
-                inputs=json.dumps(inputs, ensure_ascii=False, indent=2)
-            ))
-        )
+        if fake_ai:
+            output = _fake_output(1, inputs)
+        else:
+            output, cost = await _llm_json(
+                DAY1_PROMPT.format(inputs=json.dumps(inputs, ensure_ascii=False, indent=2)),
+                model=model_for_tier,
+            )
+            await _track_api_spend(pool, sid, "llm_day1", cost, {"model": model_for_tier, "tier": access_tier})
         confidence = 0.4
     elif job["day_number"] == 2:
-        market = (
-            {"signals": {}, "market_score": 5, "evidence_status": "user_reported"}
-            if fake_ai
-            else await _market_signals(pool, inputs["keywords"])
-        )
+        # VIP-gate market signals: free user -> skip API calls, use user_reported fallback
+        if fake_ai:
+            market = {"signals": {}, "market_score": 5, "evidence_status": "user_reported"}
+        elif access_tier == "vip":
+            market = await _market_signals(pool, inputs["keywords"])
+            # Track DataForSEO spend (5 keywords typical)
+            kw_count = len(inputs.get("keywords", []))
+            ds_cost = kw_count * _DATAFORSEO_COST_PER_KW
+            if ds_cost > 0:
+                await _track_api_spend(pool, sid, "dataforseo", ds_cost, {"keywords": kw_count})
+        else:
+            # FREE tier: skip DataForSEO/YouTube/Trends, use neutral score
+            market = {
+                "signals": {},
+                "market_score": 5,
+                "evidence_status": "user_reported",
+                "skipped_reason": "free_tier_no_external_apis",
+            }
         evidence = market
         evidence_status = market["evidence_status"]
-        output = (
-            _fake_output(2, inputs, market)
-            if fake_ai
-            else await _llm_json(DAY2_PROMPT.format(
-                inputs=json.dumps(inputs, ensure_ascii=False, indent=2),
-                signals=json.dumps(market, ensure_ascii=False, indent=2)[:10000],
-                market_score=market["market_score"],
-            ))
-        )
+        if fake_ai:
+            output = _fake_output(2, inputs, market)
+        else:
+            output, cost = await _llm_json(
+                DAY2_PROMPT.format(
+                    inputs=json.dumps(inputs, ensure_ascii=False, indent=2),
+                    signals=json.dumps(market, ensure_ascii=False, indent=2)[:10000],
+                    market_score=market["market_score"],
+                ),
+                model=model_for_tier,
+            )
+            await _track_api_spend(pool, sid, "llm_day2", cost, {"model": model_for_tier, "tier": access_tier})
         confidence = float(output.get("opportunity_score", {}).get("confidence", 0)) / 10
     else:
-        output = (
-            _fake_output(3, inputs)
-            if fake_ai
-            else await _llm_json(DAY3_PROMPT.replace(
-                "{inputs}", json.dumps(inputs, ensure_ascii=False, indent=2)
-            ))
-        )
+        if fake_ai:
+            output = _fake_output(3, inputs)
+        else:
+            output, cost = await _llm_json(
+                DAY3_PROMPT.replace("{inputs}", json.dumps(inputs, ensure_ascii=False, indent=2)),
+                model=model_for_tier,
+            )
+            await _track_api_spend(pool, sid, "llm_day3", cost, {"model": model_for_tier, "tier": access_tier})
         confidence = 0.6
     return output, evidence, evidence_status, confidence
 
@@ -1161,7 +1267,14 @@ async def _claim_generation(pool: asyncpg.Pool) -> dict[str, Any] | None:
 
 
 async def _complete_generation(pool: asyncpg.Pool, job: dict[str, Any]) -> None:
-    output, evidence, evidence_status, confidence = await _generate_for_job(pool, job)
+    # Lookup session access_tier de quyet dinh model + bat API ngoai
+    async with pool.acquire() as conn:
+        access_tier = await conn.fetchval(
+            "SELECT access_tier FROM breakout_challenge.sessions WHERE id=$1",
+            job["session_id"],
+        )
+    access_tier = (access_tier or "free").lower()
+    output, evidence, evidence_status, confidence = await _generate_for_job(pool, job, access_tier=access_tier)
     next_state = {1: "d1_ready", 2: "d2_ready", 3: "completed"}[job["day_number"]]
     async with pool.acquire() as conn:
         async with conn.transaction():
