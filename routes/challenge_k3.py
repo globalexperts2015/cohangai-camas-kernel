@@ -679,12 +679,38 @@ async def _enqueue_generation(
     return job_id
 
 
+# Bài tập mỗi ngày chỉ mở lúc 20:00 giờ VN của đúng ngày đó (=13:00 UTC).
+# Chặn học viên cày dồn / tọc mạch thử trước khi LIVE dạy cách làm.
+_K3_DAY_UNLOCK_UTC = {
+    1: os.getenv("K3_DAY1_UNLOCK_UTC", "2026-06-18T13:00:00+00:00"),
+    2: os.getenv("K3_DAY2_UNLOCK_UTC", "2026-06-19T13:00:00+00:00"),
+    3: os.getenv("K3_DAY3_UNLOCK_UTC", "2026-06-20T13:00:00+00:00"),
+}
+_K3_DAY_UNLOCK_LABEL = {1: "20:00 ngày 18/06", 2: "20:00 ngày 19/06", 3: "20:00 ngày 20/06"}
+
+
+def _guard_day_unlocked(day: int) -> None:
+    iso = _K3_DAY_UNLOCK_UTC.get(day)
+    if not iso:
+        return
+    try:
+        unlock = datetime.fromisoformat(iso)
+    except ValueError:
+        return
+    if datetime.now(timezone.utc) < unlock:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Bài tập Ngày {day} sẽ mở lúc {_K3_DAY_UNLOCK_LABEL.get(day, '')} (giờ Việt Nam). Hãy quay lại sau nhé.",
+        )
+
+
 @router.post("/challenge/k3/session/{token}/day/1", status_code=202)
 async def submit_day1(
     token: str,
     body: Day1Request,
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict[str, Any]:
+    _guard_day_unlocked(1)
     session = await _session_by_token(pool, token)
     if session["current_state"] not in ("registered", "d1_generating"):
         raise HTTPException(status_code=409, detail="Ngày 1 đã được xử lý")
@@ -742,6 +768,7 @@ async def submit_day2(
     body: Day2Request,
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict[str, Any]:
+    _guard_day_unlocked(2)
     session = await _session_by_token(pool, token)
     if session["current_state"] not in ("d1_selected", "d2_generating"):
         raise HTTPException(status_code=409, detail="Hãy chọn ý tưởng ngày 1 trước")
@@ -811,6 +838,7 @@ async def submit_day3(
     body: Day3Request,
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict[str, Any]:
+    _guard_day_unlocked(3)
     session = await _session_by_token(pool, token)
     if session["current_state"] not in ("d2_offer_approved", "d3_generating"):
         raise HTTPException(status_code=409, detail="Hãy xác nhận offer ngày 2 trước")
