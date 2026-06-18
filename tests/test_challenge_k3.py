@@ -8,8 +8,10 @@ from pydantic import ValidationError
 from routes.challenge_k3 import (
     Day1Request,
     Day2Request,
+    Day3Request,
     EVENT_CONFIG,
     RegisterRequest,
+    _assert_output_contract,
     _derive_token,
     _fake_output,
     _token_hash,
@@ -71,6 +73,32 @@ def test_day2_score_uses_five_canonical_dimensions() -> None:
         "ai_leverage", "confidence", "total",
     }
     assert score["total"] == sum(value for key, value in score.items() if key != "total")
+    assert output["willingness_to_pay_verdict"]["verdict"] in {"yes", "unclear", "no"}
+
+
+def test_day3_output_matches_launch_kit_promise() -> None:
+    inputs = {
+        "selected_idea": {"name": "Pilot từ kỹ năng"},
+        "approved_offer": {
+            "who": "Người mới kinh doanh từ kỹ năng.",
+            "pain": "Không biết bắt đầu từ đâu.",
+            "desired_identity": "Có offer rõ để kiểm chứng.",
+            "vehicle": "Dịch vụ hướng dẫn và AI hỗ trợ",
+            "deliverables": ["Buổi chẩn đoán", "Kế hoạch hành động"],
+        },
+        **Day3Request(
+            sales_channel="Facebook cá nhân",
+            audience_size=500,
+            available_hours_per_week=10,
+            launch_date="2026-06-22",
+            delivery_capacity=5,
+        ).model_dump(mode="json"),
+    }
+    output = _fake_output(3, inputs)
+    _assert_output_contract(3, output)
+    assert len(output["facebook_posts"]) == 30
+    assert len(output["email_sequence"]) == 10
+    assert len(output["roadmap_30_days"]) == 30
 
 
 def test_completed_event_sets_day3_and_program_tags() -> None:

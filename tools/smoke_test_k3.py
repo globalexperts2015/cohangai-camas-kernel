@@ -39,24 +39,27 @@ from routes.challenge_k3 import (  # noqa: E402
 async def _complete_job(pool: asyncpg.Pool, job_id: str) -> None:
     parsed_job_id = UUID(str(job_id))
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            "SELECT * FROM breakout_challenge.generation_jobs WHERE id=$1",
-            parsed_job_id,
-        )
-        await conn.execute(
-            """
-            UPDATE breakout_challenge.generation_jobs
-            SET status='processing', attempts=attempts+1, started_at=now()
-            WHERE id=$1
-            """,
-            parsed_job_id,
-        )
+        async with conn.transaction():
+            row = await conn.fetchrow(
+                """
+                UPDATE breakout_challenge.generation_jobs
+                SET status='processing', attempts=attempts+1, started_at=now()
+                WHERE id=$1 AND status IN ('queued','processing')
+                RETURNING *
+                """,
+                parsed_job_id,
+            )
+            if row is None:
+                current = await conn.fetchrow(
+                    "SELECT status, error FROM breakout_challenge.generation_jobs WHERE id=$1",
+                    parsed_job_id,
+                )
+                raise RuntimeError(f"Smoke job was claimed outside smoke runner: {dict(current) if current else job_id}")
     job = dict(row)
-    job["attempts"] += 1
     await _complete_generation(pool, job)
 
 
-async def run_profile(pool: asyncpg.Pool, index: int) -> None:
+async def run_profile(pool: asyncpg.Pool, index: int) -> UUID:
     email = f"k3-smoke-{index:02d}@daothihang.com"
     registration = await register(
         RegisterRequest(
@@ -131,6 +134,7 @@ async def run_profile(pool: asyncpg.Pool, index: int) -> None:
     assert row["current_state"] == "completed"
     assert row["artifacts"] == 3
     assert row["events"] == 4
+    return UUID(registration["session_id"])
 
 
 async def main() -> int:
@@ -140,6 +144,7 @@ async def main() -> int:
         print("DATABASE_URL or CDP_DATABASE_URL is required")
         return 1
     os.environ["K3_FAKE_AI"] = "1"
+    os.environ.setdefault("HMAC_SECRET", "k3-smoke-test-hmac-secret-32-bytes-minimum")
     pool = await asyncpg.create_pool(dsn, min_size=1, max_size=4)
     cleanup_sql = (
         "DELETE FROM breakout_challenge.integration_outbox WHERE session_id IN "
@@ -148,16 +153,18 @@ async def main() -> int:
     )
     try:
         await pool.execute(cleanup_sql)
+        session_ids = []
         for index in range(1, 11):
-            await run_profile(pool, index)
+            session_ids.append(await run_profile(pool, index))
             print(f"profile {index:02d}: passed")
         totals = await pool.fetchrow(
             """
             SELECT count(*) AS sessions,
                    count(*) FILTER (WHERE current_state='completed') AS completed
             FROM breakout_challenge.sessions
-            WHERE cohort_id='k3-smoke-2026-06'
-            """
+            WHERE id = ANY($1::uuid[])
+            """,
+            session_ids,
         )
         assert totals["sessions"] == 10
         assert totals["completed"] == 10
