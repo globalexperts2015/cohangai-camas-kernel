@@ -10,10 +10,11 @@ from __future__ import annotations
 import logging
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import AsyncIterator
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from agents.bc1_team_leader import BC1TeamLeader
 from agents.bc2_voice_guardian import BC2VoiceGuardian
@@ -131,6 +132,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 log = logging.getLogger("camas.main")
+BASE_DIR = Path(__file__).resolve().parent
 
 
 @asynccontextmanager
@@ -618,13 +620,17 @@ except Exception as exc:
 async def root(request: Request):
     """Public landing page tại os.breakout.live root.
 
-    V3.4 (2026-06-11): Landing 5 tầng (Hiểu Mình / Hiểu Khách / Thiết Kế Hệ Thống /
-    Tăng Trưởng / Nhân Bản). Founder Transformation Operating System.
+    2026-06-19: Redirect root → /foundation-system. Lý do: landing V3.4 5 tầng
+    (Hiểu Mình / Hiểu Khách / Thiết Kế Hệ Thống / Tăng Trưởng / Nhân Bản) đã
+    out of sync với canonical V3.5.7 (6 OS layers, Founder Freedom Score North
+    Star). Foundation System là entry point Anna đang push K3 → Foundation
+    conversion. Khi V3.5.7 root landing sẵn sàng (rewrite về 6 tầng đúng tên),
+    bỏ redirect này, restore _render_landing_5_tang() hoặc render landing mới.
     """
     host = request.headers.get("host", "").lower()
     if host.startswith("os.breakout.live"):
-        from fastapi.responses import HTMLResponse
-        return HTMLResponse(_render_landing_5_tang())
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/foundation-system", status_code=302)
     return JSONResponse(
         {
             "service": "camas-kernel",
@@ -635,6 +641,7 @@ async def root(request: Request):
     )
 
 
+@app.get("/foundation-system")
 @app.get("/foundation")
 async def foundation_landing(request: Request):
     """Landing khoá Foundation với Digital Assets Foundation angle.
@@ -645,6 +652,11 @@ async def foundation_landing(request: Request):
     """
     from fastapi.responses import HTMLResponse
     return HTMLResponse(_render_landing_foundation())
+
+
+@app.get("/foundation-assets/vault-structure.png")
+async def foundation_vault_image():
+    return FileResponse(BASE_DIR / "static" / "foundation" / "vault-structure.png")
 
 
 def _render_landing_5_tang() -> str:
@@ -951,634 +963,396 @@ def _render_landing_foundation() -> str:
     return """<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Foundation · Xây nền móng trước khi xây doanh thu | BreakoutOS</title>
-<meta name="description" content="Nền Móng (Foundation) 7 ngày · 3 triệu · Hằng đồng hành trực tiếp. Khai giảng 22/6 lúc 5h sáng giờ Việt Nam. Xây xong Hệ Điều Hành Sáng Lập trong 1 tuần với Hằng.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundation System, Hệ điều hành Solo Biz đầu tiên cùng AI | BreakoutOS</title>
+<meta name="description" content="Một người. Một AI. Một Solo Biz. Sau 7 ngày, bạn xây xong nền móng Solo Biz đầu tiên cùng AI. Lịch học 2-4-6 sáng và Chủ nhật.">
 <style>
-:root{
-  --ink:#0a0a0a;--ink-soft:#2a2a2a;--paper:#fafaf7;--paper-warm:#f0ece0;
-  --red:#d63031;--red-deep:#b71c1c;--accent:#d63031;
-  --gold:#d4a24a;--gold-deep:#b8860b;
-  --line:#e5dfd0;--muted:#5a5453;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-body{font-family:'Be Vietnam Pro',-apple-system,sans-serif;line-height:1.75;color:var(--ink);background:var(--paper);font-weight:400;font-size:18px}
-.container{max-width:920px;margin:0 auto;padding:0 24px}
-h1,h2,h3,h4{font-weight:800;line-height:1.22}
-h1{font-size:54px;letter-spacing:-0.8px}
-h2{font-size:38px;letter-spacing:-0.4px;margin-bottom:20px}
-h3{font-size:24px;margin-bottom:12px}
-a{color:var(--red);text-decoration:none}
-.btn-primary{display:inline-block;background:var(--red);color:#fff;padding:22px 40px;border-radius:14px;font-weight:800;font-size:20px;box-shadow:0 8px 28px rgba(214,48,49,0.35);transition:transform 0.15s,background 0.15s;letter-spacing:0.2px}
-.btn-primary:hover{transform:translateY(-2px);background:var(--red-deep)}
-.btn-gold{background:var(--red)}
-.btn-gold:hover{background:var(--red-deep)}
-.tag{display:inline-block;background:rgba(214,48,49,0.12);color:var(--red);padding:8px 18px;border-radius:999px;font-size:12px;letter-spacing:1.8px;text-transform:uppercase;font-weight:800;margin-bottom:18px}
-.en{font-size:0.7em;color:var(--muted);font-weight:500;letter-spacing:normal;text-transform:none;margin-left:4px;font-style:italic}
-.os-pillar .en,.vault-card .en,.canonical-card .en,.step .en{color:rgba(255,255,255,0.55);font-weight:500;font-style:italic}
-.vault-card .en,.canonical-card .en,.step .en{color:var(--muted)}
-
-section{padding:90px 0;border-bottom:1px solid var(--line)}
-.hero{background:linear-gradient(180deg,#fff,#f5f0e3);padding:100px 0 80px;text-align:center}
-.hero h1{margin-bottom:22px}
-.hero .sub{font-size:22px;color:var(--ink-soft);max-width:680px;margin:0 auto 36px;line-height:1.55}
-.hero .meta{font-size:16px;color:var(--muted);margin-top:22px}
-
-.problem{background:#0a0a0a;color:#fff}
-.problem h2{color:#fff;text-align:center;margin-bottom:44px;max-width:760px;margin-left:auto;margin-right:auto}
-.problem .lede{font-size:20px;text-align:center;opacity:0.9;max-width:720px;margin:0 auto 56px;line-height:1.65}
-.scenes{display:grid;gap:18px;max-width:720px;margin:0 auto}
-.scene{background:rgba(255,255,255,0.05);border-left:4px solid var(--red);padding:22px 26px;border-radius:0 14px 14px 0}
-.scene .act{display:block;font-size:14px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;font-weight:800;margin-bottom:6px}
-.scene .result{font-size:20px;font-weight:600;line-height:1.45}
-.problem .punch{text-align:center;font-size:26px;font-weight:800;margin-top:60px;line-height:1.4}
-.problem .punch span{color:var(--red)}
-
-.insight{background:var(--paper-warm);text-align:center}
-.insight h2{max-width:780px;margin:0 auto 28px}
-.insight .body{font-size:21px;max-width:680px;margin:0 auto;color:var(--ink-soft);line-height:1.7}
-.insight .body p{margin-bottom:16px}
-.insight .highlight{background:#fff;border:3px solid var(--red);border-radius:20px;padding:32px 36px;margin:40px auto 0;max-width:640px;font-size:23px;font-weight:700;line-height:1.5}
-
-.vaults h2{text-align:center;margin-bottom:16px}
-.vaults .lede{text-align:center;color:var(--ink-soft);max-width:680px;margin:0 auto 56px;font-size:19px;line-height:1.6}
-.vault-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.vault-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px 30px;transition:transform 0.15s,box-shadow 0.15s}
-.vault-card:hover{transform:translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,0.08)}
-.vault-card .num{display:inline-block;width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;text-align:center;line-height:40px;font-weight:800;font-size:16px;margin-bottom:16px}
-.vault-card h3{font-size:22px;margin-bottom:10px}
-.vault-card p{font-size:17px;color:var(--ink-soft);line-height:1.6}
-
-.mantra{background:linear-gradient(135deg,#1a1a1a,#2d2d2d);color:#fff;text-align:center;padding:100px 0}
-.mantra .lines{font-size:36px;font-weight:800;line-height:1.55}
-.mantra .lines span{display:block;color:var(--red)}
-
-.tools{background:#fff}
-.tools h2{text-align:center;margin-bottom:46px}
-.tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:760px;margin:0 auto}
-.tool{display:flex;align-items:center;gap:16px;background:var(--paper);border-radius:14px;padding:20px 24px;border:1px solid var(--line)}
-.tool .dot{width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0}
-.tool strong{font-size:18px}
-.tool small{display:block;color:var(--muted);font-size:15px;margin-top:3px;line-height:1.5}
-
-.why-ai{background:var(--paper-warm)}
-.why-ai h2{text-align:center;margin-bottom:36px;max-width:760px;margin-left:auto;margin-right:auto}
-.why-ai .body{max-width:720px;margin:0 auto;font-size:20px;color:var(--ink-soft);line-height:1.7}
-.why-ai .body p{margin-bottom:16px}
-.why-ai .body strong{color:var(--ink)}
-
-.foundation-5{background:#fff;text-align:center}
-.foundation-5 h2{margin-bottom:16px}
-.foundation-5 .lede{color:var(--ink-soft);max-width:640px;margin:0 auto 56px;font-size:19px;line-height:1.6}
-.pillars{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;max-width:860px;margin:0 auto}
-.pillar{background:var(--paper);border-radius:14px;padding:26px 14px;border:1px solid var(--line)}
-.pillar .num{font-size:30px;font-weight:800;color:var(--red);margin-bottom:8px}
-.pillar h3{font-size:16px;margin-bottom:0;line-height:1.3}
-
-.pricing{background:linear-gradient(180deg,#0a0a0a,#1a1a1a);color:#fff;text-align:center}
-.pricing h2{color:#fff;margin-bottom:16px}
-.pricing .lede{opacity:0.85;max-width:620px;margin:0 auto 48px;font-size:19px;line-height:1.6}
-.price-card{background:rgba(255,255,255,0.04);border:3px solid var(--red);border-radius:24px;padding:48px 40px;max-width:540px;margin:0 auto}
-.price-card .tier{font-size:14px;letter-spacing:2.5px;text-transform:uppercase;color:var(--red);font-weight:800;margin-bottom:10px}
-.price-card h3{font-size:32px;color:#fff;margin-bottom:22px}
-.price-card .price-row{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-bottom:10px}
-.price-card .new{font-size:60px;font-weight:800;color:#fff;letter-spacing:-1.5px}
-.price-card .meta{font-size:16px;color:rgba(255,255,255,0.75);margin-bottom:28px}
-.price-card .includes{text-align:left;background:rgba(0,0,0,0.3);border-radius:14px;padding:22px 26px;margin-bottom:28px}
-.price-card .includes li{padding:7px 0;font-size:16px;color:rgba(255,255,255,0.9);list-style:none;display:flex;align-items:flex-start;gap:12px;line-height:1.55}
-.price-card .includes li::before{content:"✓";color:var(--red);font-weight:800;flex-shrink:0;font-size:18px}
-
-.cta-final{background:#fff;text-align:center}
-.cta-final h2{margin-bottom:22px;max-width:760px;margin-left:auto;margin-right:auto}
-.cta-final p{font-size:20px;color:var(--ink-soft);max-width:640px;margin:0 auto 36px;line-height:1.65}
-
-/* Section 4: Founder Foundation (8 canonical files - PHẦN TRUNG TÂM) */
-.founder-foundation{background:#fff}
-.founder-foundation h2{text-align:center;margin-bottom:18px}
-.founder-foundation .lede{text-align:center;color:var(--ink-soft);max-width:720px;margin:0 auto 56px;font-size:20px;line-height:1.65}
-.canonical-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
-.canonical-card{background:var(--paper);border-left:5px solid var(--red);border-radius:0 18px 18px 0;padding:28px 30px;transition:transform 0.15s,box-shadow 0.15s}
-.canonical-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.08)}
-.canonical-card .num{display:inline-block;width:42px;height:42px;border-radius:50%;background:var(--red);color:#fff;text-align:center;line-height:42px;font-weight:800;font-size:18px;margin-bottom:16px}
-.canonical-card h3{font-size:24px;margin-bottom:10px;color:var(--ink)}
-.canonical-card p{font-size:17px;color:var(--ink-soft);line-height:1.6}
-
-/* Section schedule: lịch 7 ngày với Hằng */
-.schedule{background:linear-gradient(135deg,#0a0a0a,#1c1c1c);color:#fff}
-.schedule h2{color:#fff;text-align:center;margin-bottom:18px}
-.schedule .lede{text-align:center;opacity:0.88;max-width:780px;margin:0 auto 56px;font-size:20px;line-height:1.65;color:rgba(255,255,255,0.92)}
-.schedule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:980px;margin:0 auto}
-.day-card{background:rgba(255,255,255,0.04);border:1px solid rgba(214,48,49,0.25);border-radius:16px;padding:24px 22px}
-.day-card.highlight-day{background:rgba(214,48,49,0.12);border:2px solid var(--red);grid-column:span 3}
-.day-num{display:inline-block;background:var(--red);color:#fff;font-size:13px;font-weight:800;letter-spacing:1.5px;padding:5px 14px;border-radius:999px;margin-bottom:10px}
-.day-when{font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:14px;font-weight:600}
-.day-card h3{color:#fff;font-size:21px;margin-bottom:10px}
-.day-card p{color:rgba(255,255,255,0.85);font-size:16px;line-height:1.6}
-.highlight-day h3{font-size:24px}
-.highlight-day p{font-size:18px}
-.schedule-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:880px;margin:60px auto 0}
-.summary-item{text-align:center;padding:24px 16px;background:rgba(255,255,255,0.04);border-radius:14px;border:1px solid rgba(255,255,255,0.08)}
-.summary-num{font-size:54px;font-weight:800;color:var(--red);line-height:1;margin-bottom:8px}
-.summary-label{font-size:15px;color:rgba(255,255,255,0.85);line-height:1.5;font-weight:600}
-.reassure-box{max-width:780px;margin:0 auto 50px;background:rgba(214,48,49,0.12);border-left:4px solid var(--red);border-radius:0 14px 14px 0;padding:22px 26px}
-.reassure-box p{font-size:18px;color:rgba(255,255,255,0.92);line-height:1.65;margin:0}
-.reassure-box strong{color:#fff;font-weight:700}
-
-/* Section 5: Business Foundation (4 câu hỏi định hướng) */
-.business-foundation{background:var(--paper-warm)}
-.business-foundation h2{text-align:center;margin-bottom:18px}
-.business-foundation .lede{text-align:center;color:var(--ink-soft);max-width:760px;margin:0 auto 56px;font-size:20px;line-height:1.65}
-.biz-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;max-width:820px;margin:0 auto}
-.biz-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:32px 30px}
-.biz-card h3{font-size:22px;margin-bottom:14px;color:var(--red);line-height:1.35}
-.biz-card p{font-size:17px;color:var(--ink-soft);line-height:1.65}
-
-/* Section 7: Founder Operating System (kết quả) */
-.founder-os{background:linear-gradient(135deg,#0a0a0a,#1c1c1c);color:#fff;text-align:center}
-.founder-os h2{color:#fff;margin-bottom:18px}
-.founder-os .lede{opacity:0.85;max-width:720px;margin:0 auto 56px;font-size:20px;line-height:1.65}
-.os-pillars{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;max-width:860px;margin:0 auto}
-.os-pillar{background:rgba(255,255,255,0.05);border:1px solid rgba(214,48,49,0.3);border-radius:18px;padding:32px 28px;text-align:left}
-.os-pillar .os-num{display:inline-block;width:42px;height:42px;border-radius:50%;background:var(--red);color:#fff;text-align:center;line-height:42px;font-weight:800;font-size:18px;margin-bottom:16px}
-.os-pillar h3{color:#fff;font-size:22px;margin-bottom:10px}
-.os-pillar p{color:rgba(255,255,255,0.85);font-size:17px;line-height:1.6}
-
-/* Section 8: Deliverables (bảng nhận được gì cụ thể) */
-.deliverables{background:#fff}
-.deliverables h2{text-align:center;margin-bottom:50px}
-.deliv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.deliv-block{background:var(--paper);border-radius:16px;padding:28px 24px;border:1px solid var(--line)}
-.deliv-num{font-size:48px;font-weight:800;color:var(--red);line-height:1;margin-bottom:10px}
-.deliv-label{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.3}
-.deliv-detail{font-size:15px;color:var(--ink-soft);line-height:1.6}
-
-/* Section 9: Founder Story Hằng */
-.founder-story-hang{background:var(--paper-warm)}
-.founder-story-hang h2{text-align:center;margin-bottom:40px;max-width:780px;margin-left:auto;margin-right:auto}
-.story-body{max-width:680px;margin:0 auto;font-size:19px;color:var(--ink-soft);line-height:1.75}
-.story-body p{margin-bottom:18px}
-.story-body strong{color:var(--ink);font-weight:700}
-
-/* Section 10: Curriculum (6 tầng BreakoutOS) */
-.curriculum{background:#fff}
-.curriculum h2{text-align:center;margin-bottom:18px}
-.curriculum .lede{text-align:center;color:var(--ink-soft);max-width:720px;margin:0 auto 56px;font-size:19px;line-height:1.65}
-.curriculum-steps{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:880px;margin:0 auto}
-.step{background:var(--paper);border-radius:16px;padding:24px 26px;border:1px solid var(--line);position:relative}
-.step.active{background:#fff;border:2px solid var(--red);box-shadow:0 8px 24px rgba(214,48,49,0.12)}
-.step.active::after{content:"Bạn đang ở đây";position:absolute;top:-12px;right:18px;background:var(--red);color:#fff;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;letter-spacing:0.5px}
-.step-week{font-size:13px;font-weight:800;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
-.step h3{font-size:20px;margin-bottom:8px;color:var(--ink)}
-.step p{font-size:16px;color:var(--ink-soft);line-height:1.55}
-
-footer{background:#0a0a0a;color:#fff;padding:60px 0 50px;font-size:16px}
-footer a{color:rgba(255,255,255,0.75)}
-footer .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:34px}
-footer h5{color:var(--red);font-size:14px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px;font-weight:800}
-
-@media(max-width:680px){
-  body{font-size:17px}
-  h1{font-size:38px}
-  h2{font-size:28px}
-  h3{font-size:20px}
-  .hero{padding:70px 0 60px}
-  .hero .sub{font-size:19px}
-  .btn-primary{font-size:18px;padding:20px 30px;display:block;width:100%}
-  .vault-grid{grid-template-columns:1fr}
-  .canonical-grid{grid-template-columns:1fr}
-  .biz-grid{grid-template-columns:1fr}
-  .schedule-grid{grid-template-columns:1fr}
-  .day-card.highlight-day{grid-column:span 1}
-  .schedule-summary{grid-template-columns:repeat(2,1fr)}
-  .summary-num{font-size:40px}
-  .os-pillars{grid-template-columns:1fr}
-  .deliv-grid{grid-template-columns:1fr}
-  .curriculum-steps{grid-template-columns:1fr}
-  .tools-grid{grid-template-columns:1fr}
-  .pillars{grid-template-columns:repeat(2,1fr)}
-  .price-card{padding:36px 24px}
-  .price-card .new{font-size:48px}
-  footer .footer-grid{grid-template-columns:1fr}
-}
+  :root{
+    --ink:#15181f; --muted:#5b6472; --line:#e7e9ee; --bg:#ffffff; --soft:#f6f7f9;
+    --brand:#e11d2a; --brand-dark:#b3121e; --accent:#fff4e6; --accent-line:#ffd9a8;
+    --ok:#1f9d63; --warn:#d9433f; --maxw:760px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:18px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+  section{padding:54px 0;border-bottom:1px solid var(--line)}
+  h1{font-size:42px;line-height:1.12;font-weight:800;letter-spacing:-0.5px;margin-bottom:18px}
+  h2{font-size:26px;line-height:1.2;font-weight:800;margin-bottom:18px;letter-spacing:-0.3px}
+  p{margin-bottom:12px}
+  .eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--brand);background:#fdeaec;padding:6px 12px;border-radius:999px;margin-bottom:20px}
+  .lead{font-size:20px;color:var(--ink)}
+  .muted{color:var(--muted)}
+  .big{font-size:22px;font-weight:700}
+  .stack p{margin-bottom:6px}
+  .gap{height:14px}
+  /* hero */
+  .hero{background:linear-gradient(180deg,#fff5f5 0%,#ffffff 100%);text-align:center;padding-top:64px}
+  .hero .sub{font-size:20px;color:var(--ink);max-width:560px;margin:0 auto 8px}
+  .hero .nots{color:var(--muted);font-size:18px;margin:14px auto 26px}
+  /* buttons */
+  .cta{display:inline-block;background:var(--brand);color:#fff;font-size:19px;font-weight:700;text-decoration:none;padding:16px 30px;border-radius:12px;box-shadow:0 8px 22px rgba(225,29,42,.30);transition:transform .12s ease,background .2s}
+  .cta:hover{background:var(--brand-dark);transform:translateY(-1px)}
+  .cta-note{font-size:15px;color:var(--muted);margin-top:12px}
+  .center{text-align:center}
+  /* image placeholder */
+  .imgph{border:2px dashed #c3c9d6;background:var(--soft);border-radius:14px;padding:40px 20px;text-align:center;color:var(--muted);font-size:15px;margin:8px 0 22px}
+  .imgph strong{display:block;color:#3a4252;font-size:16px;margin-bottom:4px}
+  .shot{width:100%;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(20,24,31,.08);margin:8px 0 8px;display:block}
+  .cap{font-size:14px;color:var(--muted);text-align:center;margin:0 0 22px}
+  /* before after */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  .card{border:1px solid var(--line);border-radius:14px;padding:22px}
+  .card h3{font-size:15px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px}
+  .card.before{background:#fff7f7;border-color:#f3d6d4}
+  .card.before h3{color:var(--warn)}
+  .card.after{background:#f2fbf6;border-color:#cdeedd}
+  .card.after h3{color:var(--ok)}
+  .card ul{list-style:none}
+  .card li{padding:6px 0 6px 26px;position:relative;font-size:17px}
+  .card.before li:before{content:"\\2717";position:absolute;left:0;color:var(--warn);font-weight:700}
+  .card.after li:before{content:"\\2713";position:absolute;left:0;color:var(--ok);font-weight:700}
+  /* quote */
+  .pull{background:var(--accent);border:1px solid var(--accent-line);border-radius:14px;padding:20px 22px;font-size:20px;font-weight:700;margin:22px 0}
+  /* tiers */
+  .tier{border-left:3px solid var(--brand);padding:6px 0 6px 18px;margin-bottom:18px}
+  .tier .t{font-weight:800;font-size:18px}
+  .tier .heart{display:inline-block;background:#fff0f3;color:#d6336c;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .own{background:var(--soft);border-radius:14px;padding:20px 22px;margin-top:8px}
+  .own p{margin-bottom:6px}
+  /* days */
+  .day{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .day:last-child{border-bottom:0}
+  .day .d{min-width:118px;font-weight:700;color:var(--brand);font-size:15px}
+  .levels .lv{padding:12px 0;border-bottom:1px solid var(--line)}
+  .levels .lv:last-child{border-bottom:0}
+  .levels .lv b{color:var(--ink)}
+  /* obj */
+  .obj{margin-bottom:16px}
+  .obj .q{font-weight:700}
+  /* price */
+  .pricebox{background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .pricebox ul{list-style:none;margin-bottom:16px}
+  .pricebox li{padding:7px 0 7px 26px;position:relative}
+  .pricebox li:before{content:"\\2713";position:absolute;left:0;color:var(--ok);font-weight:700}
+  .price-final{font-size:22px;font-weight:800;margin-top:6px}
+  .price-final .old{color:var(--muted);font-weight:600;font-size:18px}
+  /* sticky */
+  .sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px 16px;text-align:center;z-index:50}
+  .sticky a{font-size:17px;padding:13px 24px}
+  body{padding-bottom:86px}
+  .limit{background:#fff7ed;border:1px solid #ffe0b8;border-radius:14px;padding:20px 22px}
+  @media(max-width:620px){
+    h1{font-size:33px}
+    body{font-size:17px}
+    .ba{grid-template-columns:1fr}
+    .hero{padding-top:44px}
+    section{padding:40px 0}
+  }
 </style>
 </head>
 <body>
 
+<!-- HERO -->
 <section class="hero">
-  <div class="container">
-    <div class="tag">BreakoutOS · Tầng 1 · Hiểu Mình (Founder OS)</div>
-    <h1>Chỉ 1 tuần<br>là xây xong Foundation, với Hằng.</h1>
-    <p class="sub">Bạn không biết nên bán gì. Bạn không biết nên phục vụ ai. Bạn không biết mình thực sự muốn xây cuộc đời như thế nào.<br><br>7 ngày tới, Hằng đồng hành trực tiếp cùng bạn xây hệ điều hành đầu tiên cho chính mình.</p>
-    <a href="https://app.breakout.live/thanh-toan.html?product=foundation&source=foundation_landing" class="btn-primary btn-gold">Đăng ký Foundation 3 triệu →</a>
-    <p class="meta"><strong>Khai giảng Thứ Hai 22/6 lúc 5h sáng giờ Việt Nam</strong><br>Có video quay lại nếu bạn không tham gia LIVE được</p>
+  <div class="wrap">
+    <span class="eyebrow">BreakoutOS, Tầng 1, Foundation System</span>
+    <h1>Một người. Một AI. Một Solo Biz.</h1>
+    <p class="sub" style="font-weight:700;font-size:23px;color:var(--ink)">Không còn bắt đầu lại từ đầu mỗi lần mở AI (ChatGPT, Claude, Gemini).</p>
+    <p class="nots">Bạn không cần thêm người.<br>Bạn cần một hệ thống AI hiểu bạn, nhớ thay bạn và làm việc cùng bạn mỗi ngày.<br>Sau 7 ngày, bạn ngừng làm việc một mình.</p>
+    <a class="cta" href="https://app.breakout.live/thanh-toan.html?product=foundation&source=landing_hero">Đăng ký Foundation System 3 triệu</a>
+    <p class="cta-note">Lịch học Thứ Hai, Thứ Tư, Thứ Sáu từ 5h đến 6h30 sáng giờ Việt Nam. Chủ nhật từ 9h sáng đến 3h chiều giờ Việt Nam. Có video quay lại.</p>
   </div>
 </section>
 
-<section class="problem">
-  <div class="container">
-    <h2>Bạn không thiếu nỗ lực.<br>Bạn thiếu sự rõ ràng.</h2>
-    <p class="lede">Bạn đang làm việc rất chăm chỉ. Đọc sách, xem video, học khoá này khoá kia, thử mô hình này mô hình khác. Nhưng vẫn cảm thấy mình đang đứng yên. Không phải vì bạn lười. Mà vì bạn đang xây mọi thứ trên một nền móng chưa được làm rõ.</p>
-
-    <div class="scenes">
-      <div class="scene"><span class="act">Học rồi quên</span><div class="result">Khoá học, sách, video tích luỹ nhiều nhưng không áp dụng được vào việc của mình.</div></div>
-      <div class="scene"><span class="act">Làm rồi bỏ</span><div class="result">Bắt đầu một ý tưởng, vài tuần sau dừng lại, không hiểu vì sao mình không tiếp tục.</div></div>
-      <div class="scene"><span class="act">Đổi hướng liên tục</span><div class="result">Tháng này thử coaching, tháng sau thử bán hàng, năm sau lại nhảy sang mảng khác.</div></div>
-      <div class="scene"><span class="act">Theo trend liên tục</span><div class="result">Thấy ai làm AI thì làm AI. Thấy ai làm TikTok thì làm TikTok. Rồi không cái nào ra kết quả.</div></div>
-      <div class="scene"><span class="act">Không có phương hướng</span><div class="result">Mọi quyết định đều mất nhiều giờ. Cuối ngày mệt nhưng không nhớ mình đã quyết được gì.</div></div>
-      <div class="scene"><span class="act">Không chắc mình muốn gì</span><div class="result">Đang xây doanh nghiệp nhưng không chắc đó có phải cuộc sống mình muốn 10 năm tới.</div></div>
-    </div>
-
-    <p class="punch">Bạn không phải đang tiến lên.<br><span>Bạn đang liên tục bắt đầu lại từ số 0.</span></p>
+<!-- PROOF -->
+<section>
+  <div class="wrap">
+    <h2>Đây là vault thật Hằng đang dùng để vận hành</h2>
+    <img class="shot" src="/foundation-assets/vault-structure.png" alt="Vault Second Brain thật của Hằng với cấu trúc raw, wiki, boards, cohangai và migration">
+    <p class="cap">Vault Second Brain thật của Hằng. Đây là nơi dữ liệu, tri thức, dự án và hệ thống AI được giữ có cấu trúc.</p>
+    <p>Bạn đang nhìn vào nền móng phía sau hệ thống của Hằng.</p>
+    <p>Một vault giữ raw data. Một wiki giữ tri thức đã xử lý. Các project giữ từng venture. Các agent và workflow biến dữ liệu đó thành hành động.</p>
+    <p class="big">Ý tưởng. Khách hàng. Nội dung. Quy trình. Tri thức. Quyết định.</p>
+    <p>Hệ thống này giúp Hằng vận hành nhiều dự án cùng lúc mà không phải bắt đầu lại từ đầu mỗi lần mở AI.</p>
+    <p>Đây không phải chatbot. Không phải prompt.<br><strong>Đây là cách một người vận hành như một công ty.</strong></p>
+    <p>7 ngày tới, bạn xây phiên bản đầu tiên của chính mình.</p>
   </div>
 </section>
 
-<section class="insight">
-  <div class="container">
-    <div class="tag">Insight</div>
-    <h2>Phần lớn người làm kinh doanh<br>xây mọi thứ theo thứ tự ngược.</h2>
-    <div class="body">
-      <p>Họ xây <strong>website</strong> trước khi biết mình là ai.</p>
-      <p>Họ xây <strong>fanpage</strong> trước khi biết mình phục vụ ai.</p>
-      <p>Họ chạy <strong>quảng cáo</strong> trước khi biết mình bán cái gì.</p>
-      <p>Họ cài <strong>CRM</strong> trước khi biết mình muốn xây loại doanh nghiệp gì.</p>
-      <p style="margin-top:22px">Đó là lý do càng đi càng rối.</p>
+<!-- BEFORE / AFTER -->
+<section>
+  <div class="wrap">
+    <h2>7 ngày nữa, cuộc sống bạn khác thế nào</h2>
+    <div class="ba">
+      <div class="card before">
+        <h3>Hôm nay</h3>
+        <ul>
+          <li>Viết bài từ đầu, mỗi lần</li>
+          <li>Quên khách hàng đã nói gì</li>
+          <li>Học rồi quên</li>
+          <li>Ý tưởng nằm rải rác khắp nơi</li>
+          <li>Làm việc một mình</li>
+        </ul>
+      </div>
+      <div class="card after">
+        <h3>Sau Foundation System</h3>
+        <ul>
+          <li>Có AI viết đúng hành văn của bạn, kể câu chuyện của bạn</li>
+          <li>Có bộ nhớ khách hàng</li>
+          <li>Có kho tri thức riêng</li>
+          <li>Có hệ thống trợ lý AI làm việc cùng bạn</li>
+        </ul>
+      </div>
     </div>
-    <div class="highlight">Đúng thứ tự phải là:<br>Con người trước. Cuộc sống trước. Doanh nghiệp trước.<br>Sau đó mới tới công cụ và tri thức.</div>
+    <div class="gap"></div>
+    <p>Bạn ngừng phải làm mọi thứ một mình.<br>Bạn có lại thời gian. Cho khách. Cho con. Cho chính mình.</p>
+    <div class="pull">Breakout Challenge giúp bạn tìm ra ý tưởng. Foundation System giúp bạn xây nền móng vận hành cho Solo Biz đầu tiên từ ý tưởng đó.</div>
   </div>
 </section>
 
-<section class="founder-foundation">
-  <div class="container">
-    <div class="tag" style="display:block;text-align:center">Phần 1 · Nền Móng Sáng Lập (Founder Foundation)</div>
-    <h2>Trong 7 ngày,<br>bạn xây 8 nền móng cho chính con người mình.</h2>
-    <p class="lede">Đây là phần trung tâm của khoá học. Bạn sẽ trả lời 3 câu hỏi gốc rễ: Tôi là ai? Tôi tồn tại để làm gì? Tôi muốn phục vụ ai? Hằng dạy lý thuyết trực tiếp sáng Hai, Tư, Sáu và xem lại + triển khai cùng bạn Chủ nhật. Khi 3 câu gốc rễ này rõ, mọi quyết định kinh doanh phía sau trở nên đơn giản.</p>
-
-    <div class="canonical-grid">
-      <div class="canonical-card">
-        <div class="num">1</div>
-        <h3>Sứ Mệnh Đời <span class="en">(Life Mission)</span></h3>
-        <p>Lý do bạn tồn tại trong 10 đến 20 năm tới. Sứ mệnh đời không phụ thuộc bạn đang kinh doanh gì hôm nay. Có thể đổi nghề, đổi sản phẩm, nhưng sứ mệnh đời thì còn nguyên.</p>
-      </div>
-      <div class="canonical-card">
-        <div class="num">2</div>
-        <h3>Tầm Nhìn 5 Năm <span class="en">(Vision Statement)</span></h3>
-        <p>Bức tranh cuộc sống cụ thể bạn muốn nhìn thấy 5 năm tới. Tầm nhìn có thể đổi khi bạn lớn lên, nhưng phải rõ để mọi việc hôm nay có hướng đi.</p>
-      </div>
-      <div class="canonical-card">
-        <div class="num">3</div>
-        <h3>Bản Sắc Sáng Lập <span class="en">(Founder Identity)</span></h3>
-        <p>Bạn là ai. Giá trị cốt lõi. Năng lực độc nhất. Loại người sáng lập bạn thực sự là (không phải loại bạn nghĩ mình nên là). Đây là gốc của mọi định vị thương hiệu sau này.</p>
-      </div>
-      <div class="canonical-card">
-        <div class="num">4</div>
-        <h3>Nguyên Tắc Quyết Định <span class="en">(Decision Principles)</span></h3>
-        <p>5 đến 7 nguyên tắc sống giúp bạn ra quyết định nhanh. Khi có nguyên tắc rõ, bạn không còn mất nhiều giờ cân nhắc mỗi việc nhỏ.</p>
-      </div>
-      <div class="canonical-card">
-        <div class="num">5</div>
-        <h3>Điều Tôi Không Muốn <span class="en">(Anti Vision)</span></h3>
-        <p>Những điều bạn KHÔNG muốn trở thành. Không muốn có đội ngũ 50 người. Không muốn làm việc 12 giờ một ngày. Không muốn phụ thuộc quảng cáo. Điều không muốn lọc cơ hội tốt hơn cả tầm nhìn.</p>
-      </div>
-      <div class="canonical-card">
-        <div class="num">6</div>
-        <h3>Lý Do Cốt Lõi <span class="en">(Why Statement)</span></h3>
-        <p>Tại sao bạn làm điều này. Lý do sâu hơn tiền. Khi bạn gặp khó khăn, lý do cốt lõi là thứ duy nhất giữ bạn lại với hành trình.</p>
-      </div>
-      <div class="canonical-card">
-        <div class="num">7</div>
-        <h3>Tài Sản Sáng Lập <span class="en">(Founder Assets)</span></h3>
-        <p>Tài sản bạn đã tích luỹ trong đời. Kiến thức, kinh nghiệm, chứng chỉ, mối quan hệ, kỹ năng, câu chuyện. Đây là nguyên liệu bạn dùng để xây doanh nghiệp, không phải bắt đầu từ con số 0.</p>
-      </div>
-      <div class="canonical-card">
-        <div class="num">8</div>
-        <h3>Câu Chuyện Sáng Lập <span class="en">(Founder Story)</span></h3>
-        <p>Câu chuyện hình thành con người bạn. Xuất phát điểm. Bước ngoặt. Hành trình. Câu chuyện sáng lập là tài sản marketing mạnh nhất, sống cùng bạn suốt đời.</p>
-      </div>
-    </div>
+<!-- CHATGPT -->
+<section>
+  <div class="wrap">
+    <h2>Tại sao AI (ChatGPT, Claude, Gemini) chưa giúp bạn kiếm được tiền</h2>
+    <p>AI không thiếu. Prompt cũng không thiếu.</p>
+    <p class="big">Vấn đề là mọi thứ không được sắp xếp và lưu trữ có hệ thống theo thời gian.</p>
+    <p>Hôm nay bạn hỏi một câu. Ngày mai bạn hỏi lại từ đầu.</p>
+    <p class="stack">
+      Nó không nhớ bạn là ai.<br>
+      Không nhớ khách của bạn.<br>
+      Không nhớ bạn đang xây gì.
+    </p>
+    <p>Mỗi lần là một lần bắt đầu lại.</p>
+    <p>Foundation System khác ở chỗ đó. Bạn không hỏi AI từng câu lẻ. Bạn xây một bộ não số và một hệ thống AI có ngữ cảnh riêng về bạn, khách hàng và dự án của bạn, dựa trên dữ liệu bạn nạp vào, để làm việc cùng bạn.</p>
+    <div class="pull">AI trả lời bạn. Hệ thống AI mà Foundation System xây, sẽ làm việc cùng bạn.</div>
   </div>
 </section>
 
-<section class="schedule">
-  <div class="container">
-    <div class="tag" style="display:block;text-align:center">Lịch học 7 ngày · Khai giảng 22/6/2026</div>
-    <h2>3 buổi sáng học lý thuyết.<br>1 ngày Chủ nhật triển khai cùng Hằng.</h2>
-    <p class="lede">3 ngày trong tuần (Hai, Tư, Sáu) Hằng dạy lý thuyết LIVE lúc 5h sáng giờ Việt Nam. Có video quay lại đầy đủ nếu bạn không tham gia được. Chủ nhật là ngày Hằng cùng bạn review và triển khai, đồng thời là backup cho ai chưa xây xong Foundation trong tuần.</p>
-
-    <div class="reassure-box">
-      <p><strong>Hầu hết học viên xem video lý thuyết là đã có thể tự làm được</strong>. Chủ nhật là ngày dành riêng để Hằng hỗ trợ trực tiếp những ai cần thêm thời gian, hoặc gặp khó khăn ở một file canonical nào đó.</p>
-    </div>
-
-    <div class="schedule-grid">
-      <div class="day-card highlight-day">
-        <div class="day-num">Ngày 1 · Khai giảng</div>
-        <div class="day-when">Thứ Hai 22/6 · 5h sáng giờ Việt Nam</div>
-        <h3>Buổi lý thuyết 1 · Life Mission + Vision</h3>
-        <p>Hằng LIVE chia sẻ cách làm rõ sứ mệnh 10-20 năm và tầm nhìn 5 năm. Bạn nghe + ghi chép trong 1h30 phút, sau đó tự làm bài về nhà. Có video quay lại nếu vắng mặt.</p>
-      </div>
-      <div class="day-card">
-        <div class="day-num">Ngày 2</div>
-        <div class="day-when">Thứ Ba · tự làm bài</div>
-        <h3>Bài tập Anti Vision + Why</h3>
-        <p>Tự viết những điều bạn KHÔNG muốn trở thành. Tự viết lý do sâu hơn tiền. Submit qua app, AI review trước khi Chủ nhật chốt.</p>
-      </div>
-      <div class="day-card">
-        <div class="day-num">Ngày 3</div>
-        <div class="day-when">Thứ Tư · 5h sáng giờ Việt Nam</div>
-        <h3>Buổi lý thuyết 2 · Founder Identity + Decision Principles</h3>
-        <p>Hằng LIVE hướng dẫn cách làm rõ giá trị cốt lõi, năng lực độc nhất, 5 đến 7 nguyên tắc sống. Có video quay lại.</p>
-      </div>
-      <div class="day-card">
-        <div class="day-num">Ngày 4</div>
-        <div class="day-when">Thứ Năm · tự làm bài</div>
-        <h3>Bài tập Founder Assets</h3>
-        <p>Liệt kê tài sản tích luỹ trong đời. Kiến thức, kinh nghiệm, chứng chỉ, network. AI extract giúp bạn không bỏ sót gì.</p>
-      </div>
-      <div class="day-card">
-        <div class="day-num">Ngày 5</div>
-        <div class="day-when">Thứ Sáu · 5h sáng giờ Việt Nam</div>
-        <h3>Buổi lý thuyết 3 · Founder Story 3 hồi</h3>
-        <p>Hằng LIVE hướng dẫn cách dựng câu chuyện founder. Xuất phát điểm, bước ngoặt, hành trình. Đây là tài sản marketing mạnh nhất của bạn. Có video quay lại.</p>
-      </div>
-      <div class="day-card">
-        <div class="day-num">Ngày 6</div>
-        <div class="day-when">Thứ Bảy · nghỉ ngấm</div>
-        <h3>Để mọi thứ ngấm</h3>
-        <p>Một ngày không học. Để những gì đã làm 5 ngày qua ngấm vào tiềm thức. Sáng Chủ nhật bạn quay lại với góc nhìn rõ hơn.</p>
-      </div>
-      <div class="day-card highlight-day">
-        <div class="day-num">Ngày 7 · Triển khai</div>
-        <div class="day-when">Chủ nhật · review + triển khai + backup</div>
-        <h3>Review và triển khai cùng Hằng</h3>
-        <p>Chủ nhật là ngày Hằng cùng bạn xem lại 8 tài liệu gốc đã viết và trả lời 4 câu hỏi định hướng kinh doanh. Đây cũng là ngày dự phòng cho những ai chưa xây xong Nền Móng trong tuần. Cuối ngày bạn rời khoá học với Hệ Điều Hành Sáng Lập hoàn chỉnh.</p>
-      </div>
-    </div>
-
-    <div class="schedule-summary">
-      <div class="summary-item"><div class="summary-num">3</div><div class="summary-label">buổi lý thuyết LIVE<br>(2 - 4 - 6, có video)</div></div>
-      <div class="summary-item"><div class="summary-num">1</div><div class="summary-label">Chủ nhật review<br>và triển khai cùng Hằng</div></div>
-      <div class="summary-item"><div class="summary-num">7</div><div class="summary-label">ngày<br>để ra output thật</div></div>
-      <div class="summary-item"><div class="summary-num">8</div><div class="summary-label">tài liệu gốc<br>đã chốt cuối tuần</div></div>
-    </div>
+<!-- REFRAME: Foundation is installation, not course -->
+<section>
+  <div class="wrap">
+    <h2>Đây không phải khoá học để ngồi nghe</h2>
+    <p class="lead">Đây là sprint 7 ngày cài hệ điều hành Solo Biz cho riêng bạn, có hướng dẫn, mẫu sẵn và buổi ráp hệ thống cùng Hằng.</p>
+    <p>Khoá học cho bạn kiến thức để bạn về tự dựng. Phần lớn không dựng được, hoặc dựng nửa chừng rồi bỏ.</p>
+    <p>Foundation System khác. Trong 7 ngày, Hằng đồng hành để bạn <strong>cài đặt</strong> hệ thống thật trên màn hình của bạn. Bạn không học để biết. Bạn cài để bắt đầu vận hành.</p>
+    <div class="pull">Bạn không bước ra với một xấp ghi chú. Bạn bước ra với một hệ thống đang chạy.</div>
   </div>
 </section>
 
-<section class="business-foundation">
-  <div class="container">
-    <div class="tag" style="display:block;text-align:center">Phần 2 · Nền Móng Kinh Doanh (Business Foundation)</div>
-    <h2>Khi đã hiểu mình rõ,<br>việc chọn hướng kinh doanh trở nên đơn giản.</h2>
-    <p class="lede">Đây là phần Foundation giúp bạn trả lời 4 câu hỏi định hướng. Không phải tư vấn từ ngoài. Không phải lời khuyên chung chung. Mà là quyết định bạn tự đưa ra dựa trên 8 nền móng cá nhân vừa xây ở Phần 1.</p>
-
-    <div class="biz-grid">
-      <div class="biz-card">
-        <h3>Tôi nên phục vụ ai?</h3>
-        <p>Nhóm khách hàng nào phù hợp với năng lực, giá trị, và cuộc sống bạn muốn. Không phải nhóm nào trả tiền cao nhất, mà nhóm nào bạn có thể phục vụ tốt nhất trong 10 năm tới.</p>
-      </div>
-      <div class="biz-card">
-        <h3>Tôi có quyền phục vụ ai nhất?</h3>
-        <p>Có những nhóm khách hàng bạn có quyền phục vụ hơn người khác, vì bạn đã trải qua nỗi đau của họ, có bằng chứng cụ thể, có sự kết nối tự nhiên. Bạn sẽ tìm ra nhóm này.</p>
-      </div>
-      <div class="biz-card">
-        <h3>Tôi nên bắt đầu với mô hình nào?</h3>
-        <p>Coaching, dịch vụ, sản phẩm số, cộng đồng, hay phối hợp. Mô hình nào phù hợp với năng lực + cuộc sống + tài sản hiện có của bạn.</p>
-      </div>
-      <div class="biz-card">
-        <h3>Tôi nên xây loại doanh nghiệp nào?</h3>
-        <p>Solo với AI. Hay đội ngũ tinh gọn. Hay scale. Mỗi loại doanh nghiệp đi kèm một cuộc sống khác nhau. Bạn cần biết loại nào hợp với mình trước khi chạy vào nó.</p>
-      </div>
-    </div>
-
-    <p style="text-align:center;margin-top:40px;font-size:19px;color:var(--ink-soft);max-width:680px;margin-left:auto;margin-right:auto;line-height:1.65">Phần 1 trả lời <strong>Bạn là ai</strong>. Phần 2 trả lời <strong>Bạn nên xây gì</strong>. Đây là 2 phần không thể tách rời.</p>
+<!-- 5 THINGS YOU INSTALL -->
+<section>
+  <div class="wrap">
+    <h2>5 thứ bạn cài đặt trong 7 ngày</h2>
+    <p class="muted">Đây không phải nội dung học. Đây là 5 thứ bạn lắp xong, mỗi cái có trên màn hình của bạn.</p>
+    <div class="gap"></div>
+    <div class="tier"><span class="t">1. Hồ sơ Sáng Lập</span><br>AI phỏng vấn bạn về câu chuyện, kinh nghiệm, thế mạnh, giá trị, mục tiêu. Sau khi điền xong, AI tự sinh cho bạn một trang "Bạn là ai" bằng giọng của chính bạn. Lần đầu tiên bạn đọc, bạn sẽ cảm giác có ai đó cuối cùng đã hiểu mình.</div>
+    <div class="tier"><span class="t">2. Kho dữ liệu cá nhân</span><br>Bạn nạp vào bộ não số 10 đến 20 tài liệu đầu tiên (nạp thêm sau tuỳ bạn). CV, bio, nhật ký, sách đã đọc, ghi chú cũ, transcript video, khoá học từng tham gia. Đây là nhiên liệu cho AI hiểu bạn ngày càng sâu.</div>
+    <div class="tier"><span class="t">3. Cô Hằng AI phiên bản của riêng bạn</span><span class="heart">Trái tim của Foundation System</span><br>Sau khi nạp dữ liệu, bạn có một AI Assistant chạy trên Bộ não số của bạn. Bạn hỏi sách đã đọc, hỏi bài học cũ, hỏi khách hàng, hỏi nội dung. Nó trả lời dựa trên dữ liệu bạn đã nạp và cấu trúc bạn dựng, không phải kho của Internet, cũng không phải một tài khoản AI tách rời.</div>
+    <div class="tier"><span class="t">4. 6 hệ thống cài sẵn</span><br>Bạn không phải tự xây từ con số 0. Hằng phát template sẵn cho 6 hệ thống. Nhiệm vụ của bạn chỉ là điền dữ liệu của mình vào.</div>
+    <div class="tier"><span class="t">5. Thói quen vận hành</span><br>Phần quan trọng nhất, vì rất nhiều người setup xong rồi không dùng. Cuối khoá bạn có 4 quy trình rõ. Cộng với AI Morning Brief, mỗi sáng 6h, "Cô Hằng AI của bạn" tự đẩy 3 việc cần focus hôm nay vào điện thoại của bạn. Bạn không phải tự nhớ mở hệ thống.</div>
   </div>
 </section>
 
-<section class="vaults">
-  <div class="container">
-    <div class="tag" style="display:block;text-align:center">Phần 3 · Nền Móng Tài Sản Số (Digital Assets Foundation)</div>
-    <h2>Mọi thứ bạn xây trong Phần 1 và Phần 2<br>được lưu lại thành tài sản số.</h2>
-    <p class="lede">Đây là phần công cụ. Không phải mục tiêu cuối cùng. Mục tiêu cuối cùng là Bản Sắc Sáng Lập và Định Hướng Kinh Doanh rõ ràng. Các kho chỉ là nơi lưu giữ những gì bạn vừa xây, để không bao giờ bị thất thoát.</p>
-
-    <div class="vault-grid">
-      <div class="vault-card">
-        <div class="num">1</div>
-        <h3>Bộ Não Thứ Hai <span class="en">(Second Brain)</span></h3>
-        <p>Ý tưởng và ghi chú đời sống được lưu có cấu trúc, không trôi đi như mảnh giấy nhớ rời.</p>
-      </div>
-      <div class="vault-card">
-        <div class="num">2</div>
-        <h3>Kho Tri Thức <span class="en">(Knowledge Vault)</span></h3>
-        <p>Sách, khoá học, video, bài nói chuyện được tóm tắt và tra cứu lại bất cứ lúc nào qua AI.</p>
-      </div>
-      <div class="vault-card">
-        <div class="num">3</div>
-        <h3>Kho Kinh Doanh <span class="en">(Business Vault)</span></h3>
-        <p>Nơi lưu 8 tài liệu gốc Nền Móng Sáng Lập và mọi quyết định kinh doanh của bạn.</p>
-      </div>
-      <div class="vault-card">
-        <div class="num">4</div>
-        <h3>Kho Khách Hàng <span class="en">(Customer Vault)</span></h3>
-        <p>Ghi chú khách hàng được giữ lại để AI hiểu khách của bạn ngày càng sâu theo thời gian.</p>
-      </div>
-      <div class="vault-card">
-        <div class="num">5</div>
-        <h3>Kho Nội Dung <span class="en">(Content Vault)</span></h3>
-        <p>Bài viết, email, video đã làm được phân loại để tái sử dụng nhiều lần, không phải bắt đầu lại từ đầu mỗi ý.</p>
-      </div>
-      <div class="vault-card">
-        <div class="num">6</div>
-        <h3>Kho Học Tập <span class="en">(Learning Vault)</span></h3>
-        <p>Buổi tư vấn, hội thảo, ngộ ra cá nhân được lưu cùng AI sinh đôi của bạn để tra cứu khi cần.</p>
-      </div>
+<!-- OUTPUT 6 SYSTEMS -->
+<section>
+  <div class="wrap">
+    <h2>Bạn bước ra với nền móng Solo Biz đầu tiên</h2>
+    <p class="muted">Sau 7 ngày, 3 thứ này hoàn chỉnh và dùng được ngay. 6 hệ thống con đã có khung sẵn để bạn tiếp tục điền sau khoá.</p>
+    <div class="gap"></div>
+    <p style="font-weight:700">3 đầu ra hoàn chỉnh sau 7 ngày:</p>
+    <div class="own">
+      <p><strong>1. Hồ sơ Sáng Lập.</strong> Trang "Bạn là ai" do AI sinh bằng giọng của chính bạn.</p>
+      <p><strong>2. Kho dữ liệu cá nhân có cấu trúc.</strong> Bộ não số đã nạp dữ liệu, AI tra cứu lại được.</p>
+      <p><strong>3. Bản đồ Solo Biz 12 tháng (bản nháp).</strong> Hướng đi, thị trường, sản phẩm, kênh bán để bạn thử và sửa tiếp.</p>
     </div>
+    <div class="gap"></div>
+    <p style="font-weight:700">6 khung hệ thống đã cài sẵn để bạn điền tiếp:</p>
+    <div class="own">
+      <p><strong>1. Hệ thống ghi chép, bộ não thứ hai.</strong> Nơi mọi ý tưởng, ghi chú đời sống được giữ có cấu trúc.</p>
+      <p><strong>2. Hệ thống quản lý tri thức.</strong> Sách, khoá, video, bài học được tóm tắt và tra cứu lại bằng AI.</p>
+      <p><strong>3. Hệ thống quản lý khách hàng.</strong> Hồ sơ và ghi chú khách để AI hiểu khách ngày càng sâu.</p>
+      <p><strong>4. Hệ thống quản lý công việc.</strong> Việc cần làm, quy trình, theo dõi tiến độ.</p>
+      <p><strong>5. Hệ thống quản lý nội dung.</strong> Bài viết, email, video được phân loại để tái sử dụng.</p>
+      <p><strong>6. Hệ thống vận hành Solo Biz.</strong> Mục tiêu, KPI, cơ hội kinh doanh, sản phẩm, doanh thu, tất cả ở một cockpit. AI đọc dữ liệu và đề xuất hành động hàng ngày.</p>
+    </div>
+    <div class="pull">Sau 7 ngày bạn có phiên bản đầu tiên của hệ thống vận hành Solo Biz, đủ để dùng, thử, sửa và phát triển tiếp.</div>
+    <div class="center"><a class="cta" href="https://app.breakout.live/thanh-toan.html?product=foundation&source=landing_mid">Tôi muốn cài hệ điều hành Solo Biz</a></div>
   </div>
 </section>
 
-<section class="founder-os">
-  <div class="container">
-    <div class="tag" style="display:block;text-align:center">Kết quả · Hệ Điều Hành Sáng Lập (Founder Operating System)</div>
-    <h2>Sau 7 ngày,<br>bạn sở hữu một Hệ Điều Hành Sáng Lập cá nhân.</h2>
-    <p class="lede">Đây không phải khoá học bạn học xong rồi thôi. Đây là một hệ điều hành cá nhân chạy cùng bạn suốt đời. Khi bạn lớn lên, hệ điều hành lớn lên cùng bạn.</p>
-
-    <div class="os-pillars">
-      <div class="os-pillar">
-        <div class="os-num">1</div>
-        <h3>Bản Sắc Sáng Lập <span class="en">(Founder Identity)</span></h3>
-        <p>Bạn biết rõ mình là ai, tồn tại để làm gì, và muốn trở thành ai.</p>
-      </div>
-      <div class="os-pillar">
-        <div class="os-num">2</div>
-        <h3>Định Hướng Kinh Doanh <span class="en">(Business Direction)</span></h3>
-        <p>Bạn biết rõ nên phục vụ ai, bán gì, và xây loại doanh nghiệp nào.</p>
-      </div>
-      <div class="os-pillar">
-        <div class="os-num">3</div>
-        <h3>Hệ Thống Tri Thức <span class="en">(Knowledge System)</span></h3>
-        <p>Bạn có hệ thống lưu trữ tri thức cá nhân. Học một lần. Dùng nhiều lần.</p>
-      </div>
-      <div class="os-pillar">
-        <div class="os-num">4</div>
-        <h3>Hệ Thống Tài Sản Số <span class="en">(Digital Assets System)</span></h3>
-        <p>Bạn có kho tài sản số chạy cùng AI, ngày càng giàu theo thời gian.</p>
-      </div>
-    </div>
+<!-- FOR WHOM -->
+<section>
+  <div class="wrap">
+    <h2>Foundation System dành cho những ai?</h2>
+    <p>Hằng nói thẳng.</p>
+    <p>Foundation System không dành cho người đã có doanh nghiệp lớn.<br><strong>Foundation System dành cho người muốn xây Solo Biz đầu tiên cùng AI. Người muốn tăng hiệu suất làm việc của mình x3, x5.</strong></p>
+    <p>Bạn là giáo viên. Là nhân viên văn phòng. Là mẹ bỉm. Là người muốn khởi nghiệp.</p>
+    <div class="gap"></div>
+    <p><strong>Nếu bạn chưa biết bán gì.</strong><br>Hệ thống giúp bạn nhìn lại chính mình, tìm nhóm khách hàng phù hợp, và tạo ra những ý tưởng đầu tiên để kiểm chứng.</p>
+    <p><strong>Nếu bạn đã có sản phẩm mà còn chông chênh.</strong><br>Hệ thống giúp bạn ngừng tự hỏi mình có đang đi đúng không.</p>
+    <p><strong>Nếu bạn đang bán mà ngập việc.</strong><br>Hệ thống gánh bớt việc lặp đi lặp lại, để bạn rảnh tay quay lại với khách.</p>
+    <p>Dù bạn là ai trong ba người đó, bạn đều cần một doanh nghiệp gọn nhẹ, một người vẫn vận hành được.</p>
+    <div class="gap"></div>
+    <p><strong>Phù hợp nhất nếu</strong> bạn đã có chuyên môn, kinh nghiệm, câu chuyện hoặc ý tưởng ban đầu, và muốn biến nó thành Solo Biz có hệ thống cùng AI.</p>
+    <p class="muted">Chương trình không phù hợp nếu bạn muốn Hằng chọn ngành, chọn sản phẩm, hoặc cam kết doanh thu thay bạn. Foundation dựng nền vận hành, phần quyết định kinh doanh vẫn là của bạn. Foundation cũng không giúp bạn kiếm tiền ngay, nó xây nền để sau đó bạn tìm khách và bán nhất quán hơn.</p>
   </div>
 </section>
 
-<section class="deliverables">
-  <div class="container">
-    <h2>Bạn nhận được gì cụ thể trong Foundation</h2>
-    <div class="deliv-grid">
-      <div class="deliv-block">
-        <div class="deliv-num">8</div>
-        <div class="deliv-label">Tài liệu gốc Nền Móng Sáng Lập</div>
-        <div class="deliv-detail">Sứ Mệnh Đời, Tầm Nhìn, Bản Sắc Sáng Lập, Nguyên Tắc Quyết Định, Điều Tôi Không Muốn, Lý Do Cốt Lõi, Tài Sản Sáng Lập, Câu Chuyện Sáng Lập.</div>
-      </div>
-      <div class="deliv-block">
-        <div class="deliv-num">4</div>
-        <div class="deliv-label">Câu trả lời Định Hướng Kinh Doanh</div>
-        <div class="deliv-detail">Phục vụ ai. Có quyền phục vụ ai nhất. Mô hình kinh doanh phù hợp. Loại doanh nghiệp muốn xây.</div>
-      </div>
-      <div class="deliv-block">
-        <div class="deliv-num">6</div>
-        <div class="deliv-label">Kho tri thức cá nhân</div>
-        <div class="deliv-detail">Bộ Não Thứ Hai, Kho Tri Thức, Kho Kinh Doanh, Kho Khách Hàng, Kho Nội Dung, Kho Học Tập. Có sẵn mẫu Hằng thiết kế.</div>
-      </div>
-      <div class="deliv-block">
-        <div class="deliv-num">1</div>
-        <div class="deliv-label">Kho Tri Thức AI 12 tháng</div>
-        <div class="deliv-detail">AI Sinh Đôi truy cập toàn bộ kho của bạn, tìm kiếm thông minh, tra cứu khi cần ra quyết định.</div>
-      </div>
-      <div class="deliv-block">
-        <div class="deliv-num">1</div>
-        <div class="deliv-label">Chứng Nhận Sáng Lập</div>
-        <div class="deliv-detail">Cấp 1 cuối Chủ nhật. Bạn chốt 8 tài liệu gốc. Sau đó được mở khoá Tầng 2 Hiểu Khách.</div>
-      </div>
-      <div class="deliv-block">
-        <div class="deliv-num">1-1</div>
-        <div class="deliv-label">Hằng hỗ trợ Zalo trực tiếp</div>
-        <div class="deliv-detail">Cài đặt kho, xem lại tài liệu gốc, gỡ rối khi bạn kẹt. Không phải tự bơi một mình.</div>
-      </div>
-    </div>
+<!-- 7 DAYS -->
+<section>
+  <div class="wrap">
+    <h2>Lịch học 7 ngày</h2>
+    <p class="muted">3 buổi LIVE T2 T4 T6 sáng sớm. 2 ngày tự làm theo video. Chủ nhật cùng Hằng ráp hệ thống của bạn.</p>
+    <div class="gap"></div>
+    <div class="day"><div class="d">T2, 5h-6h30 sáng</div><div><strong>LIVE.</strong> Khởi tạo Bộ não số. Làm Hồ sơ Sáng Lập. AI phỏng vấn để rút bạn là ai, phục vụ ai.</div></div>
+    <div class="day"><div class="d">T3, tự làm</div><div>Đổ 10 đến 20 tài liệu đầu tiên vào kho tri thức và kho tài sản cá nhân (nạp thêm sau tuỳ bạn). 30-60 phút.</div></div>
+    <div class="day"><div class="d">T4, 5h-6h30 sáng</div><div><strong>LIVE.</strong> Dựng Cô Hằng AI phiên bản của bạn. Hằng demo sống cách biến AI từ hỏi đáp thành đội ngũ.</div></div>
+    <div class="day"><div class="d">T5, tự làm</div><div>Ráp đủ 6 hệ thống con. Có mẫu sẵn để điền, bạn không xây từ số 0. 30-60 phút.</div></div>
+    <div class="day"><div class="d">T6, 5h-6h30 sáng</div><div><strong>LIVE.</strong> Dựng Bản đồ Solo Biz 12 tháng. AI đọc toàn bộ kho rồi đề xuất mục tiêu, thị trường, sản phẩm, kênh bán.</div></div>
+    <div class="day"><div class="d">T7, nghỉ ngấm</div><div>Một ngày không học mới. Dùng thử trợ lý AI của bạn vào một việc thật.</div></div>
+    <div class="day"><div class="d">CN, 9h-3h chiều</div><div><strong>Ráp hệ thống cùng Hằng.</strong> Hằng review theo checklist 5 điểm (hồ sơ sáng lập, kho dữ liệu, cấu trúc hệ thống, bản đồ Solo Biz, bước tiếp theo), ráp tại chỗ, chốt hướng đi. Trao Chứng Nhận Sáng Lập.</div></div>
+    <div class="gap"></div>
+    <p class="muted">Mọi giờ ở trên là giờ Việt Nam. Có video quay lại đầy đủ. Lỡ buổi LIVE nào bạn xem replay rồi gặp Hằng Chủ nhật.</p>
   </div>
 </section>
 
-<section class="founder-story-hang">
-  <div class="container">
-    <div class="tag" style="display:block;text-align:center">Tại sao Hằng tạo Foundation</div>
-    <h2>15 năm đào tạo. Xây nhiều thứ.<br>Rồi quay lại bắt đầu từ chính mình.</h2>
-    <div class="story-body">
-      <p>Hằng từng có đội ngũ lớn. Từng quản lý nhiều người. Từng xây nhiều doanh nghiệp khác nhau trong 15 năm.</p>
-      <p>Nhưng đến một lúc Hằng nhận ra: mỗi lần bắt đầu một việc mới, Hằng lại đi lại đúng những bước cũ. Tìm khách hàng. Đoán nỗi đau của họ. Thử offer. Thử landing. Thử ads. Lại quên những gì đã học. Lại bắt đầu lại từ số 0.</p>
-      <p>Vấn đề lớn nhất không phải marketing. Không phải sản phẩm. Không phải kỹ năng.</p>
-      <p><strong>Vấn đề lớn nhất là không có nền móng.</strong></p>
-      <p>Không rõ mình là ai. Không rõ mình muốn phục vụ ai. Không có hệ thống lưu giữ những gì đã học. Mỗi venture là một lần bắt đầu lại từ đầu.</p>
-      <p>Khi AI xuất hiện, Hằng quyết định quay lại làm điều đáng lẽ phải làm 15 năm trước. Xây hệ điều hành cho chính mình trước. Sau đó dùng AI để vận hành doanh nghiệp một mình, không cần đội ngũ lớn.</p>
-      <p>Hằng đang chạy 6 doanh nghiệp với 1 mình + AI. Mỗi doanh nghiệp đứng trên cùng một Hệ Điều Hành Sáng Lập. Không bắt đầu lại từ số 0 mỗi lần nữa.</p>
-      <p><strong>Foundation là phương pháp Hằng đã dùng cho chính mình. Bây giờ Hằng chia sẻ lại cho bạn.</strong></p>
+<!-- CONTROL -->
+<section>
+  <div class="wrap">
+    <h2>Bạn luôn nắm quyền</h2>
+    <p>Nhiều người sợ một điều. Giao cho AI, lỡ nó làm bậy thì sao.</p>
+    <p>Hằng dạy bạn chia việc thành 3 mức.</p>
+    <div class="levels">
+      <div class="lv"><b>Mức 1.</b> Việc AI tự làm. Việc nhỏ, sai cũng không sao.</div>
+      <div class="lv"><b>Mức 2.</b> Việc AI hỏi bạn một cái. Bạn bấm đồng ý hoặc không.</div>
+      <div class="lv"><b>Mức 3.</b> Việc AI chỉ được đề xuất. Việc quan trọng, bạn quyết.</div>
     </div>
+    <div class="pull">Bạn là chỉ huy. AI là cánh tay nối dài. Tướng vẫn là bạn.</div>
   </div>
 </section>
 
-<section class="curriculum">
-  <div class="container">
-    <div class="tag" style="display:block;text-align:center">Foundation trong bức tranh tổng thể</div>
-    <h2>Foundation là tầng đầu tiên<br>của BreakoutOS.</h2>
-    <p class="lede">BreakoutOS là một hệ điều hành 6 tầng giúp bạn đi từ "không biết mình là ai" đến "founder tự do". Foundation là tầng đầu. Khi xong, bạn được mở khoá các tầng tiếp theo.</p>
-
-    <div class="curriculum-steps">
-      <div class="step active">
-        <div class="step-week">Tuần 1 · 7 ngày</div>
-        <h3>Tầng 1 · Hiểu Mình <span class="en">(Founder OS)</span></h3>
-        <p>Bạn đang ở đây. 7 ngày cùng Hằng. Trả lời "Tôi là ai" và "Tôi muốn phục vụ ai".</p>
-      </div>
-      <div class="step">
-        <div class="step-week">Tuần 2-3</div>
-        <h3>Tầng 2 · Hiểu Khách <span class="en">(Customer Intelligence OS)</span></h3>
-        <p>Hiểu sâu khách hàng. Xây câu nói một dòng định vị và hồ sơ khách hàng chi tiết.</p>
-      </div>
-      <div class="step">
-        <div class="step-week">Tuần 4-5</div>
-        <h3>Tầng 3 · Đóng Gói Giá Trị <span class="en">(Value Proposition OS)</span></h3>
-        <p>Thiết kế sản phẩm đầu tiên, định vị thương hiệu, định giá, cam kết.</p>
-      </div>
-      <div class="step">
-        <div class="step-week">Tuần 6</div>
-        <h3>Tầng 4 · Vận Hành Doanh Nghiệp <span class="en">(Business Operating OS)</span></h3>
-        <p>Giám đốc vận hành AI, tự động hoá, quy trình chuẩn. Hệ thống chạy ngầm thay bạn.</p>
-      </div>
-      <div class="step">
-        <div class="step-week">Tuần 7-8</div>
-        <h3>Tầng 5 · Tăng Trưởng Doanh Thu <span class="en">(Revenue Growth OS)</span></h3>
-        <p>Thu hút khách, lọc khách tiềm năng, bán hàng, giữ chân, lên bậc. Đạt khách hàng trả tiền đầu tiên.</p>
-      </div>
-      <div class="step">
-        <div class="step-week">Tuần 9-11</div>
-        <h3>Tầng 6 · Tự Do Sáng Lập <span class="en">(Founder Freedom OS)</span></h3>
-        <p>Điểm Tự Do Sáng Lập từ 70 điểm trở lên. Bạn thoát khỏi việc vận hành tay.</p>
-      </div>
-    </div>
+<!-- WHY HANG -->
+<section>
+  <div class="wrap">
+    <h2>Tại sao là Hằng</h2>
+    <p>Hằng là Đào Thị Hằng, sinh ra bên sông Thạch Hãn ở Quảng Trị, đang sống ở Úc. 15 năm kinh doanh, 33 nghìn người Việt đã đi qua các chương trình của Hằng.</p>
+    <p>Có một thời Hằng đứng đầu một công ty hơn 70 nhân sự. Tuyển CEO, tuyển phòng kế toán, thuê agency marketing. Doanh số nhìn ngoài là triệu đô, ai cũng nghĩ Hằng đang ăn nên làm ra.</p>
+    <p>Bên trong, mỗi tháng Hằng phải bán dần từng miếng đất, rồi bán cả căn nhà, để có tiền trả lương cho 70 con người đó. Hằng tưởng đó là kinh doanh. Hoá ra đó là cái lồng Hằng tự dựng rồi tự nhốt mình vào.</p>
+    <p>Một ngày Hằng quyết định đóng cửa. Lùi lại 3 năm. Không đi học thêm khoá nào, không tìm thêm mentor. Hằng chỉ ngồi yên với một câu hỏi mà đáng lẽ Hằng phải trả lời 15 năm trước. Hằng thật sự là ai. Hằng thật sự muốn phục vụ ai.</p>
+    <p>Rồi AI tới đúng thời điểm.</p>
+    <p>Hằng không dùng AI để hỏi vu vơ từng câu lẻ. Hằng dựng AI thành một hệ thống chạy ngầm phía sau mình. Hằng chỉ giữ hai thứ quan trọng nhất, chiến lược và quyết định. AI gánh phần lớn việc lặp đi lặp lại của cả phòng ban cũ.</p>
+    <p>Bây giờ Hằng vận hành nhiều dự án cùng lúc, một mình, mà không còn kiệt sức như xưa, và lần đầu tiên có lại cuộc sống.</p>
+    <p><strong>Foundation System là cách Hằng đã làm cho chính mình trong 3 năm đó. Bây giờ Hằng gói lại 7 ngày, trao cho bạn, để bạn không phải trả cái giá Hằng đã trả.</strong></p>
   </div>
 </section>
 
-<section class="pricing">
-  <div class="container">
-    <div class="tag" style="background:rgba(214,48,49,0.2);display:inline-block">Cohort 1 · Bắt đầu khi sẵn sàng</div>
-    <h2>Đầu tư một lần.<br>Xây người sáng lập cả đời.</h2>
-    <p class="lede">Khai giảng Thứ Hai 22/6 lúc 5h sáng giờ Việt Nam. 3 buổi lý thuyết LIVE có video quay lại. Chủ nhật Hằng review và triển khai cùng bạn. Thanh toán xong Hằng nhắn tin Zalo trong vài giờ để chuẩn bị.</p>
+<!-- OBJECTIONS -->
+<section>
+  <div class="wrap">
+    <h2>Nếu bạn đang nghĩ</h2>
+    <div class="obj"><p class="q">"Em chưa biết bán gì."</p><p>Hợp. Chưa biết bán gì là lý do nên vào, không phải lý do đứng ngoài.</p></div>
+    <div class="obj"><p class="q">"Em tự làm với AI (ChatGPT, Claude, Gemini) được."</p><p>AI trả lời xong, bạn vẫn tự làm hết. Hệ thống của bạn thì nhớ bạn, hiểu khách bạn, làm cùng bạn.</p></div>
+    <div class="obj"><p class="q">"Em không rành công nghệ."</p><p>Không cần giỏi công nghệ. Bạn chỉ cần làm theo từng bước, mỗi ngày 30 đến 60 phút. Có mẫu sẵn để điền và Hằng hỗ trợ qua Zalo.</p></div>
+    <div class="obj"><p class="q">"Em không có thời gian."</p><p>Mỗi ngày 30 đến 60 phút, trong 7 ngày. Đổi 5 giờ một tuần lấy một nền móng dùng nhiều năm.</p></div>
+    <div class="obj"><p class="q">"Em chưa kiếm được đồng nào, đầu tư có đáng không?"</p><p>Đây không phải chi phí học. Đây là đầu tư xây một tài sản dùng nhiều năm. Có cam kết hoàn tiền sau 7 ngày (xem điều kiện ở phần cam kết).</p></div>
+  </div>
+</section>
 
-    <div class="price-card">
-      <div class="tier">Nền Móng (Foundation)</div>
-      <h3>Tầng 1 · Hiểu Mình (Founder OS)</h3>
-      <div class="price-row">
-        <span class="new">3.000.000đ</span>
-      </div>
-      <div class="meta"><strong>Khai giảng Thứ Hai 22/6/2026 lúc 5h sáng giờ Việt Nam</strong></div>
-      <ul class="includes">
-        <li><strong>3 buổi học lý thuyết trực tiếp cùng Hằng</strong> (Hai, Tư, Sáu lúc 5h sáng giờ Việt Nam)</li>
-        <li><strong>Video quay lại đầy đủ</strong> nếu bạn không tham gia trực tiếp được</li>
-        <li><strong>Chủ nhật xem lại và triển khai cùng Hằng</strong> (dự phòng cho ai chưa xây xong)</li>
-        <li>8 tài liệu gốc Nền Móng Sáng Lập (Sứ Mệnh Đời đến Câu Chuyện Sáng Lập)</li>
-        <li>4 câu trả lời Định Hướng Kinh Doanh (phục vụ ai, bán gì, mô hình nào)</li>
-        <li>6 kho tri thức cá nhân (Bộ Não Thứ Hai đến Kho Học Tập)</li>
-        <li>Kho Tri Thức AI + AI Sinh Đôi truy cập 12 tháng</li>
-        <li>Chứng Nhận Sáng Lập cuối Chủ nhật (Cấp 1)</li>
-        <li>Mở khoá Tầng 2 Hiểu Khách sau khi hoàn thành</li>
+<!-- BONUS STACK -->
+<section>
+  <div class="wrap">
+    <h2>Bonus đi kèm khi bạn đăng ký</h2>
+    <p class="muted">Đây là phần Hằng kèm sẵn, không tính thêm phí. Để bạn không cần đi tìm tool, tài liệu hay group ngoài.</p>
+    <div class="gap"></div>
+    <div class="tier"><span class="t">Bonus 1. Group Breakout Founders 6 tháng</span><br>Cộng đồng học viên đã tốt nghiệp. Hằng vào trả lời mỗi tuần. Giá trị riêng 3 triệu.</div>
+    <div class="tier"><span class="t">Bonus 2. Mini course "5 trợ lý AI Hằng dùng hàng ngày"</span><br>Workflow ready to clone. Bạn không xây trợ lý từ con số 0. Giá trị riêng 3 triệu.</div>
+    <div class="gap"></div>
+    <h2 style="color:var(--brand);margin-top:20px">Bonus đặc biệt cho người đăng ký sớm</h2>
+    <div class="tier" style="border-left-color:var(--brand-dark)"><span class="t">Fast Action, đăng ký trong 48 giờ đầu</span><br>30 phút 1-1 với Hằng để review Bản đồ Solo Biz 12 tháng của bạn sau khoá. Giá trị riêng 5 triệu.</div>
+    <div class="tier" style="border-left-color:var(--brand-dark)"><span class="t">Early Bird, 5 người đăng ký đầu tiên</span><br>Truy cập BreakoutOS Premium Model trong 1 tháng. Giá trị riêng 1,5 triệu.</div>
+  </div>
+</section>
+
+<!-- PRICE -->
+<section>
+  <div class="wrap">
+    <h2>Bạn nhận được gì và học phí</h2>
+    <div class="pricebox">
+      <p style="font-weight:700;margin-bottom:14px;font-size:18px">Phần lõi của Foundation System:</p>
+      <ul>
+        <li>3 buổi LIVE 90 phút sáng T2 T4 T6 (5h-6h30 giờ Việt Nam)</li>
+        <li>Buổi Chủ nhật 6 tiếng cùng Hằng ráp hệ thống của bạn (9h-3h chiều)</li>
+        <li>Hằng review theo checklist 5 điểm cho từng người trong buổi ráp Chủ nhật</li>
+        <li>Bộ não số với 3 đầu ra lõi hoàn chỉnh + 6 khung hệ thống để điền tiếp</li>
+        <li>Trợ lý AI đầu tiên cộng 5 mẫu trợ lý Hằng dùng hàng ngày</li>
+        <li>Bản đồ Solo Biz 12 tháng (bản nháp) cho Solo Biz của bạn</li>
+        <li>Chứng Nhận Sáng Lập có tên và chữ ký Hằng</li>
+        <li>Replay trọn đời và workbook đầy đủ để xem lại bất cứ lúc nào</li>
       </ul>
-      <a href="https://app.breakout.live/thanh-toan.html?product=foundation&source=foundation_landing_pricing" class="btn-primary btn-gold">Đăng ký Foundation 3 triệu →</a>
+      <p style="margin-top:14px;color:var(--muted);font-size:15px">Cộng 3 Bonus đi kèm + 2 Bonus đặc biệt cho người đăng ký sớm (xem phần trên).</p>
+      <div class="gap"></div>
+      <p class="price-final"><span class="old">Riêng phần bonus đi kèm đã hơn 7 triệu.</span><br>Đợt mở đầu giá <strong style="color:var(--brand)">3 triệu</strong>. Đợt sau giá tăng.</p>
+    </div>
+    <div class="gap"></div>
+    <p class="muted">Hằng không bán rẻ hơn. AI chạy là chi phí thật. Hằng review theo checklist cho từng người là thời gian thật. 6 tháng đồng hành là cam kết thật.</p>
+  </div>
+</section>
+
+<!-- LIMIT -->
+<section>
+  <div class="wrap">
+    <h2>Giới hạn thật</h2>
+    <div class="limit">
+      <p><strong>Mỗi đợt Foundation System chỉ nhận 20 người.</strong></p>
+      <p>Lý do thật. Hằng review theo checklist 5 điểm cho từng người trong buổi ráp Chủ nhật 6 tiếng. Quá 20, Hằng làm không kỹ được. Đủ 20, Hằng đóng đăng ký.</p>
+      <p><strong>Hai mốc cần nhớ:</strong></p>
+      <p>1. <strong>5 người đăng ký đầu tiên</strong> nhận truy cập BreakoutOS Premium Model trong 1 tháng (trị giá 1,5 triệu).</p>
+      <p>2. <strong>48 giờ đầu kể từ khi mở đăng ký</strong> nhận thêm 30 phút 1-1 với Hằng review Bản đồ Solo Biz 12 tháng của bạn sau khoá.</p>
+      <p>Lịch học Thứ Hai, Thứ Tư, Thứ Sáu từ 5h đến 6h30 sáng giờ Việt Nam. Chủ nhật từ 9h sáng đến 3h chiều giờ Việt Nam.</p>
     </div>
   </div>
 </section>
 
-<section class="cta-final">
-  <div class="container">
-    <h2>Đừng xây doanh nghiệp<br>trước khi xây người sáng lập.</h2>
-    <p>Khai giảng Thứ Hai 22/6 lúc 5h sáng giờ Việt Nam. 3 buổi lý thuyết có video quay lại. Chủ nhật Hằng xem lại và triển khai cùng bạn. Cuối tuần bạn rời khoá học với 8 tài liệu gốc đã chốt.</p>
-    <a href="https://app.breakout.live/thanh-toan.html?product=foundation&source=foundation_landing_bottom" class="btn-primary btn-gold">Đăng ký Foundation 3 triệu →</a>
+<!-- GUARANTEE -->
+<section>
+  <div class="wrap">
+    <h2>Hằng cam kết</h2>
+    <p>Hằng không hứa bạn 100 triệu tháng đầu. Không hứa AI làm thay hết. Không hứa thành công mà không cần nỗ lực.</p>
+    <p><strong>Hằng cam kết một điều cụ thể.</strong></p>
+    <p>Sau 7 ngày, nếu bạn đã làm đủ phần của mình (hoàn thành checklist mỗi ngày, nạp tối thiểu 10 tài liệu, dự hoặc xem lại đủ các buổi, và nộp hệ thống cho Hằng review trong buổi Chủ nhật) mà vẫn không có hệ thống chạy được, demo được trên màn hình của bạn, Hằng hoàn 100 phần trăm. Cộng thêm 30 phút coaching 1-1 cùng Hằng để rà soát bạn đang vướng ở đâu.</p>
+    <p>Lý do Hằng dám cam kết như vậy: hệ thống này Hằng đã chạy thật trên 5 venture của mình. Không phải lý thuyết.</p>
   </div>
 </section>
 
-<footer>
-  <div class="container footer-grid">
-    <div>
-      <h5>BreakoutOS Foundation</h5>
-      <p style="font-size:13px;opacity:0.7">Tầng 1 trong Founder Transformation Operating System.</p>
-      <p style="margin-top:12px;font-size:12px;opacity:0.6">© 2026 Đào Thị Hằng, Pimpama, Gold Coast QLD, Australia</p>
-    </div>
-    <div>
-      <h5>Hệ sinh thái</h5>
-      <p><a href="/">BreakoutOS 5 tầng</a></p>
-      <p><a href="/cohort/">Vào hệ thống</a></p>
-    </div>
-    <div>
-      <h5>Liên hệ</h5>
-      <p>Zalo Hằng: 0932 093 593</p>
-      <p>Email: hang@mail.daothihang.com</p>
-    </div>
+<!-- BRIDGE Customer System -->
+<section>
+  <div class="wrap">
+    <h2>Sau Foundation System thì sao?</h2>
+    <p>Foundation System dựng xong cho bạn một hệ thống Solo Biz vận hành được. Nhưng hệ thống đó đang rỗng khách.</p>
+    <p>Bước tiếp theo là Customer System. Đó là nơi mình đổ khách thật vào hệ thống, để có doanh thu đầu tiên.</p>
+    <p>Hằng sẽ mở Customer System cho học viên Foundation System trước, không bán rộng. Không phải bây giờ, không phải tuần sau. Khi nào học viên Foundation System đầu tiên hoàn thành đã.</p>
+    <p class="muted">Đây không phải pitch. Hằng chỉ muốn bạn biết hành trình tiếp theo trông như thế nào, để bạn không phải quay lại tự loay hoay tìm sau khi dựng xong nền móng.</p>
   </div>
-</footer>
+</section>
+
+<!-- CLOSE -->
+<section style="border-bottom:0">
+  <div class="wrap center">
+    <h2><strong>Breakout Challenge tìm ra ý tưởng.</strong><br><strong>Foundation System xây nền móng Solo Biz.</strong></h2>
+    <p>Không phải bằng cách làm nhiều hơn.<br>Mà bằng cách có một hệ thống AI làm việc cùng bạn.</p>
+    <p class="big">Đợt này chỉ nhận 20 người.</p>
+    <div class="gap"></div>
+    <a class="cta" href="https://app.breakout.live/thanh-toan.html?product=foundation&source=landing_bottom">Đăng ký, còn 20 suất</a>
+    
+  </div>
+</section>
+
+<!-- STICKY CTA -->
+<div class="sticky">
+  <a class="cta" href="https://app.breakout.live/thanh-toan.html?product=foundation&source=landing_sticky">Giữ chỗ Foundation System</a>
+</div>
 
 </body>
 </html>"""

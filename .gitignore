@@ -5,3 +5,7 @@ __pycache__/
 .venv/
 *.egg-info/
 .venv-test/
+
+# macOS custom folder icon junk (file tên "Icon\r")
+Icon?
+.DS_Store
