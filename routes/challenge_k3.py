@@ -31,6 +31,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from agents.e6_market_demand.agent import compute_demand_score
 from agents.e6_market_demand.external_apis import (
+    answerthepublic_questions,
     dataforseo_search_volume,
     google_trends_growth,
     youtube_search_count,
@@ -158,13 +159,43 @@ class IdeaSelectionRequest(BaseModel):
 class Day2Request(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    customer_hypothesis: str = Field(min_length=5, max_length=2500)
-    observed_evidence: str = Field(min_length=3, max_length=4000)
-    top_problem: str = Field(min_length=5, max_length=2500)
-    desired_result: str = Field(min_length=5, max_length=2500)
-    customer_channels: str = Field(min_length=3, max_length=1500)
-    keywords: list[str] = Field(min_length=1, max_length=5)
-    existing_alternatives: str = Field(min_length=3, max_length=2000)
+    # K3 Day 2 schema migration 2026-06-20:
+    # old artifact rows keep legacy JSON fields; new submissions use framework-aligned fields.
+    customer_hypothesis: str = Field(
+        min_length=5,
+        max_length=2500,
+        description="Khách hàng đầu tiên là ai, tuổi, nghề, hoàn cảnh",
+    )
+    pain_evidence: str = Field(
+        min_length=5,
+        max_length=3000,
+        description="Khách đã mất tiền/thời gian/kết quả gì vì vấn đề này",
+    )
+    top_problem: str = Field(
+        min_length=5,
+        max_length=2500,
+        description="Vấn đề lớn nhất và mức đau 1-10",
+    )
+    desired_result: str = Field(
+        min_length=5,
+        max_length=2500,
+        description="Kết quả khách muốn đạt được",
+    )
+    keywords: list[str] = Field(
+        min_length=1,
+        max_length=5,
+        description="1-5 từ khóa khách search về vấn đề",
+    )
+    payment_evidence: str = Field(
+        min_length=5,
+        max_length=2500,
+        description="Khách đang dùng giải pháp gì và đã trả bao nhiêu",
+    )
+    founder_advantage: str = Field(
+        min_length=5,
+        max_length=2000,
+        description="Founder có mạng lưới, kinh nghiệm, brand gì để tiếp cận nhóm này",
+    )
 
     @field_validator("keywords")
     @classmethod
@@ -500,6 +531,7 @@ def _k3_config_checks() -> dict[str, Any]:
         "dataforseo_password": has("DATAFORSEO_PASSWORD"),
         "youtube_api_key": has("YOUTUBE_API_KEY"),
         "pytrends_available": pytrends_available,
+        "answerthepublic_api_key": has("ANSWERTHEPUBLIC_API_KEY"),
     }
 
 
@@ -601,22 +633,34 @@ async def k3_readiness(pool: asyncpg.Pool = Depends(get_pool)) -> dict[str, Any]
 @router.get("/challenge/k3/market-readiness", dependencies=[Depends(require_service_key)])
 async def k3_market_readiness(
     keyword: str = "kinh doanh online",
+    access_tier: str = "vip",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict[str, Any]:
-    """Internal live probe for Day 2 market APIs. Uses real API calls, so keep protected."""
+    """Internal live probe for Day 2 market APIs. Uses real API calls, so keep protected.
+
+    access_tier query param controls which sources run:
+      - "vip" (default for admin testing): 4 source (DataForSEO + YouTube + Trends + ATP)
+      - "free": 3 source (no ATP)
+    """
     keyword = (keyword or "kinh doanh online").strip()[:80]
-    market = await _market_signals(pool, [keyword])
+    access_tier = (access_tier or "vip").lower()
+    if access_tier not in ("free", "vip"):
+        access_tier = "vip"
+    market = await _market_signals(pool, [keyword], access_tier=access_tier)
     signals = market.get("signals") or {}
     volume_data = signals.get("volume_data") or {}
     youtube_data = signals.get("youtube_data") or {}
     trends_data = signals.get("trends_data") or {}
+    atp_data = signals.get("atp_data") or {}
     youtube_one = youtube_data.get(keyword) or {}
     trends_one = trends_data.get(keyword) or {}
+    atp_one = atp_data.get(keyword) or {}
     dataforseo_ok = bool(volume_data.get(keyword))
     youtube_ok = isinstance(youtube_one, dict) and "_error" not in youtube_one
     google_trends_ok = isinstance(trends_one, dict) and "_error" not in trends_one
+    atp_ok = isinstance(atp_one, dict) and "_error" not in atp_one
     return {
-        "ready": bool(dataforseo_ok and youtube_ok and google_trends_ok),
+        "ready": bool(dataforseo_ok and youtube_ok and google_trends_ok and atp_ok),
         "keyword": keyword,
         "market_score": market.get("market_score"),
         "raw_score": market.get("raw_score"),
@@ -638,6 +682,11 @@ async def k3_market_readiness(
                 "ok": google_trends_ok,
                 "growth_present": bool(trends_one.get("growth_pct_12m") is not None),
                 "error": None if google_trends_ok else str(trends_one.get("_error", "unknown"))[:160],
+            },
+            "answerthepublic": {
+                "ok": atp_ok,
+                "suggestion_count": len(atp_one.get("top_suggestions", []) or []) if atp_ok else 0,
+                "error": None if atp_ok else str(atp_one.get("_error", "unknown"))[:160],
             },
         },
         "flags": market.get("flags") or [],
@@ -900,6 +949,28 @@ Không bịa số liệu. Viết tiếng Việt, câu ngắn, không dùng dấu
 
 DAY2_PROMPT = """Bạn là BreakoutOS Customer and Offer Coach.
 Tạo Customer Snapshot, Opportunity Score và Offer v0.
+
+Input gồm 7 trường data học viên cung cấp, mỗi trường tương ứng 1 câu hỏi framework:
+- customer_hypothesis: WHO, khách là ai
+- pain_evidence: Câu 1 ĐAU THẬT, khách mất gì
+- top_problem: vấn đề lớn nhất và mức đau 1-10
+- desired_result: WHAT desired, kết quả khách muốn
+- keywords: Câu 2 TỰ TÌM, từ khóa khách search
+- payment_evidence: Câu 3 TRẢ TIỀN, giải pháp cũ và giá đã trả
+- founder_advantage: Câu 4 LỢI THẾ TIẾP CẬN, advantage của founder
+
+External signals bổ sung Câu 5 KIỂM CHỨNG (số lượng nguồn phụ thuộc access_tier):
+- volume_data: DataForSEO search volume, CPC, competition (cả 2 tier đều có)
+- youtube_data: số kết quả video (cả 2 tier đều có)
+- trends_data: Google Trends 12 tháng growth (cả 2 tier đều có)
+- atp_data: AnswerThePublic autocomplete suggestions từ khách thật (CHỈ VIP TIER)
+
+Tier gating:
+- Free tier (signals.access_tier="free"): 3 nguồn. atp_data sẽ có "_error":"vip_only" → max evidence_status là "partial".
+- VIP tier (signals.access_tier="vip"): 4 nguồn (+ ATP). 4/4 source available → evidence_status có thể "verified".
+
+Nếu signals.access_tier="free" và atp_data có "_error":"vip_only", AI phải ghi trong verification_speed_rationale: "Chấm theo 3 nguồn data thật cho tier free. VIP tier có thêm AnswerThePublic enrichment (autocomplete + search volume khách thật) để chấm chính xác hơn câu 5 KIỂM CHỨNG." KHÔNG bịa số ATP cho free tier.
+
 Market demand phải dùng đúng external_signals đã cung cấp.
 Nếu external_signals thiếu, nói rõ chưa đủ bằng chứng.
 
@@ -915,10 +986,19 @@ Trả JSON thuần:
 {{
   "customer_snapshot": {{
     "who": "...",
+    "pain_evidence_summary": "...",
     "top_problem": "...",
     "desired_identity": "...",
-    "buying_context": "...",
-    "alternatives": ["..."]
+    "buying_context": "infer từ payment_evidence + founder_advantage",
+    "alternatives": ["từ payment_evidence"]
+  }},
+  "framework_score": {{
+    "pain_real": 0,
+    "active_search": 0,
+    "payment_capacity": 0,
+    "founder_advantage": 0,
+    "verification_speed": 0,
+    "total": 0
   }},
   "evidence_summary": {{
     "status": "insufficient|user_reported|partial|verified",
@@ -934,20 +1014,25 @@ Trả JSON thuần:
     "total": 0
   }},
   "offer_v0": {{
-    "name": "...",
-    "who": "...",
-    "pain": "...",
-    "desired_identity": "...",
-    "vehicle": "...",
-    "deliverables": ["..."],
+    "label": "Định hướng giải pháp sơ khởi (NHÁP, sẽ đóng gói full ở Ngày 3)",
+    "name": "Định hướng sản phẩm cho nhóm khách + vấn đề trên (1 câu mô tả)",
+    "who": "(nhắc lại nhóm khách từ customer_hypothesis)",
+    "pain": "(nhắc lại top_problem)",
+    "desired_identity": "(nhắc lại desired_result)",
+    "vehicle": "(format giải pháp: 1-1 / nhóm / digital / hybrid, KHÔNG đóng gói chi tiết)",
+    "deliverables": ["Để Ngày 3 đóng gói cụ thể"],
     "price_range_vnd": {{"min": 0, "max": 0}},
-    "proof_or_risk": "...",
-    "cta": "..."
+    "proof_or_risk": "(rủi ro lớn nhất cần verify với khách thật trước khi đóng gói)",
+    "cta": "Verify với 5-10 cuộc trò chuyện khách thật trong 7-14 ngày trước Ngày 3"
   }},
   "next_validation_actions": ["..."]
 }}
 
-Mỗi score 0 đến 10. total là tổng 5 score, tối đa 50.
+QUAN TRỌNG về offer_v0: Đây KHÔNG phải sản phẩm đóng gói. Đây chỉ là ĐỊNH HƯỚNG GIẢI PHÁP SƠ KHỞI dựa trên 1 nhóm khách + 1 vấn đề học viên vừa chọn. Triết lý Ngày 2 là KHÁCH TRƯỚC, SẢN PHẨM SAU. Ngày 3 mới đóng gói sản phẩm thật (sales_experiment_kit) với landing/content/script/30-day plan. offer_v0 chỉ là direction để Ngày 3 build lên. KHÔNG bịa price chính xác, KHÔNG bịa deliverables chi tiết. price_range_vnd có thể để 0/0 nếu chưa rõ.
+
+framework_score chấm 0-10 mỗi tiêu chí, tổng 0-50. Đây là 5 câu hỏi framework Hằng đã dạy.
+opportunity_score giữ cấu trúc cũ cho backward compat dashboard hiển thị.
+Mỗi score 0 đến 10.
 Không bịa search volume, xu hướng hoặc bằng chứng."""
 
 DAY3_PROMPT = """Bạn là BreakoutOS Minimum Viable Sales Coach.
@@ -1079,6 +1164,14 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
         }
     if day_number == 2:
         market_score = int((signals or {}).get("market_score", 5))
+        framework_score = {
+            "pain_real": 8,
+            "active_search": market_score,
+            "payment_capacity": 7,
+            "founder_advantage": 8,
+            "verification_speed": 6,
+        }
+        framework_score["total"] = sum(framework_score.values())
         scores = {
             "founder_fit": 8,
             "market_demand": market_score,
@@ -1090,14 +1183,16 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
         return {
             "customer_snapshot": {
                 "who": inputs["customer_hypothesis"],
+                "pain_evidence_summary": inputs["pain_evidence"],
                 "top_problem": inputs["top_problem"],
                 "desired_identity": inputs["desired_result"],
-                "buying_context": inputs["customer_channels"],
-                "alternatives": [inputs["existing_alternatives"]],
+                "buying_context": inputs["founder_advantage"],
+                "alternatives": [inputs["payment_evidence"]],
             },
+            "framework_score": framework_score,
             "evidence_summary": {
                 "status": (signals or {}).get("evidence_status", "user_reported"),
-                "what_we_know": [inputs["observed_evidence"]],
+                "what_we_know": [inputs["pain_evidence"], inputs["payment_evidence"]],
                 "what_is_missing": ["Phỏng vấn và tín hiệu thanh toán thật."],
             },
             "opportunity_score": scores,
@@ -1157,12 +1252,44 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
     }
 
 
-async def _market_signals(pool: asyncpg.Pool, keywords: list[str]) -> dict[str, Any]:
+async def _market_signals(
+    pool: asyncpg.Pool,
+    keywords: list[str],
+    access_tier: str = "free",
+) -> dict[str, Any]:
+    """Pull external signals for Day 2 Market Validation.
+
+    Tier gating (2026-06-19):
+      - Free tier: 3 source (DataForSEO + YouTube + Google Trends). NO ATP.
+        Evidence status max: partial (cần phỏng vấn khách thật để verified).
+      - VIP tier: 4 source (+ AnswerThePublic). Differentiator của Premium AI Model.
+        Evidence status max: verified (khi 4/4 source available).
+
+    ATP cache 60 ngày trong market_signal_cache. Nếu free user search cùng keyword VIP user
+    đã pull, cache hit không tốn budget — nhưng free user vẫn KHÔNG được dùng cache đó vì
+    gate access_tier, chỉ VIP user mới đọc atp_data từ cache.
+    """
     volume = await dataforseo_search_volume(pool, keywords)
-    youtube_results, trends_results = await asyncio.gather(
-        asyncio.gather(*(youtube_search_count(pool, keyword) for keyword in keywords)),
-        asyncio.gather(*(google_trends_growth(pool, keyword) for keyword in keywords)),
-    )
+    is_vip = (access_tier or "").lower() == "vip"
+
+    # ATP chỉ chạy cho VIP tier. Free tier skip hoàn toàn (tiết kiệm budget 100/day).
+    if is_vip:
+        # ATP budget tiết kiệm: chỉ pull cho keyword đầu tiên (tránh 5x cost với 100/day cap).
+        atp_keywords = keywords[:1]
+        youtube_results, trends_results, atp_results_first = await asyncio.gather(
+            asyncio.gather(*(youtube_search_count(pool, keyword) for keyword in keywords)),
+            asyncio.gather(*(google_trends_growth(pool, keyword) for keyword in keywords)),
+            asyncio.gather(*(answerthepublic_questions(pool, keyword) for keyword in atp_keywords)),
+        )
+        atp = dict(zip(atp_keywords, atp_results_first))
+    else:
+        youtube_results, trends_results = await asyncio.gather(
+            asyncio.gather(*(youtube_search_count(pool, keyword) for keyword in keywords)),
+            asyncio.gather(*(google_trends_growth(pool, keyword) for keyword in keywords)),
+        )
+        # Free tier: atp gated, expose vip_only marker để AI prompt biết và communicate đúng.
+        atp = {kw: {"_error": "vip_only", "_body": "ATP enrichment chỉ có cho VIP tier"} for kw in keywords[:1]}
+
     youtube = dict(zip(keywords, youtube_results))
     trends = dict(zip(keywords, trends_results))
     clean_volume = {} if "_error" in volume else volume
@@ -1170,6 +1297,8 @@ async def _market_signals(pool: asyncpg.Pool, keywords: list[str]) -> dict[str, 
         "volume_data": clean_volume,
         "youtube_data": youtube,
         "trends_data": trends,
+        "atp_data": atp,
+        "access_tier": access_tier,
     }
     raw_score, verdict, flags = compute_demand_score(signals)
     available_sources = 0
@@ -1179,12 +1308,29 @@ async def _market_signals(pool: asyncpg.Pool, keywords: list[str]) -> dict[str, 
         available_sources += 1
     if any("_error" not in value for value in trends.values()):
         available_sources += 1
-    evidence_status = {
-        0: "user_reported",
-        1: "partial",
-        2: "partial",
-        3: "verified",
-    }[available_sources]
+    if is_vip and any("_error" not in value for value in atp.values()):
+        available_sources += 1
+
+    # Evidence status mapping khác nhau tier:
+    #   Free: max 3 source (DataForSEO + YouTube + Trends). Top tier max là "partial" vì
+    #         cần phỏng vấn khách thật + ATP để verified.
+    #   VIP: max 4 source. 4/4 source = "verified".
+    if is_vip:
+        evidence_status = {
+            0: "user_reported",
+            1: "partial",
+            2: "partial",
+            3: "partial",
+            4: "verified",
+        }[available_sources]
+    else:
+        evidence_status = {
+            0: "user_reported",
+            1: "partial",
+            2: "partial",
+            3: "partial",
+        }[available_sources]
+
     return {
         "signals": signals,
         "raw_score": raw_score,
@@ -1193,6 +1339,7 @@ async def _market_signals(pool: asyncpg.Pool, keywords: list[str]) -> dict[str, 
         "flags": flags,
         "evidence_status": evidence_status,
         "available_sources": available_sources,
+        "access_tier": access_tier,
     }
 
 
@@ -1226,7 +1373,7 @@ async def _generate_for_job(
         if fake_ai:
             market = {"signals": {}, "market_score": 5, "evidence_status": "user_reported"}
         elif access_tier == "vip":
-            market = await _market_signals(pool, inputs["keywords"])
+            market = await _market_signals(pool, inputs["keywords"], access_tier="vip")
             # Track DataForSEO spend (5 keywords typical)
             kw_count = len(inputs.get("keywords", []))
             ds_cost = kw_count * _DATAFORSEO_COST_PER_KW
@@ -1706,15 +1853,15 @@ async def resume_page(
         content = f"<h2>Chọn một ý tưởng để kiểm chứng</h2><p>Đây là giả thuyết, chưa phải kết luận thị trường.</p><div class='choices'>{cards}</div>"
     elif state == "d1_selected":
         content = """
-        <h2>Ngày 2: Khách hàng, bằng chứng và Offer v0</h2>
+        <h2>Ngày 2: 5 câu hỏi lọc ý tưởng</h2>
         <form id="day2">
-          <textarea name="customer_hypothesis" placeholder="Khách hàng dự kiến" required></textarea>
-          <textarea name="observed_evidence" placeholder="Điều bạn đã nghe hoặc quan sát được" required></textarea>
-          <textarea name="top_problem" placeholder="Vấn đề ưu tiên" required></textarea>
-          <textarea name="desired_result" placeholder="Kết quả hoặc identity khách mong muốn" required></textarea>
-          <textarea name="customer_channels" placeholder="Khách đang tìm kiếm hoặc trò chuyện ở đâu" required></textarea>
+          <textarea name="customer_hypothesis" placeholder="Khách hàng đầu tiên là ai" required></textarea>
+          <textarea name="pain_evidence" placeholder="Khách đã mất tiền, thời gian hoặc kết quả gì" required></textarea>
+          <textarea name="top_problem" placeholder="Vấn đề lớn nhất và mức đau 1-10" required></textarea>
+          <textarea name="desired_result" placeholder="Kết quả hoặc phiên bản mới khách mong muốn" required></textarea>
           <input name="keywords" placeholder="Từ khóa, phân cách bằng dấu phẩy" required>
-          <textarea name="existing_alternatives" placeholder="Giải pháp thay thế khách đang dùng" required></textarea>
+          <textarea name="payment_evidence" placeholder="Giải pháp khách đang dùng và đã trả bao nhiêu" required></textarea>
+          <textarea name="founder_advantage" placeholder="Lợi thế tiếp cận của bạn với nhóm khách này" required></textarea>
           <button>Kiểm chứng và tạo Offer v0</button>
         </form>"""
     elif state == "d2_ready" and d2:

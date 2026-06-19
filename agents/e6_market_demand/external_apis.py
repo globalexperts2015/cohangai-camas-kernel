@@ -26,6 +26,10 @@ log = logging.getLogger("camas.e6_market_demand.external_apis")
 DATAFORSEO_LOGIN = os.environ.get("DATAFORSEO_LOGIN", "").strip()
 DATAFORSEO_PASSWORD = os.environ.get("DATAFORSEO_PASSWORD", "").strip()
 YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "").strip()
+ANSWERTHEPUBLIC_API_KEY = os.environ.get("ANSWERTHEPUBLIC_API_KEY", "").strip()
+ATP_BASE_URL = "https://api.answerthepublic.com/api/public/v1"
+ATP_POLL_TIMEOUT_SEC = 45
+ATP_POLL_INTERVAL_SEC = 2
 
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 Chrome/120.0 Safari/537.36"
 LOCATION_CODE_VN = 1028581
@@ -229,4 +233,120 @@ async def google_trends_growth(pool: asyncpg.Pool, keyword: str) -> dict:
     signal = await loop.run_in_executor(None, _fetch_blocking)
     if "_error" not in signal:
         await _set_cached(pool, keyword, "google_trends", signal)
+    return signal
+
+
+async def _atp_daily_count(pool: asyncpg.Pool) -> int:
+    """Đếm ATP cache rows mới insert trong 24h qua (proxy cho daily API call count)."""
+    if not pool:
+        return 0
+    async with pool.acquire() as conn:
+        n = await conn.fetchval(
+            "SELECT count(*) FROM market_signal_cache "
+            "WHERE source='answerthepublic' AND fetched_at >= NOW() - INTERVAL '24 hours'"
+        )
+        return int(n or 0)
+
+
+async def answerthepublic_questions(pool: asyncpg.Pool, keyword: str) -> dict:
+    """Pull AnswerThePublic Google Web autocomplete suggestions cho 1 keyword.
+
+    ATP API hardcoded language=en, region=us (VN/vi không supported, nhưng server
+    vẫn trả autocomplete tiếng Việt khi keyword là tiếng Việt).
+
+    Returns {top_suggestions: [{suggestion, search_volume, cpc, cpc_category, source}],
+             total_count, parent_search_id}.
+
+    Budget: 100 ATP search/day. Daily gate ở 90 calls, soft skip còn lại.
+    """
+    if not ANSWERTHEPUBLIC_API_KEY:
+        return {"_error": "ANSWERTHEPUBLIC_API_KEY missing"}
+
+    keyword = (keyword or "").strip().lower()
+    if not keyword:
+        return {"_error": "empty_keyword"}
+
+    cached = await _get_cached(pool, keyword, "answerthepublic")
+    if cached is not None:
+        return cached
+
+    daily_count = await _atp_daily_count(pool)
+    if daily_count >= 90:
+        log.warning("ATP daily budget gate hit: %d/100 (cap=90)", daily_count)
+        return {"_error": "daily_budget_gate", "_body": f"{daily_count}/100 used today"}
+
+    headers = {
+        "Authorization": f"Bearer {ANSWERTHEPUBLIC_API_KEY}",
+        "Content-Type": "application/json",
+        "User-Agent": UA,
+    }
+    body = json.dumps({
+        "search": {
+            "keyword": keyword,
+            "language": "en",
+            "region": "us",
+            "provider": "gweb",
+        }
+    }).encode("utf-8")
+
+    loop = asyncio.get_event_loop()
+    create_resp = await loop.run_in_executor(
+        None, _sync_post, f"{ATP_BASE_URL}/searches", body, headers
+    )
+    if "_error" in create_resp:
+        log.warning("ATP create search fail keyword=%s: %s", keyword, create_resp)
+        return {"_error": create_resp["_error"], "_body": create_resp.get("_body", "")}
+
+    data = create_resp.get("data", {}) or {}
+    gweb_id = None
+    for s in data.get("searches", []) or []:
+        if s.get("provider") == "gweb":
+            gweb_id = s.get("id")
+            break
+    if not gweb_id:
+        return {"_error": "no_gweb_search_id"}
+
+    parent_id = data.get("parent_search_id")
+    snapshot = None
+    elapsed = 0
+    while elapsed < ATP_POLL_TIMEOUT_SEC:
+        await asyncio.sleep(ATP_POLL_INTERVAL_SEC)
+        elapsed += ATP_POLL_INTERVAL_SEC
+        poll = await loop.run_in_executor(
+            None, _sync_get, f"{ATP_BASE_URL}/searches/{gweb_id}", headers
+        )
+        if "_error" in poll:
+            log.warning("ATP poll fail keyword=%s id=%s: %s", keyword, gweb_id, poll)
+            return {"_error": poll["_error"], "_body": poll.get("_body", "")}
+        snap = (poll.get("data", {}) or {}).get("snapshot") or {}
+        if snap.get("completed") is True:
+            snapshot = snap
+            break
+
+    if snapshot is None:
+        return {"_error": "poll_timeout", "_body": f"elapsed {elapsed}s"}
+
+    results = (snapshot.get("results", {}) or {}).get("data", []) or []
+    top = sorted(
+        results,
+        key=lambda r: (r.get("search_volume") or 0),
+        reverse=True,
+    )[:20]
+    signal = {
+        "parent_search_id": parent_id,
+        "gweb_search_id": gweb_id,
+        "total_count": len(results),
+        "top_suggestions": [
+            {
+                "suggestion": (r.get("suggestion") or "")[:200],
+                "search_volume": r.get("search_volume"),
+                "cpc": r.get("cost_per_click"),
+                "cpc_category": r.get("cost_per_click_category"),
+                "volume_category": r.get("search_volume_category"),
+                "source": r.get("source_name"),
+            }
+            for r in top
+        ],
+    }
+    await _set_cached(pool, keyword, "answerthepublic", signal)
     return signal

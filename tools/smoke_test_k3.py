@@ -90,12 +90,12 @@ async def run_profile(pool: asyncpg.Pool, index: int) -> None:
         token,
         Day2Request(
             customer_hypothesis="Người đi làm muốn bắt đầu kinh doanh từ kỹ năng.",
-            observed_evidence="Tôi đã nghe nhiều người hỏi cách chọn ý tưởng và tìm khách.",
+            pain_evidence="Họ mất nhiều tháng học rời rạc, mất tiền mua khóa học chung nhưng vẫn chưa có offer.",
             top_problem="Không biết chọn cơ hội nào phù hợp với bản thân.",
             desired_result="Có một offer nhỏ để kiểm chứng trong 30 ngày.",
-            customer_channels="Facebook group và các cộng đồng nghề nghiệp.",
             keywords=["kinh doanh từ kỹ năng", "ý tưởng kinh doanh"],
-            existing_alternatives="Khóa học chung và nội dung miễn phí.",
+            payment_evidence="Đã trả 2-5 triệu cho khóa học chung hoặc công cụ AI nhưng chưa có kết quả rõ.",
+            founder_advantage="Có kinh nghiệm đào tạo, khách hàng cũ và network nhỏ trong cộng đồng nghề nghiệp.",
         ),
         pool,
     )

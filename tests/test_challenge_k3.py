@@ -57,14 +57,20 @@ def test_day1_fake_output_has_ten_hypotheses() -> None:
 def test_day2_score_uses_five_canonical_dimensions() -> None:
     inputs = Day2Request(
         customer_hypothesis="Người mới kinh doanh từ kỹ năng.",
-        observed_evidence="Đã nghe khách hàng hỏi nhiều lần.",
+        pain_evidence="Đã mất nhiều tháng tự học và vẫn không biết chọn hướng.",
         top_problem="Không biết chọn ý tưởng nào.",
         desired_result="Có offer để kiểm chứng.",
-        customer_channels="Facebook và cộng đồng.",
         keywords=["kinh doanh kỹ năng"],
-        existing_alternatives="Khóa học chung.",
+        payment_evidence="Đã mua khóa học chung giá 3 triệu nhưng chưa ra offer.",
+        founder_advantage="Có kinh nghiệm hướng dẫn người mới và network cộng đồng nhỏ.",
     ).model_dump()
     output = _fake_output(2, inputs, {"market_score": 6, "evidence_status": "partial"})
+    framework = output["framework_score"]
+    assert set(framework) == {
+        "pain_real", "active_search", "payment_capacity",
+        "founder_advantage", "verification_speed", "total",
+    }
+    assert framework["total"] == sum(value for key, value in framework.items() if key != "total")
     score = output["opportunity_score"]
     assert set(score) == {
         "founder_fit", "market_demand", "monetization",
