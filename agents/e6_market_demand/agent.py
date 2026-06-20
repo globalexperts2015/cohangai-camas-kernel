@@ -36,8 +36,10 @@ def compute_demand_score(signals: dict) -> tuple[int, str, list[str]]:
     flags = []
 
     # Volume signal (DataForSEO): 40 points max
+    # NOTE: DataForSEO sometimes returns `null` cho volume (very low search), nên dùng `or 0`
+    # để None → 0 (avoid TypeError int + None).
     vol_data = signals.get("volume_data", {})
-    total_volume = sum(v.get("volume", 0) for v in vol_data.values())
+    total_volume = sum((v.get("volume") or 0) for v in vol_data.values())
     if total_volume >= 5000:
         score += 40
     elif total_volume >= 1000:
@@ -50,7 +52,7 @@ def compute_demand_score(signals: dict) -> tuple[int, str, list[str]]:
         flags.append("VOLUME_TOO_LOW: tổng search volume <50/tháng, ngách quá nhỏ")
 
     # Competition signal: -10 if too HIGH
-    avg_comp_idx = sum(v.get("competition_index", 0) for v in vol_data.values()) / max(len(vol_data), 1)
+    avg_comp_idx = sum((v.get("competition_index") or 0) for v in vol_data.values()) / max(len(vol_data), 1)
     if avg_comp_idx > 80:
         score -= 10
         flags.append("COMPETITION_VERY_HIGH: avg competition >80, cần build moat hoặc niche down")
@@ -58,7 +60,7 @@ def compute_demand_score(signals: dict) -> tuple[int, str, list[str]]:
     # YouTube signal: 25 points max
     youtube_data = signals.get("youtube_data", {})
     total_youtube_results = sum(
-        (yt.get("total_results_estimated", 0) if isinstance(yt, dict) and "_error" not in yt else 0)
+        ((yt.get("total_results_estimated") or 0) if isinstance(yt, dict) and "_error" not in yt else 0)
         for yt in youtube_data.values()
     )
     if total_youtube_results >= 50000:
@@ -75,7 +77,7 @@ def compute_demand_score(signals: dict) -> tuple[int, str, list[str]]:
     # Google Trends signal: 35 points max
     trends_data = signals.get("trends_data", {})
     growth_pcts = [
-        td.get("growth_pct_12m", 0)
+        (td.get("growth_pct_12m") or 0)
         for td in trends_data.values()
         if isinstance(td, dict) and "_error" not in td
     ]
