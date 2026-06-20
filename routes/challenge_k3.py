@@ -747,7 +747,15 @@ async def _enqueue_generation(
                   (idempotency_key, session_id, day_number, artifact_type, input_json)
                 VALUES ($1,$2,$3,$4,$5::jsonb)
                 ON CONFLICT (idempotency_key) DO UPDATE
-                  SET scheduled_at=LEAST(breakout_challenge.generation_jobs.scheduled_at, now())
+                  SET scheduled_at=now(),
+                      status=CASE WHEN breakout_challenge.generation_jobs.status='dead'
+                                  THEN 'queued' ELSE breakout_challenge.generation_jobs.status END,
+                      attempts=CASE WHEN breakout_challenge.generation_jobs.status='dead'
+                                    THEN 0 ELSE breakout_challenge.generation_jobs.attempts END,
+                      error=CASE WHEN breakout_challenge.generation_jobs.status='dead'
+                                 THEN NULL ELSE breakout_challenge.generation_jobs.error END,
+                      started_at=CASE WHEN breakout_challenge.generation_jobs.status='dead'
+                                      THEN NULL ELSE breakout_challenge.generation_jobs.started_at END
                 RETURNING id
                 """,
                 key,
