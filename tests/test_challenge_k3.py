@@ -12,6 +12,7 @@ from routes.challenge_k3 import (
     RegisterRequest,
     _derive_token,
     _fake_output,
+    _normalize_day3_output,
     _token_hash,
 )
 
@@ -77,6 +78,38 @@ def test_day2_score_uses_five_canonical_dimensions() -> None:
         "ai_leverage", "confidence", "total",
     }
     assert score["total"] == sum(value for key, value in score.items() if key != "total")
+
+
+def test_day3_output_contract_has_launch_assets() -> None:
+    inputs = {
+        "approved_offer": {
+            "who": "Người mới kinh doanh từ kỹ năng.",
+            "pain": "Không biết bắt đầu bán từ đâu.",
+            "desired_identity": "Có offer nhỏ để kiểm chứng.",
+            "vehicle": "Dịch vụ hướng dẫn và AI hỗ trợ",
+            "deliverables": ["Để Ngày 3 đóng gói cụ thể"],
+        },
+        "sales_channel": "Facebook cá nhân",
+        "audience_size": 500,
+        "available_hours_per_week": 10,
+        "launch_date": "2026-06-27",
+        "delivery_capacity": 5,
+    }
+    output = _fake_output(3, inputs)
+    assert len(output["launch_content"]) == 30
+    assert len(output["email_sequence"]) == 10
+    assert set(output["roadmap_30_days"]) == {"week_1", "week_2", "week_3", "week_4"}
+
+
+def test_day3_normalizer_pads_missing_assets() -> None:
+    output = _normalize_day3_output({
+        "launch_content": [{"hook": "Một bài"}],
+        "email_sequence": [{"subject": "Một email"}],
+        "roadmap_30_days": {"week_1": ["Phỏng vấn khách"]},
+    })
+    assert len(output["launch_content"]) == 30
+    assert len(output["email_sequence"]) == 10
+    assert all(len(output["roadmap_30_days"][f"week_{week}"]) >= 5 for week in range(1, 5))
 
 
 def test_completed_event_sets_day3_and_program_tags() -> None:

@@ -693,6 +693,42 @@ async def k3_market_readiness(
     }
 
 
+async def _advance_session_state(conn: asyncpg.Connection, session_id: UUID, next_state: str) -> None:
+    # Generation jobs can finish out of order; never let an older day move a learner backwards.
+    await conn.execute(
+        """
+        UPDATE breakout_challenge.sessions
+        SET current_state=$1
+        WHERE id=$2
+          AND CASE current_state
+                WHEN 'registered' THEN 0
+                WHEN 'd1_generating' THEN 1
+                WHEN 'd1_ready' THEN 2
+                WHEN 'd1_selected' THEN 3
+                WHEN 'd2_generating' THEN 4
+                WHEN 'd2_ready' THEN 5
+                WHEN 'd2_offer_approved' THEN 6
+                WHEN 'd3_generating' THEN 7
+                WHEN 'completed' THEN 8
+                ELSE 0
+              END <= CASE $1
+                WHEN 'registered' THEN 0
+                WHEN 'd1_generating' THEN 1
+                WHEN 'd1_ready' THEN 2
+                WHEN 'd1_selected' THEN 3
+                WHEN 'd2_generating' THEN 4
+                WHEN 'd2_ready' THEN 5
+                WHEN 'd2_offer_approved' THEN 6
+                WHEN 'd3_generating' THEN 7
+                WHEN 'completed' THEN 8
+                ELSE 0
+              END
+        """,
+        next_state,
+        session_id,
+    )
+
+
 async def _enqueue_generation(
     pool: asyncpg.Pool,
     session: asyncpg.Record,
@@ -720,11 +756,7 @@ async def _enqueue_generation(
                 artifact_type,
                 json.dumps(inputs, ensure_ascii=False),
             )
-            await conn.execute(
-                "UPDATE breakout_challenge.sessions SET current_state=$1 WHERE id=$2",
-                state,
-                session["id"],
-            )
+            await _advance_session_state(conn, session["id"], state)
     return job_id
 
 
@@ -947,8 +979,48 @@ Trả JSON thuần:
 Score từng trường từ 0 đến 10. Sort giảm dần theo provisional_total.
 Không bịa số liệu. Viết tiếng Việt, câu ngắn, không dùng dấu gạch ngang dài."""
 
-DAY2_PROMPT = """Bạn là BreakoutOS Customer and Offer Coach.
-Tạo Customer Snapshot, Opportunity Score và Offer v0.
+DAY2_PROMPT = """Bạn là Trợ lý Khách hàng và Định hướng Giải pháp của BreakoutOS.
+Tạo Chân dung Khách hàng, Điểm Cơ hội và Định hướng Giải pháp Sơ khởi.
+
+QUY TẮC NGÔN NGỮ TUYỆT ĐỐI (BẮT BUỘC TUÂN THỦ):
+
+1. **OUTPUT 100% TIẾNG VIỆT.** Học viên Việt Nam ít rành thuật ngữ tiếng Anh.
+
+2. **KHÔNG dùng thuật ngữ tiếng Anh khi có từ Việt tương đương**:
+   - "score" → "điểm"
+   - "verify" → "kiểm chứng"
+   - "validate" → "xác thực"
+   - "confidence" → "độ tin cậy"
+   - "framework" → "khung", "khung lọc"
+   - "monetization" → "khả năng kiếm tiền"
+   - "retention" → "tỷ lệ giữ chân"
+   - "upgrade" → "nâng cấp"
+   - "demo" → "thử nghiệm" hoặc "trình bày"
+   - "test" → "thử"
+   - "draft" → "bản nháp"
+   - "input" → "đầu vào", "dữ liệu"
+   - "service" → "dịch vụ"
+   - "session" → "buổi"
+   - "subscription" → "gói thuê bao theo tháng"
+   - "mood board" → "bảng cảm hứng phong cách"
+   - "search volume" → "lượng người tìm kiếm"
+   - "active search" → "đang tự tìm"
+   - "pain" → "đau", "nỗi đau"
+   - "founder" → "người sáng lập" (hoặc dùng "bạn")
+   - "customer" → "khách hàng"
+   - "TBD" → "Sẽ làm ở Ngày 3"
+   - "hybrid" → "kết hợp"
+   - "fit" → "phù hợp"
+
+3. **Tên công cụ external giữ nguyên + chú thích tiếng Việt lần đầu**: ví dụ "AnswerThePublic (công cụ thu thập câu hỏi khách thật)", "DataForSEO (công cụ đo lượng tìm kiếm)", "Google Trends (xu hướng tìm kiếm theo thời gian)". Sau lần đầu có thể dùng tên gọi tắt tiếng Việt.
+
+4. **Tránh dẫn thương hiệu nước ngoài** trong ví dụ trừ khi học viên đã nhắc trong input. Ưu tiên ví dụ thương hiệu Việt Nam hoặc context Việt Nam.
+
+5. **Các trường JSON key (customer_hypothesis, framework_score, etc.) GIỮ NGUYÊN tiếng Anh** vì đây là tên field code, không phải nội dung khách đọc. Nhưng GIÁ TRỊ trong mỗi field phải 100% tiếng Việt.
+
+6. **Câu ngắn, không dùng dấu gạch ngang dài "—"**, dùng dấu phẩy hoặc xuống dòng.
+
+7. **Không dùng emoji** trừ khi học viên đã dùng trong input.
 
 Input gồm 7 trường data học viên cung cấp, mỗi trường tương ứng 1 câu hỏi framework:
 - customer_hypothesis: WHO, khách là ai
@@ -1022,13 +1094,36 @@ Trả JSON thuần:
     "vehicle": "(format giải pháp: 1-1 / nhóm / digital / hybrid, KHÔNG đóng gói chi tiết)",
     "deliverables": ["Để Ngày 3 đóng gói cụ thể"],
     "price_range_vnd": {{"min": 0, "max": 0}},
+    "price_note": "(BẮT BUỘC: ghi rõ source con số từ payment_evidence học viên cung cấp, HOẶC ghi 'Chưa có dữ liệu giá thật từ khách, cần phỏng vấn 5-10 khách trước Ngày 3'. TUYỆT ĐỐI KHÔNG bịa giá từ assumption_to_validate Day 1 hoặc projection customer profile.)",
     "proof_or_risk": "(rủi ro lớn nhất cần verify với khách thật trước khi đóng gói)",
     "cta": "Verify với 5-10 cuộc trò chuyện khách thật trong 7-14 ngày trước Ngày 3"
   }},
   "next_validation_actions": ["..."]
 }}
 
-QUAN TRỌNG về offer_v0: Đây KHÔNG phải sản phẩm đóng gói. Đây chỉ là ĐỊNH HƯỚNG GIẢI PHÁP SƠ KHỞI dựa trên 1 nhóm khách + 1 vấn đề học viên vừa chọn. Triết lý Ngày 2 là KHÁCH TRƯỚC, SẢN PHẨM SAU. Ngày 3 mới đóng gói sản phẩm thật (sales_experiment_kit) với landing/content/script/30-day plan. offer_v0 chỉ là direction để Ngày 3 build lên. KHÔNG bịa price chính xác, KHÔNG bịa deliverables chi tiết. price_range_vnd có thể để 0/0 nếu chưa rõ.
+QUAN TRỌNG về offer_v0: Đây KHÔNG phải sản phẩm đóng gói. Đây chỉ là ĐỊNH HƯỚNG GIẢI PHÁP SƠ KHỞI dựa trên 1 nhóm khách + 1 vấn đề học viên vừa chọn. Triết lý Ngày 2 là KHÁCH TRƯỚC, SẢN PHẨM SAU. Ngày 3 mới đóng gói sản phẩm thật (sales_experiment_kit) với landing/content/script/30-day plan. offer_v0 chỉ là direction để Ngày 3 build lên. KHÔNG bịa deliverables chi tiết.
+
+QUY TẮC GIÁ TUYỆT ĐỐI (đọc kỹ, vi phạm là output bị từ chối):
+
+1. **CHỈ ĐƯỢC ĐẶT price_range_vnd KHI payment_evidence CỦA HỌC VIÊN CÓ CON SỐ THẬT.**
+   Con số thật = học viên đã ghi rõ "khách đã trả X đồng cho dịch vụ Y" hoặc "tôi đã bán Z đồng cho khách trước đó".
+
+2. **KHÔNG dùng assumption_to_validate từ selected_idea (Day 1) làm bằng chứng giá.**
+   assumption_to_validate là GIẢ THUYẾT AI tự đặt ra ở Day 1 để CHỜ KIỂM CHỨNG, không phải data. Nếu bạn lấy số từ đó làm price_range_vnd, bạn đang bịa.
+
+3. **KHÔNG suy diễn giá từ customer profile** (vd: "phụ nữ Melbourne tự tin thì có thể trả X"). Đây là projection, không phải evidence.
+
+4. **Nếu payment_evidence KHÔNG có con số thật**:
+   - Set `price_range_vnd: {{"min": 0, "max": 0}}`
+   - Set `price_note`: "Chưa có dữ liệu giá thật từ khách. Học viên cần phỏng vấn 5-10 khách thật + hỏi 'bạn đã từng trả bao nhiêu cho giải pháp tương tự?' trước Ngày 3."
+   - framework_score.payment_capacity tối đa 5/10 (không thể chấm cao khi chưa có evidence trả tiền).
+
+5. **Nếu payment_evidence CÓ con số thật** (vd "khách trả 500k/tháng ChatGPT Plus, 50tr cho coach 1-1"):
+   - price_range_vnd dựa trên con số đó ±30%.
+   - price_note: ghi rõ con số nào của khách là source.
+   - framework_score.payment_capacity có thể chấm 7-10.
+
+6. **price_note BẮT BUỘC** có trong offer_v0. Nếu thiếu, output không hợp lệ.
 
 framework_score chấm 0-10 mỗi tiêu chí, tổng 0-50. Đây là 5 câu hỏi framework Hằng đã dạy.
 opportunity_score giữ cấu trúc cũ cho backward compat dashboard hiển thị.
@@ -1036,11 +1131,17 @@ Mỗi score 0 đến 10.
 Không bịa search volume, xu hướng hoặc bằng chứng."""
 
 DAY3_PROMPT = """Bạn là BreakoutOS Minimum Viable Sales Coach.
-Từ offer đã duyệt và nguồn lực founder, tạo bộ thử nghiệm bán hàng tối thiểu.
-Không tạo khối lượng content gây quá tải. Không hứa doanh thu.
+Từ offer đã duyệt và nguồn lực founder, tạo Business Launch Kit đầu tiên.
+Không hứa doanh thu. Không dùng dấu gạch ngang dài. Viết tiếng Việt rõ ràng.
 
 Input:
 {inputs}
+
+HỢP ĐỒNG OUTPUT BẮT BUỘC:
+- launch_content phải có ĐÚNG 30 ý tưởng bài social/Facebook.
+- email_sequence phải có ĐÚNG 10 email marketing.
+- roadmap_30_days phải có 4 tuần, mỗi tuần 5-7 việc cụ thể.
+- Nếu chưa đủ dữ liệu, vẫn tạo bản nháp conservative dựa trên offer đã duyệt, không bịa kết quả.
 
 Trả JSON thuần:
 {{
@@ -1062,9 +1163,10 @@ Trả JSON thuần:
     "cta": "..."
   }},
   "launch_content": [
-    {{"hook": "...", "body": "...", "cta": "..."}},
-    {{"hook": "...", "body": "...", "cta": "..."}},
-    {{"hook": "...", "body": "...", "cta": "..."}}
+    {{"day": 1, "hook": "...", "body": "...", "cta": "..."}}
+  ],
+  "email_sequence": [
+    {{"email": 1, "subject": "...", "preview": "...", "body": "...", "cta": "..."}}
   ],
   "dm_script": "...",
   "follow_up_messages": ["...", "...", "..."],
@@ -1083,7 +1185,13 @@ Trả JSON thuần:
     "expressions_of_interest": 3,
     "paid_pilot_target": 1
   }}
-}}"""
+}}
+
+KIỂM TRA TRƯỚC KHI TRẢ:
+- Count launch_content = 30.
+- Count email_sequence = 10.
+- Có roadmap_30_days.week_1 đến week_4.
+- JSON parse được, không markdown fence."""
 
 
 async def _llm_json(prompt: str, model: str | None = None) -> tuple[dict[str, Any], float]:
@@ -1197,15 +1305,17 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
             },
             "opportunity_score": scores,
             "offer_v0": {
+                "label": "Định hướng giải pháp sơ khởi (NHÁP, sẽ đóng gói full ở Ngày 3)",
                 "name": "Pilot giải pháp 7 ngày",
                 "who": inputs["customer_hypothesis"],
                 "pain": inputs["top_problem"],
                 "desired_identity": inputs["desired_result"],
                 "vehicle": "Dịch vụ hướng dẫn và AI hỗ trợ",
-                "deliverables": ["Buổi chẩn đoán", "Kế hoạch hành động", "Theo dõi 7 ngày"],
-                "price_range_vnd": {"min": 1000000, "max": 3000000},
-                "proof_or_risk": "Cần thử với khách pilot trước khi mở rộng.",
-                "cta": "Đăng ký cuộc trò chuyện 20 phút.",
+                "deliverables": ["Để Ngày 3 đóng gói cụ thể"],
+                "price_range_vnd": {"min": 0, "max": 0},
+                "price_note": "Chưa có dữ liệu giá thật từ khách. Phỏng vấn 5-10 khách + hỏi 'bạn đã từng trả bao nhiêu cho giải pháp tương tự' trước Ngày 3.",
+                "proof_or_risk": "Chưa kiểm chứng nhu cầu trả tiền của khách. Cần phỏng vấn khách thật.",
+                "cta": "Verify với 5-10 cuộc trò chuyện khách thật trong 7-14 ngày trước Ngày 3.",
             },
             "next_validation_actions": ["Phỏng vấn 5 khách", "Mời 1 khách pilot trả phí"],
         }
@@ -1228,8 +1338,23 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
             "cta": "Đặt lịch trao đổi.",
         },
         "launch_content": [
-            {"hook": f"Nội dung {i + 1}", "body": "Chia sẻ vấn đề thật.", "cta": "Nhắn tin để trao đổi."}
-            for i in range(3)
+            {
+                "day": i + 1,
+                "hook": f"Nội dung {i + 1}",
+                "body": "Chia sẻ vấn đề thật, phản chiếu nỗi đau và mời trò chuyện.",
+                "cta": "Nhắn tin để trao đổi.",
+            }
+            for i in range(30)
+        ],
+        "email_sequence": [
+            {
+                "email": i + 1,
+                "subject": f"Email {i + 1}: kiểm chứng offer nhỏ",
+                "preview": "Một bước nhỏ để hiểu khách thật.",
+                "body": "Chia sẻ vấn đề, giải pháp thử nghiệm và lời mời phản hồi.",
+                "cta": "Reply email này nếu bạn muốn trao đổi.",
+            }
+            for i in range(10)
         ],
         "dm_script": "Chào bạn, tôi đang thử nghiệm một giải pháp nhỏ cho vấn đề này.",
         "follow_up_messages": ["Bạn đã xem thông tin chưa?", "Điều gì khiến bạn còn phân vân?", "Tôi đóng nhóm pilot hôm nay."],
@@ -1250,6 +1375,84 @@ def _fake_output(day_number: int, inputs: dict[str, Any], signals: dict[str, Any
             "paid_pilot_target": 1,
         },
     }
+
+
+def _normalize_day3_output(output: dict[str, Any]) -> dict[str, Any]:
+    """Enforce the K3 Day 3 hard artifact contract before saving."""
+    result = dict(output or {})
+
+    launch_content = result.get("launch_content")
+    if not isinstance(launch_content, list):
+        launch_content = []
+    normalized_posts: list[dict[str, Any]] = []
+    for idx, item in enumerate(launch_content[:30]):
+        if isinstance(item, dict):
+            post = dict(item)
+        else:
+            post = {"body": str(item)}
+        post.setdefault("day", idx + 1)
+        post.setdefault("hook", f"Nội dung {idx + 1}")
+        post.setdefault("body", "Chia sẻ một vấn đề thật của khách hàng và cách giải pháp thử nghiệm có thể giúp họ đi bước đầu.")
+        post.setdefault("cta", "Nhắn tin để trao đổi.")
+        normalized_posts.append(post)
+    while len(normalized_posts) < 30:
+        idx = len(normalized_posts)
+        normalized_posts.append({
+            "day": idx + 1,
+            "hook": f"Nội dung {idx + 1}: một vấn đề khách đang gặp",
+            "body": "Viết một bài ngắn phản chiếu nỗi đau cụ thể của khách, kể một tình huống thật, rồi mời họ nhắn tin nếu muốn được hỏi thêm.",
+            "cta": "Nhắn tin cho tôi nếu bạn đang gặp tình huống này.",
+        })
+    result["launch_content"] = normalized_posts
+
+    email_sequence = result.get("email_sequence")
+    if not isinstance(email_sequence, list):
+        email_sequence = []
+    normalized_emails: list[dict[str, Any]] = []
+    for idx, item in enumerate(email_sequence[:10]):
+        if isinstance(item, dict):
+            email = dict(item)
+        else:
+            email = {"body": str(item)}
+        email.setdefault("email", idx + 1)
+        email.setdefault("subject", f"Email {idx + 1}: bước tiếp theo cho vấn đề này")
+        email.setdefault("preview", "Một góc nhìn ngắn để bạn quyết định rõ hơn.")
+        email.setdefault("body", "Nói về vấn đề của khách, một góc nhìn mới, giải pháp thử nghiệm và lời mời phản hồi.")
+        email.setdefault("cta", "Reply email này nếu bạn muốn trao đổi.")
+        normalized_emails.append(email)
+    while len(normalized_emails) < 10:
+        idx = len(normalized_emails)
+        normalized_emails.append({
+            "email": idx + 1,
+            "subject": f"Email {idx + 1}: thử một bước nhỏ trước",
+            "preview": "Không cần làm lớn ngay, hãy kiểm chứng bằng một bước nhỏ.",
+            "body": "Chia sẻ nỗi đau cụ thể, lý do nên kiểm chứng nhỏ trước, và mời khách trả lời nếu họ muốn tham gia pilot.",
+            "cta": "Reply email này để trao đổi thêm.",
+        })
+    result["email_sequence"] = normalized_emails
+
+    roadmap = result.get("roadmap_30_days")
+    if not isinstance(roadmap, dict):
+        roadmap = {}
+    for week in range(1, 5):
+        key = f"week_{week}"
+        items = roadmap.get(key)
+        if not isinstance(items, list):
+            items = []
+        items = [str(item) for item in items[:7] if str(item).strip()]
+        while len(items) < 5:
+            if week == 1:
+                items.append("Phỏng vấn thêm một khách thật và ghi lại đúng câu chữ họ dùng.")
+            elif week == 2:
+                items.append("Đăng một nội dung kiểm chứng và theo dõi phản hồi thật.")
+            elif week == 3:
+                items.append("Mời một khách phù hợp vào pilot nhỏ và hỏi điều kiện họ sẵn sàng trả tiền.")
+            else:
+                items.append("Tổng kết dữ liệu, chỉnh offer và quyết định bước bán tiếp theo.")
+        roadmap[key] = items
+    result["roadmap_30_days"] = roadmap
+
+    return result
 
 
 async def _market_signals(
@@ -1411,6 +1614,7 @@ async def _generate_for_job(
                 model=model_for_tier,
             )
             await _track_api_spend(pool, sid, "llm_day3", cost, {"model": model_for_tier, "tier": access_tier})
+        output = _normalize_day3_output(output)
         confidence = 0.6
     return output, evidence, evidence_status, confidence
 
@@ -1489,11 +1693,7 @@ async def _complete_generation(pool: asyncpg.Pool, job: dict[str, Any]) -> None:
                 artifact_id,
                 job["id"],
             )
-            await conn.execute(
-                "UPDATE breakout_challenge.sessions SET current_state=$1 WHERE id=$2",
-                next_state,
-                job["session_id"],
-            )
+            await _advance_session_state(conn, job["session_id"], next_state)
             if job["day_number"] == 3:
                 session = await conn.fetchrow(
                     "SELECT * FROM breakout_challenge.sessions WHERE id=$1",

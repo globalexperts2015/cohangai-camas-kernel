@@ -19,6 +19,8 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+SMOKE_COHORT = f"k3-smoke-{os.getpid()}"
+
 from routes.challenge_k3 import (  # noqa: E402
     Day1Request,
     Day2Request,
@@ -62,7 +64,7 @@ async def run_profile(pool: asyncpg.Pool, index: int) -> None:
         RegisterRequest(
             email=email,
             full_name=f"K3 Smoke {index:02d}",
-            cohort_id="k3-smoke-2026-06",
+            cohort_id=SMOKE_COHORT,
             access_tier="vip" if index % 2 == 0 else "free",
         ),
         pool,
@@ -124,9 +126,10 @@ async def run_profile(pool: asyncpg.Pool, index: int) -> None:
                    (SELECT count(*) FROM breakout_challenge.events e
                     WHERE e.session_id=s.id) AS events
             FROM breakout_challenge.sessions s
-            WHERE s.email_normalized=$1 AND s.cohort_id='k3-smoke-2026-06'
+            WHERE s.email_normalized=$1 AND s.cohort_id=$2
             """,
             email,
+            SMOKE_COHORT,
         )
     assert row["current_state"] == "completed"
     assert row["artifacts"] == 3
@@ -143,8 +146,8 @@ async def main() -> int:
     pool = await asyncpg.create_pool(dsn, min_size=1, max_size=4)
     cleanup_sql = (
         "DELETE FROM breakout_challenge.integration_outbox WHERE session_id IN "
-        "(SELECT id FROM breakout_challenge.sessions WHERE cohort_id='k3-smoke-2026-06');"
-        "DELETE FROM breakout_challenge.sessions WHERE cohort_id='k3-smoke-2026-06'"
+        f"(SELECT id FROM breakout_challenge.sessions WHERE cohort_id='{SMOKE_COHORT}');"
+        f"DELETE FROM breakout_challenge.sessions WHERE cohort_id='{SMOKE_COHORT}'"
     )
     try:
         await pool.execute(cleanup_sql)
@@ -156,9 +159,26 @@ async def main() -> int:
             SELECT count(*) AS sessions,
                    count(*) FILTER (WHERE current_state='completed') AS completed
             FROM breakout_challenge.sessions
-            WHERE cohort_id='k3-smoke-2026-06'
+            WHERE cohort_id=$1
+              AND email_normalized LIKE 'k3-smoke-%@daothihang.com'
             """
+            ,
+            SMOKE_COHORT,
         )
+        print(f"totals sessions={totals['sessions']} completed={totals['completed']}")
+        states = await pool.fetch(
+            """
+            SELECT current_state, count(*) AS n
+            FROM breakout_challenge.sessions
+            WHERE cohort_id=$1
+              AND email_normalized LIKE 'k3-smoke-%@daothihang.com'
+            GROUP BY current_state
+            ORDER BY current_state
+            """
+            ,
+            SMOKE_COHORT,
+        )
+        print("states", {r["current_state"]: r["n"] for r in states})
         assert totals["sessions"] == 10
         assert totals["completed"] == 10
         print("10/10 profiles completed")
