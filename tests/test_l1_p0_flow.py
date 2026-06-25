@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 from contextlib import asynccontextmanager
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -19,6 +20,10 @@ TEST_SECRET = "0123456789abcdef0123456789abcdef"
 class EventConnection:
     def __init__(self) -> None:
         self.executions: list[tuple[str, tuple]] = []
+
+    async def fetchval(self, sql: str, *args):
+        self.executions.append((sql, args))
+        return None
 
     async def execute(self, sql: str, *args):
         self.executions.append((sql, args))
@@ -115,27 +120,18 @@ async def test_l1_get_renders_signed_post_and_412_redirect(
     assert "window.location.href = redirect" in html
 
 
-@pytest.mark.asyncio
-async def test_founder_story_requires_three_distinct_years(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setattr(
-        extract_module,
-        "_client",
-        lambda: pytest.fail("LLM must not be called without enough evidence"),
-    )
-    result = await extract_module.extract_canonical(
+def test_founder_story_can_generate_with_partial_evidence() -> None:
+    result = extract_module._precheck_evidence(
         "founder-story",
         {
             "identity": "Founder hệ thống",
             "mission": "Giúp chủ doanh nghiệp nhỏ",
-            "lived_experience": "Năm 2018 bắt đầu. Năm 2021 đổi nghề.",
+            "lived_experience": "Có kinh nghiệm vận hành nhưng thiếu năm cụ thể.",
             "why_statement": "Tạo tự do",
         },
     )
 
-    assert result["error"] == "insufficient_evidence"
-    assert "≥3 năm cụ thể" in result["missing"][0]
+    assert result is None
 
 
 @pytest.mark.asyncio
@@ -161,7 +157,7 @@ async def test_founder_assets_requires_two_concrete_evidence_items(
 
 
 @pytest.mark.asyncio
-async def test_failed_tier_b_is_logged_without_canonical_insert() -> None:
+async def test_failed_tier_b_is_visible_and_logged() -> None:
     pool = EventPool()
     student_id = uuid4()
 
@@ -175,10 +171,12 @@ async def test_failed_tier_b_is_logged_without_canonical_insert() -> None:
         },
     )
 
-    assert len(pool.connection.executions) == 1
-    sql, args = pool.connection.executions[0]
+    assert len(pool.connection.executions) == 3
+    assert "max(version)" in pool.connection.executions[0][0]
+    assert "canonical_files" in pool.connection.executions[1][0]
+    assert "generation_failed" in pool.connection.executions[1][0]
+    sql, args = pool.connection.executions[2]
     assert "tier_b.generation_failed" in sql
-    assert "canonical_files" not in sql
     payload = json.loads(args[1])
     assert payload == {
         "file_key": "founder-story",
@@ -200,3 +198,14 @@ def test_gate_1_ready_requires_exactly_eight_reviewed_or_locked_files() -> None:
     assert not _ready_for_gate_1(
         [{"status": "draft"}, *[{"status": "reviewed"} for _ in range(7)]]
     )
+
+
+def test_output_page_shows_missing_l1_file_and_retry_action() -> None:
+    source = (
+        Path(__file__).resolve().parents[1] / "routes" / "dashboard_routes.py"
+    ).read_text(encoding="utf-8")
+
+    assert '("founder-story", "B")' in source
+    assert 'status": "missing"' in source
+    assert 'class="retry-btn"' in source
+    assert "/sdl/l1/extract/${{fk}}" in source

@@ -323,11 +323,12 @@ async def export_vault_zip(
 # ============================================================
 @router.get("/sdl/students/{student_id}/output/{level}", response_class=HTMLResponse)
 async def output_page(
-    student_id: UUID, level: str,
+    student_id: UUID, level: str, request: Request,
     sig: str = "",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> HTMLResponse:
     """Output page với review UI: duyệt từng file + duyệt tất cả + khóa Gate."""
+    require_student_signature(str(student_id), request_signature(request, sig))
     level_num = {"L1": 1, "L2": 2, "L3": 3, "L4": 4, "L5": 5, "L6a": 6}.get(level)
     if not level_num:
         raise HTTPException(404, "Unknown level")
@@ -362,6 +363,28 @@ h1{{color:#d63031}}p{{color:#5a5453}}</style></head>
 <p><a href="/foundation/{level.lower()}?student={student_id}&sig={sig}" style="background:#d63031;color:#fff;padding:14px 22px;border-radius:10px;text-decoration:none;font-weight:700">Mở {level} intake form</a></p>
 </body></html>""", status_code=404)
 
+    if level == "L1":
+        expected_files = [
+            ("life-mission", "A"), ("vision-statement", "A"),
+            ("founder-identity", "A"), ("decision-principles", "A"),
+            ("anti-vision", "A"), ("why-statement", "B"),
+            ("founder-assets", "B"), ("founder-story", "B"),
+        ]
+        existing = {f["file_key"]: dict(f) for f in files}
+        files = [
+            existing.get(key, {
+                "file_key": key,
+                "markdown_content": (
+                    "File này chưa được tạo thành công. "
+                    "Bấm “Tạo lại file” để hệ thống xử lý."
+                ),
+                "tier": tier,
+                "status": "missing",
+                "version": 0,
+            })
+            for key, tier in expected_files
+        ]
+
     # Build file cards với review controls
     reviewed_count = sum(1 for f in files if f["status"] in ("reviewed", "locked"))
     total_count = len(files)
@@ -372,10 +395,20 @@ h1{{color:#d63031}}p{{color:#5a5453}}</style></head>
     for f in files:
         is_done = f["status"] in ("reviewed", "locked")
         is_locked = f["status"] == "locked"
-        is_error = f["status"] == "generation_failed"
-        btn = "" if is_locked else (
-            f'<button class="approve-btn" data-file-key="{f["file_key"]}" {("disabled" if is_done else "")}>{"✓ Đã duyệt" if is_done else "Duyệt file này"}</button>'
-        )
+        is_error = f["status"] in ("generation_failed", "missing")
+        if is_error and level == "L1" and f["tier"] == "B":
+            btn = (
+                f'<button class="retry-btn" data-file-key="{f["file_key"]}">'
+                f'Tạo lại file</button>'
+            )
+        elif is_locked:
+            btn = ""
+        else:
+            btn = (
+                f'<button class="approve-btn" data-file-key="{f["file_key"]}" '
+                f'{("disabled" if is_done else "")}>'
+                f'{"✓ Đã duyệt" if is_done else "Duyệt file này"}</button>'
+            )
         status_color = "ok" if is_done else ("err" if is_error else "pending")
         content = (f["markdown_content"] or "(file rỗng, AI chưa sinh xong)")[:8000]
         files_html += (
@@ -450,6 +483,8 @@ pre{{margin-top:14px;background:#0a0a0a;color:#fff;padding:16px;border-radius:8p
 .approve-btn{{background:var(--ok);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}}
 .approve-btn:disabled{{background:#bbb;cursor:not-allowed}}
 .approve-btn:hover:not(:disabled){{background:#218838}}
+.retry-btn{{background:var(--red);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}}
+.retry-btn:disabled{{background:#bbb;cursor:not-allowed}}
 #approve-all-btn{{background:var(--warn);color:#fff;border:none;padding:14px 28px;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px;width:100%;margin-bottom:14px}}
 #approve-all-btn:hover{{background:#e8941c}}
 #lock-gate-btn{{background:var(--red);color:#fff;border:none;padding:18px 28px;border-radius:12px;font-weight:800;cursor:pointer;font-size:17px;width:100%;box-shadow:0 6px 20px rgba(214,48,49,0.3)}}
@@ -469,7 +504,7 @@ pre{{margin-top:14px;background:#0a0a0a;color:#fff;padding:16px;border-radius:8p
 
 <div class="header">
   <h1>{level} · {cfg.get("title", "Output")}</h1>
-  <p style="color:#5a5453">Xem lại {total_count} canonical file. Duyệt từng cái khi đã chỉnh sửa OK. Đủ duyệt = mở Gate.</p>
+  <p style="color:#5a5453">Xem lại {total_count} canonical file. File thiếu phải được tạo lại, sau đó duyệt đủ để mở Gate.</p>
 </div>
 
 <div class="progress">
@@ -528,6 +563,31 @@ document.querySelectorAll('.approve-btn').forEach(btn => {{
     }} catch(err) {{
       toast(`Lỗi: ${{err.message}}`, 4000);
       btn.disabled = false; btn.textContent = 'Duyệt file này';
+    }}
+  }});
+}});
+
+document.querySelectorAll('.retry-btn').forEach(btn => {{
+  btn.addEventListener('click', async (e) => {{
+    e.preventDefault();
+    const fk = btn.dataset.fileKey;
+    btn.disabled = true;
+    btn.textContent = 'Đang tạo lại...';
+    try {{
+      const r = await fetch(
+        `/sdl/l1/extract/${{fk}}?student_id=${{STUDENT_ID}}&sig=${{encodeURIComponent(SIG)}}`,
+        {{method: 'POST', headers: {{'X-Student-Signature': SIG}}}}
+      );
+      if (!r.ok) {{
+        const d = await r.json().catch(() => ({{}}));
+        throw new Error(d.detail?.message || d.detail?.error || `HTTP ${{r.status}}`);
+      }}
+      toast(`✓ Đã tạo lại ${{fk}}`);
+      setTimeout(() => location.reload(), 700);
+    }} catch(err) {{
+      toast(`Lỗi tạo file: ${{err.message}}`, 5000);
+      btn.disabled = false;
+      btn.textContent = 'Tạo lại file';
     }}
   }});
 }});

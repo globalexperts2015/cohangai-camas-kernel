@@ -180,7 +180,25 @@ async def _persist_tier_b(
             "error": structured["error"],
             "missing": structured.get("missing", []),
         }
+        md = render_markdown(file_key, structured, student_id)
         async with pool.acquire() as conn:
+            prev_v = await conn.fetchval(
+                "SELECT max(version) FROM breakoutos.canonical_files "
+                "WHERE student_id=$1 AND file_key=$2",
+                student_id, file_key,
+            )
+            next_v = (prev_v or 0) + 1
+            await conn.execute(
+                """
+                INSERT INTO breakoutos.canonical_files
+                  (student_id, level, file_key, file_name, file_type, tier, lock_type,
+                   markdown_content, structured_data_json, version, status, generated_by)
+                VALUES ($1, 1, $2, $3, 'canonical', 'B', 'core',
+                        $4, $5::jsonb, $6, 'generation_failed', 'ai')
+                """,
+                student_id, file_key, f"{file_key}.md", md,
+                json.dumps(structured, ensure_ascii=False), next_v,
+            )
             await conn.execute(
                 """
                 INSERT INTO breakoutos.student_events
@@ -236,6 +254,79 @@ async def _persist_tier_b(
                 f"UPDATE breakoutos.founder_profiles SET {col}=$1::jsonb WHERE student_id=$2",
                 json.dumps(structured), student_id,
             )
+
+
+def _json_text(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    return json.dumps(value, ensure_ascii=False)
+
+
+@router.post("/extract/{file_key}")
+async def rerun_tier_b_extraction(
+    file_key: str,
+    student_id: UUID,
+    request: Request,
+    sig: str = "",
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> dict:
+    """Re-run one failed or missing Tier B file from stored Founder Profile data."""
+    require_student_signature(str(student_id), request_signature(request, sig))
+    if file_key not in EXTRACTION_REGISTRY:
+        raise HTTPException(404, f"Unknown Tier B file: {file_key}")
+
+    async with pool.acquire() as conn:
+        profile = await conn.fetchrow(
+            """
+            SELECT mission, vision, why_statement, identity, principles_json,
+                   anti_vision_json, founder_assets_json
+            FROM breakoutos.founder_profiles
+            WHERE student_id=$1
+            ORDER BY version DESC LIMIT 1
+            """,
+            student_id,
+        )
+    if not profile:
+        raise HTTPException(404, "Founder Profile chưa tồn tại")
+
+    lived_experience = "\n\n".join(
+        part for part in [
+            _json_text(profile["identity"]),
+            _json_text(profile["mission"]),
+            _json_text(profile["vision"]),
+            _json_text(profile["founder_assets_json"]),
+        ] if part
+    )
+    inputs = {
+        "identity": _json_text(profile["identity"]),
+        "mission": _json_text(profile["mission"]),
+        "decision_principles": _json_text(profile["principles_json"]),
+        "anti_vision": _json_text(profile["anti_vision_json"]),
+        "customer_direction": "",
+        "lived_experience": lived_experience,
+        "why_statement": _json_text(profile["why_statement"]),
+    }
+    structured = await extract_canonical(file_key, inputs)
+    await _persist_tier_b(pool, student_id, file_key, structured)
+    if structured.get("error"):
+        raise HTTPException(
+            422,
+            {
+                "error": structured["error"],
+                "message": "Chưa thể tạo file. Hãy thử lại hoặc bổ sung thông tin.",
+                "missing": structured.get("missing", []),
+            },
+        )
+    return {
+        "status": "generated",
+        "file_key": file_key,
+        "next_step": (
+            f"/sdl/students/{student_id}/output/L1?sig="
+            f"{request_signature(request, sig)}"
+        ),
+    }
 
 
 # ============================================================

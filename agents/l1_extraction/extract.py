@@ -36,18 +36,6 @@ _CREDENTIAL_RE = re.compile(
 def _precheck_evidence(file_key: str, inputs: dict[str, Any]) -> dict[str, Any] | None:
     lived = str(inputs.get("lived_experience", "") or "").strip()
 
-    if file_key == "founder-story":
-        years = sorted(set(_YEAR_RE.findall(lived)))
-        if len(years) < 3:
-            return {
-                "error": "insufficient_evidence",
-                "missing": ["≥3 năm cụ thể trong lived_experience"],
-                "guidance": (
-                    "Bổ sung ít nhất 3 cột mốc với năm, vai trò hoặc địa điểm "
-                    "và chi tiết thật, ví dụ 2015, 2018, 2023."
-                ),
-            }
-
     if file_key == "founder-assets":
         evidence_count = len(_NUMBER_RE.findall(lived)) + len(_CREDENTIAL_RE.findall(lived))
         if evidence_count < 2:

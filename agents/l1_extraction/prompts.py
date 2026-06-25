@@ -149,6 +149,6 @@ EXTRACTION_REGISTRY = {
         "model": "claude-opus-4-7",  # Opus for narrative quality
         "prompt": FOUNDER_STORY_PROMPT,
         "input_keys": ["identity", "mission", "lived_experience", "why_statement"],
-        "max_tokens": 7000,
+        "max_tokens": 10000,
     },
 }
