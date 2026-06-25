@@ -25,6 +25,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 
 from routes._auth import sign_student, require_student_access, require_service_key
+from routes._email import send_brevo_email
 from routes.sdl_schemas import (
     GATE_REQUIREMENTS,
     CanonicalFileCreate,
@@ -377,7 +378,11 @@ async def approve_canonical_file(
     student_id: UUID, file_key: str,
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
-    """Student approves canonical file → status='reviewed' + reviewed_by."""
+    """Student approves canonical file → status='reviewed' + reviewed_by.
+
+    Khi file L1 cuối cùng được duyệt (đủ 8 file Founder OS), tự gửi email
+    kèm link tải Bộ Não Số về máy. Best-effort, không làm approve fail.
+    """
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
@@ -388,13 +393,102 @@ async def approve_canonical_file(
                 SELECT max(version) FROM breakoutos.canonical_files
                 WHERE student_id = $1 AND file_key = $2
               )
-            RETURNING id, file_key, status, version
+            RETURNING id, file_key, status, version, level
             """,
             student_id, file_key,
         )
         if not row:
             raise HTTPException(404, "File not found")
-        return dict(row)
+    result = dict(row)
+
+    if result.get("status") == "reviewed" and result.get("level") == 1:
+        try:
+            await _maybe_send_l1_complete_email(pool, student_id)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("L1 complete email trigger failed for %s: %r", student_id, exc)
+
+    return result
+
+
+def _public_base_url() -> str:
+    return os.environ.get(
+        "PUBLIC_BASE_URL",
+        os.environ.get("K3_PUBLIC_BASE_URL", "https://os.breakout.live"),
+    ).rstrip("/")
+
+
+def _l1_complete_email_html(full_name: str | None, download_url: str) -> str:
+    name = (full_name or "bạn").strip()
+    return f"""\
+<div style="font-family:-apple-system,'Be Vietnam Pro',sans-serif;color:#222;line-height:1.65;font-size:15px">
+<p>Chào {name},</p>
+<p>Bạn vừa hoàn thành 8 file nền tảng của Founder OS. Đây là lớp đầu tiên trong Bộ Não Số của bạn.</p>
+<p>Bấm nút dưới để tải toàn bộ file về máy:</p>
+<p style="margin:24px 0">
+  <a href="{download_url}" style="background:#d63031;color:#fff;padding:14px 28px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:700">Tải Bộ Não Số (.zip)</a>
+</p>
+<p>File gồm: sứ mệnh, tầm nhìn, nhận diện founder, nguyên tắc quyết định, anti-vision, cùng phần AI viết lại từ chính câu trả lời của bạn.</p>
+<p>Giữ kỹ thư mục này. Đây là tài sản dùng lại suốt hành trình, không phải bài tập nộp một lần rồi quên.</p>
+<p>Bước tiếp theo là Customer Intelligence, hiểu khách hàng đầu tiên của bạn. Bạn vào lại hệ thống khi sẵn sàng.</p>
+<p style="margin-top:24px">Hằng</p>
+</div>"""
+
+
+async def _maybe_send_l1_complete_email(pool: asyncpg.Pool, student_id: UUID) -> None:
+    """Gửi email link tải vault khi đủ 8 file L1 reviewed. Idempotent, gửi 1 lần."""
+    l1_files = GATE_REQUIREMENTS["gate_1_founder"]["required_files"]
+
+    async with pool.acquire() as conn:
+        reviewed = await conn.fetchval(
+            """
+            SELECT count(DISTINCT file_key) FROM breakoutos.canonical_files
+            WHERE student_id = $1 AND file_key = ANY($2::text[])
+              AND status IN ('reviewed', 'locked')
+            """,
+            student_id, l1_files,
+        )
+        if (reviewed or 0) < len(l1_files):
+            return  # chưa đủ 8 file
+
+        already = await conn.fetchval(
+            """
+            SELECT 1 FROM breakoutos.student_events
+            WHERE student_id = $1 AND event_type = 'l1_complete_email_sent' LIMIT 1
+            """,
+            student_id,
+        )
+        if already:
+            return  # đã gửi rồi
+
+        student = await conn.fetchrow(
+            "SELECT email, full_name FROM breakoutos.students WHERE id = $1", student_id,
+        )
+
+    if not student or not student["email"]:
+        log.warning("L1 complete: student %s has no email, skip", student_id)
+        return
+
+    sig = sign_student(str(student_id))
+    download_url = (
+        f"{_public_base_url()}/sdl/students/{student_id}/vault/export.zip?sig={sig}"
+    )
+    html = _l1_complete_email_html(student["full_name"], download_url)
+    ok = await send_brevo_email(
+        student["email"], student["full_name"],
+        "Bộ Não Số Founder OS của bạn đã sẵn sàng để tải về", html,
+    )
+
+    if ok:
+        async with pool.acquire() as conn:
+            await conn.execute(
+                """
+                INSERT INTO breakoutos.student_events
+                  (student_id, event_type, source, level, payload_json)
+                VALUES ($1, 'l1_complete_email_sent', 'system', 1, $2::jsonb)
+                """,
+                student_id, json.dumps({"to": student["email"], "download_url": download_url}),
+            )
+        log.info("L1 complete email sent to %s (student %s)", student["email"], student_id)
 
 
 # ============================================================
