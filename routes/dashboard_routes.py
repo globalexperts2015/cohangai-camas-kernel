@@ -10,10 +10,10 @@ from typing import Any
 from uuid import UUID
 
 import asyncpg
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
-from routes._auth import sign_student
+from routes._auth import request_signature, require_student_signature, sign_student
 from routes.sdl_routes import get_pool
 
 
@@ -137,10 +137,15 @@ a{{color:#d63031}}.tag{{padding:2px 8px;border-radius:6px;background:#fff5f5;col
 # ============================================================
 @router.get("/sdl/student/{student_id}/dashboard", response_class=HTMLResponse)
 async def student_dashboard(
-    student_id: UUID, key: str | None = None,
+    student_id: UUID, request: Request, key: str | None = None, sig: str = "",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> HTMLResponse:
-    """Student personal dashboard. Optional admin key bypasses ownership."""
+    """Student personal dashboard. Signed student link, optional admin key bypass."""
+    if key:
+        _check_admin(key)
+    else:
+        require_student_signature(str(student_id), request_signature(request, sig))
+
     async with pool.acquire() as conn:
         student = await conn.fetchrow(
             "SELECT * FROM breakoutos.students WHERE id=$1", student_id,
@@ -241,10 +246,10 @@ li.empty{{color:#888;font-style:italic}}
 <div class="actions">
   <a href="/foundation/l1?student={student_id}&sig={signature}" class="action-link">L1 Founder OS</a>
   <a href="/foundation/l2?student={student_id}&sig={signature}" class="action-link">L2 Customer Intel</a>
-  <a href="/cohort/chon-module/?student_id={student_id}" class="action-link">Module CHỌN</a>
-  <a href="/sdl/students/{student_id}/vault/export.zip" class="action-link">Tải vault .zip</a>
-  <a href="/sdl/students/{student_id}/output/L1" class="action-link">Output L1 Day 1</a>
-  <a href="/sdl/students/{student_id}/output/L2" class="action-link">Output L2 Day 2</a>
+  <a href="/cohort/chon-module/?student_id={student_id}&sig={signature}" class="action-link">Module CHỌN</a>
+  <a href="/sdl/students/{student_id}/vault/export.zip?sig={signature}" class="action-link">Tải vault .zip</a>
+  <a href="/sdl/students/{student_id}/output/L1?sig={signature}" class="action-link">Output L1 Day 1</a>
+  <a href="/sdl/students/{student_id}/output/L2?sig={signature}" class="action-link">Output L2 Day 2</a>
 </div>
 </div>
 </body></html>""")
@@ -501,9 +506,9 @@ function toast(msg, ms=2500) {{
 }}
 
 async function approveFile(fileKey) {{
-  const r = await fetch(`/sdl/students/${{STUDENT_ID}}/canonical-files/${{fileKey}}/approve`, {{
+  const r = await fetch(`/sdl/students/${{STUDENT_ID}}/canonical-files/${{fileKey}}/approve?sig=${{encodeURIComponent(SIG)}}`, {{
     method: 'POST',
-    headers: {{'Content-Type': 'application/json'}}
+    headers: {{'Content-Type': 'application/json', 'X-Student-Signature': SIG}}
   }});
   if (!r.ok) {{
     throw new Error(`Approve ${{fileKey}} fail: ${{r.status}}`);
@@ -548,7 +553,7 @@ if (lockBtn) {{
     if (!confirm(`Khóa ${{GATE_KEY}}? Hành động không reset được.`)) return;
     lockBtn.disabled = true; lockBtn.textContent = 'Đang khóa Gate...';
     try {{
-      const r = await fetch(`/sdl/students/${{STUDENT_ID}}/gates/${{GATE_KEY}}/lock`, {{method: 'POST'}});
+      const r = await fetch(`/sdl/students/${{STUDENT_ID}}/gates/${{GATE_KEY}}/lock?sig=${{encodeURIComponent(SIG)}}`, {{method: 'POST', headers: {{'X-Student-Signature': SIG}}}});
       if (!r.ok) {{
         const d = await r.json().catch(() => ({{}}));
         throw new Error(d.detail?.error || d.detail || r.statusText);
