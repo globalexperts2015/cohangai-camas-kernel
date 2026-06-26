@@ -19,7 +19,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from routes._auth import request_signature, require_student_signature
-from routes.sdl_routes import get_pool, check_gate_passed
+from routes.sdl_routes import get_pool, check_gate_passed, require_level_access
 
 
 log = logging.getLogger("camas.l3")
@@ -270,6 +270,7 @@ async def l3_intake(
 ) -> dict:
     sig = request_signature(request)
     require_student_signature(str(payload.student_id), sig)
+    await require_level_access(pool, payload.student_id, 3, "L3 Value Proposition OS")
     if not await check_gate_passed(pool, payload.student_id, "gate_2_customer_soft"):
         raise HTTPException(403, "Gate 2A Customer Soft chưa pass. Hoàn thành L2 trước.")
 

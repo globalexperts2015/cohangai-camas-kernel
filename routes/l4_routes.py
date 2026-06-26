@@ -18,7 +18,7 @@ import asyncpg
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from routes.sdl_routes import get_pool, check_gate_passed
+from routes.sdl_routes import get_pool, check_gate_passed, require_level_access
 from routes._auth import require_service_key
 
 
@@ -109,6 +109,7 @@ async def _save_l4_files(
 
 @router.post("/intake", status_code=201)
 async def l4_intake(payload: L4IntakePayload, pool: asyncpg.Pool = Depends(get_pool)) -> dict:
+    await require_level_access(pool, payload.student_id, 4, "L4 Business Operating OS")
     if not await check_gate_passed(pool, payload.student_id, "gate_3_value_proposition"):
         raise HTTPException(403, "Gate 3 Value Proposition chưa pass.")
     async with pool.acquire() as conn:

@@ -14,7 +14,7 @@ import asyncpg
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from routes.sdl_routes import get_pool, check_gate_passed
+from routes.sdl_routes import get_pool, check_gate_passed, require_level_access
 from routes._auth import require_service_key
 
 
@@ -42,6 +42,7 @@ L5_FILES = [
 
 @router.post("/intake", status_code=201)
 async def l5_intake(payload: L5IntakePayload, pool: asyncpg.Pool = Depends(get_pool)) -> dict:
+    await require_level_access(pool, payload.student_id, 5, "L5 Revenue Growth OS")
     if not await check_gate_passed(pool, payload.student_id, "gate_4_business_operating"):
         raise HTTPException(403, "Gate 4 Business Operating chưa pass.")
     default_ascension = [

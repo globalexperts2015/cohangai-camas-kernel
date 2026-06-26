@@ -21,8 +21,8 @@ import asyncpg
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
-from routes._auth import _verify_hmac
-from routes.sdl_routes import get_pool
+from routes._auth import request_signature, require_student_signature
+from routes.sdl_routes import get_pool, require_level_access
 
 
 router = APIRouter(prefix="/sdl/discovery", tags=["sdl-discovery"])
@@ -274,20 +274,28 @@ async def _generate_discovery(
 async def run_discovery(
     student_id: UUID,
     background: BackgroundTasks,
+    request: Request,
+    sig: str = "",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
     """Trigger Discovery Engine for student. AI runs background."""
+    require_student_signature(str(student_id), request_signature(request, sig))
+    await require_level_access(pool, student_id, 3, "Discovery Engine")
     background.add_task(_generate_discovery, student_id, pool)
     return {"status": "discovery_running", "student_id": str(student_id),
             "estimated_seconds": 45,
-            "next": f"/sdl/students/{student_id}/discovery/report"}
+            "next": f"/sdl/students/{student_id}/discovery/report?sig={request_signature(request, sig)}"}
 
 
 @router.get("/students/{student_id}/discovery/history", include_in_schema=True)
 async def discovery_history(
     student_id: UUID,
+    request: Request,
+    sig: str = "",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
+    require_student_signature(str(student_id), request_signature(request, sig))
+    await require_level_access(pool, student_id, 3, "Discovery history")
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """

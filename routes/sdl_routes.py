@@ -66,6 +66,66 @@ def require_admin_key(request: Request) -> None:
 
 
 # ============================================================
+# Program-level access cap
+# ============================================================
+PROGRAM_LEVEL_CAP: dict[str, int] = {
+    "foundation": 1,
+    "foundation-system": 1,
+    "customer": 2,
+    "customer-system": 2,
+    "growth": 5,
+    "growth-system": 5,
+    "coaching": 6,
+    "breakout-founder": 6,
+}
+DEFAULT_LEVEL_CAP = 1
+
+
+def normalize_program_id(program_id: str | None) -> str:
+    return (program_id or "").strip().lower().replace("_", "-")
+
+
+def level_cap_for_program(program_id: str | None) -> int:
+    """Fail-closed: unknown/misconfigured program gets Foundation-level access."""
+    return PROGRAM_LEVEL_CAP.get(normalize_program_id(program_id), DEFAULT_LEVEL_CAP)
+
+
+async def get_student_level_cap(pool: asyncpg.Pool, student_id: UUID) -> tuple[str, int]:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT program_id FROM breakoutos.students WHERE id=$1",
+            student_id,
+        )
+    if not row:
+        raise HTTPException(404, "Student not found")
+    program_id = row["program_id"]
+    return program_id, level_cap_for_program(program_id)
+
+
+async def require_level_access(
+    pool: asyncpg.Pool, student_id: UUID, required_level: int,
+    feature: str = "level",
+) -> tuple[str, int]:
+    program_id, max_level = await get_student_level_cap(pool, student_id)
+    if required_level > max_level:
+        raise HTTPException(
+            403,
+            {
+                "error": "Program level access denied",
+                "message": (
+                    f"Gói {program_id} chỉ được truy cập đến Level {max_level}. "
+                    f"{feature} yêu cầu Level {required_level}."
+                ),
+                "program_id": program_id,
+                "max_level": max_level,
+                "required_level": required_level,
+                "action": "upgrade_program",
+            },
+        )
+    return program_id, max_level
+
+
+# ============================================================
 # DB pool helper (module-level lazy singleton)
 # ============================================================
 _POOL: asyncpg.Pool | None = None
@@ -304,6 +364,7 @@ async def create_canonical_file(
 ) -> dict:
     if body.student_id != student_id:
         raise HTTPException(400, "student_id mismatch")
+    await require_level_access(pool, student_id, body.level, f"Canonical file L{body.level}")
     async with pool.acquire() as conn:
         # Determine next version
         prev = await conn.fetchval(
@@ -347,6 +408,10 @@ async def list_canonical_files(
     P0.3 (Anna 2026-06-12): Cohort 1 default filter Tier A only.
     Override with cohort_filter=false to see all 47 files.
     """
+    _, max_level = await require_level_access(
+        pool, student_id, level or 1,
+        f"Canonical files L{level}" if level else "Canonical files",
+    )
     async with pool.acquire() as conn:
         # Lookup student cohort_id
         cohort_id = await conn.fetchval(
@@ -365,11 +430,12 @@ async def list_canonical_files(
             FROM breakoutos.canonical_files
             WHERE student_id = $1
               AND ($2::int IS NULL OR level = $2)
+              AND level <= $5
               AND ($3::text IS NULL OR tier = $3)
               AND ($4::text IS NULL OR status = $4)
             ORDER BY file_key, version DESC
             """,
-            student_id, level, effective_tier, status,
+            student_id, level, effective_tier, status, max_level,
         )
         return [dict(r) for r in rows]
 
@@ -390,7 +456,8 @@ async def get_canonical_file_latest(
         )
         if not row:
             raise HTTPException(404, f"Canonical file {file_key} not found")
-        return {**dict(row), "structured_data_json": _decode_jsonb(row["structured_data_json"])}
+    await require_level_access(pool, student_id, row["level"], f"Canonical file {file_key}")
+    return {**dict(row), "structured_data_json": _decode_jsonb(row["structured_data_json"])}
 
 
 @router.post("/students/{student_id}/canonical-files/{file_key}/approve", dependencies=[Depends(require_student_access)])
@@ -403,6 +470,19 @@ async def approve_canonical_file(
     Khi file L1 cuối cùng được duyệt (đủ 8 file Founder OS), tự gửi email
     kèm link tải Bộ Não Số về máy. Best-effort, không làm approve fail.
     """
+    async with pool.acquire() as conn:
+        latest_level = await conn.fetchval(
+            """
+            SELECT level FROM breakoutos.canonical_files
+            WHERE student_id = $1 AND file_key = $2
+            ORDER BY version DESC LIMIT 1
+            """,
+            student_id, file_key,
+        )
+        if latest_level is None:
+            raise HTTPException(404, "File not found")
+    await require_level_access(pool, student_id, latest_level, f"Approve file {file_key}")
+
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
@@ -609,6 +689,10 @@ async def lock_gate(
         raise HTTPException(404, f"Unknown gate {gate_key}")
 
     req = GATE_REQUIREMENTS[gate_key]
+    await require_level_access(
+        pool, student_id, req.get("level", 1),
+        f"Lock {gate_key}",
+    )
 
     async with pool.acquire() as conn:
         # Validate first

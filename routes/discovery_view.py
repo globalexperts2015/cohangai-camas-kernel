@@ -6,11 +6,11 @@ from typing import Any
 from uuid import UUID
 
 import asyncpg
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
-from routes._auth import _verify_hmac
-from routes.sdl_routes import get_pool
+from routes._auth import request_signature, require_student_signature
+from routes.sdl_routes import get_pool, require_level_access
 
 
 router = APIRouter(tags=["discovery-view"])
@@ -33,10 +33,13 @@ def _render_kv_table(items: list[dict], cols: list[tuple[str, str]]) -> str:
 @router.get("/sdl/students/{student_id}/discovery/report", response_class=HTMLResponse)
 async def discovery_report(
     student_id: UUID,
+    request: Request,
     sig: str = "",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> HTMLResponse:
     """Render latest Discovery Report HTML."""
+    require_student_signature(str(student_id), request_signature(request, sig))
+    await require_level_access(pool, student_id, 3, "Discovery Report")
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
@@ -55,7 +58,7 @@ async def discovery_report(
 h1{{color:#d63031}}button{{background:#d63031;color:#fff;border:none;padding:18px 32px;border-radius:12px;font-weight:800;font-size:17px;cursor:pointer;margin-top:20px}}</style></head>
 <body><h1>Chưa có Discovery Report</h1>
 <p>Bạn cần hoàn thành Tầng 1 + Tầng 2 trước, rồi nhấn "Khám phá cơ hội kinh doanh".</p>
-<form method="post" action="/sdl/discovery/run?student_id={student_id}">
+    <form method="post" action="/sdl/discovery/run?student_id={student_id}&sig={sig}">
 <button type="submit">🚀 Khám phá cơ hội kinh doanh</button></form>
 </body></html>""", status_code=200)
 

@@ -14,7 +14,7 @@ import asyncpg
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from routes.sdl_routes import get_pool, check_gate_passed
+from routes.sdl_routes import get_pool, check_gate_passed, require_level_access
 from routes._auth import require_service_key
 
 
@@ -32,6 +32,7 @@ L6A_FILES = [
 
 @router.post("/intake", status_code=201)
 async def l6a_intake(student_id: UUID, pool: asyncpg.Pool = Depends(get_pool)) -> dict:
+    await require_level_access(pool, student_id, 6, "L6 Founder Freedom OS")
     if not await check_gate_passed(pool, student_id, "gate_5_revenue_growth"):
         raise HTTPException(403, "Gate 5 Revenue Growth chưa pass.")
     data_map = {

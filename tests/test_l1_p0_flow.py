@@ -12,6 +12,7 @@ from agents.l1_extraction import extract as extract_module
 from routes import intake_forms
 from routes._auth import _verify_hmac, sign_student
 from routes.l1_routes import _persist_tier_b, _ready_for_gate_1
+from routes.sdl_routes import level_cap_for_program
 
 
 TEST_SECRET = "0123456789abcdef0123456789abcdef"
@@ -209,3 +210,27 @@ def test_output_page_shows_missing_l1_file_and_retry_action() -> None:
     assert 'status": "missing"' in source
     assert 'class="retry-btn"' in source
     assert "/sdl/l1/extract/${{fk}}" in source
+
+
+def test_program_level_cap_fails_closed() -> None:
+    assert level_cap_for_program("foundation") == 1
+    assert level_cap_for_program("customer") == 2
+    assert level_cap_for_program("growth") == 5
+    assert level_cap_for_program("coaching") == 6
+    assert level_cap_for_program("unknown-product") == 1
+
+
+def test_access_cap_is_enforced_on_student_surfaces() -> None:
+    root = Path(__file__).resolve().parents[1]
+    dashboard = (root / "routes" / "dashboard_routes.py").read_text(encoding="utf-8")
+    intake = (root / "routes" / "intake_forms.py").read_text(encoding="utf-8")
+    l2 = (root / "routes" / "l2_routes.py").read_text(encoding="utf-8")
+    l3 = (root / "routes" / "l3_routes.py").read_text(encoding="utf-8")
+
+    assert "require_student_signature(str(student_id), request_signature(request, sig))" in dashboard
+    assert "WHERE student_id=$1 AND level <= $2" in dashboard
+    assert "await require_level_access(pool, student_id, level_num" in dashboard
+    assert "await require_level_access(pool, student_uuid, 2" in intake
+    assert "await require_level_access(pool, student_uuid, 3" in intake
+    assert "await require_level_access(pool, payload.student_id, 2" in l2
+    assert "await require_level_access(pool, payload.student_id, 3" in l3

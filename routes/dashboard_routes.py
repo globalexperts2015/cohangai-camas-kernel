@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from routes._auth import request_signature, require_student_signature, sign_student
-from routes.sdl_routes import get_pool
+from routes.sdl_routes import get_pool, get_student_level_cap, require_level_access
 
 
 log = logging.getLogger("camas.dashboard")
@@ -176,6 +176,7 @@ async def student_dashboard(
         )
 
     signature = sign_student(str(student_id))
+    _, max_level = await get_student_level_cap(pool, student_id)
     baseline_html = ""
     if baseline:
         baseline_html = (
@@ -203,6 +204,22 @@ async def student_dashboard(
         f'{g["lock_status"].upper()} · {g["locked_at"].strftime("%Y-%m-%d")}</li>'
         for g in gates
     ) or '<li class="empty">Chưa có gate nào lock</li>'
+
+    quick_actions = [
+        f'<a href="/foundation/l1?student={student_id}&sig={signature}" class="action-link">L1 Founder OS</a>',
+        f'<a href="/sdl/students/{student_id}/vault/export.zip?sig={signature}" class="action-link">Tải vault .zip</a>',
+        f'<a href="/sdl/students/{student_id}/output/L1?sig={signature}" class="action-link">Output L1 Day 1</a>',
+    ]
+    if max_level >= 2:
+        quick_actions.extend([
+            f'<a href="/foundation/l2?student={student_id}&sig={signature}" class="action-link">L2 Customer Intel</a>',
+            f'<a href="/sdl/students/{student_id}/output/L2?sig={signature}" class="action-link">Output L2 Day 2</a>',
+        ])
+    if max_level >= 3:
+        quick_actions.append(
+            f'<a href="/cohort/chon-module/?student_id={student_id}&sig={signature}" class="action-link">Module CHỌN</a>'
+        )
+    quick_actions_html = "\n  ".join(quick_actions)
 
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8">
@@ -244,12 +261,7 @@ li.empty{{color:#888;font-style:italic}}
 
 <h2>Hành động nhanh</h2>
 <div class="actions">
-  <a href="/foundation/l1?student={student_id}&sig={signature}" class="action-link">L1 Founder OS</a>
-  <a href="/foundation/l2?student={student_id}&sig={signature}" class="action-link">L2 Customer Intel</a>
-  <a href="/cohort/chon-module/?student_id={student_id}&sig={signature}" class="action-link">Module CHỌN</a>
-  <a href="/sdl/students/{student_id}/vault/export.zip?sig={signature}" class="action-link">Tải vault .zip</a>
-  <a href="/sdl/students/{student_id}/output/L1?sig={signature}" class="action-link">Output L1 Day 1</a>
-  <a href="/sdl/students/{student_id}/output/L2?sig={signature}" class="action-link">Output L2 Day 2</a>
+  {quick_actions_html}
 </div>
 </div>
 </body></html>""")
@@ -260,17 +272,26 @@ li.empty{{color:#888;font-style:italic}}
 # ============================================================
 @router.get("/sdl/students/{student_id}/vault/export.zip")
 async def export_vault_zip(
-    student_id: UUID, pool: asyncpg.Pool = Depends(get_pool),
+    student_id: UUID,
+    request: Request,
+    sig: str = "",
+    key: str | None = None,
+    pool: asyncpg.Pool = Depends(get_pool),
 ):
+    if key:
+        _check_admin(key)
+    else:
+        require_student_signature(str(student_id), request_signature(request, sig))
+    _, max_level = await get_student_level_cap(pool, student_id)
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """
             SELECT DISTINCT ON (file_key) level, file_key, file_name, markdown_content, tier
             FROM breakoutos.canonical_files
-            WHERE student_id=$1
+            WHERE student_id=$1 AND level <= $2
             ORDER BY file_key, version DESC
             """,
-            student_id,
+            student_id, max_level,
         )
 
     AI_CONTEXT_KEYS = {"founder-dna", "brand-voice", "ai-instructions"}
@@ -332,15 +353,17 @@ async def output_page(
     level_num = {"L1": 1, "L2": 2, "L3": 3, "L4": 4, "L5": 5, "L6a": 6}.get(level)
     if not level_num:
         raise HTTPException(404, "Unknown level")
+    _, max_level = await require_level_access(pool, student_id, level_num, f"Output {level}")
 
     # Gate config per level
     gate_config = {
         "L1": {"gate_key": "gate_1_founder", "next_level": "L2", "next_path": "/foundation/l2",
-               "expected_count": 8, "title": "Founder OS"},
+               "next_level_num": 2, "expected_count": 8, "title": "Founder OS"},
         "L2": {"gate_key": "gate_2_customer_soft", "next_level": "L3", "next_path": "/foundation/l3",
-               "expected_count": 11, "title": "Customer Intelligence"},
+               "next_level_num": 3, "expected_count": 11, "title": "Customer Intelligence"},
     }
     cfg = gate_config.get(level, {})
+    next_allowed = max_level >= cfg.get("next_level_num", 999)
 
     async with pool.acquire() as conn:
         files = await conn.fetch(
@@ -424,15 +447,15 @@ h1{{color:#d63031}}p{{color:#5a5453}}</style></head>
     gate_btn_state = ""
     if any_locked:
         gate_btn_state = '<div class="gate-locked">🔒 Gate đã khóa. Bạn có thể tiếp tục bước sau.</div>'
-        if level == "L2":
+        if level == "L2" and max_level >= 3:
             gate_btn_state += (
                 f'<a class="discovery-btn" href="/sdl/students/{student_id}/discovery/report?sig={sig}">'
                 f'🚀 Khám phá cơ hội kinh doanh (Day 3 Discovery Engine)</a>'
-                f'<form method="post" action="/sdl/discovery/run?student_id={student_id}" '
+                f'<form method="post" action="/sdl/discovery/run?student_id={student_id}&sig={sig}" '
                 f'style="margin-top:10px"><button type="submit" class="trigger-btn">'
                 f'Tạo Discovery Report mới (đợi 30-45s)</button></form>'
             )
-        if cfg.get("next_path"):
+        if cfg.get("next_path") and next_allowed:
             gate_btn_state += f'<a class="next-btn" href="{cfg["next_path"]}?student={student_id}&sig={sig}">Mở {cfg["next_level"]} →</a>'
     elif cfg.get("gate_key"):
         expected = cfg.get("expected_count", total_count)
@@ -441,12 +464,22 @@ h1{{color:#d63031}}p{{color:#5a5453}}</style></head>
         wait_css = ("background:#eef7f0;border:1px solid #cde8d4;color:#1e6b3a;"
                     "padding:14px 18px;border-radius:10px;font-weight:600;text-align:center")
         if all_reviewed:
-            gate_btn_state = (f'<div style="{wait_css}">✅ Hồ sơ của bạn đã đủ. '
-                              f'Hằng sẽ xem lại và mở tầng tiếp theo cho bạn.</div>')
+            next_text = (
+                "Hằng sẽ xem lại và mở tầng tiếp theo cho bạn."
+                if next_allowed else
+                "Hằng sẽ xem lại và chốt Gate này cho bạn."
+            )
+            gate_btn_state = f'<div style="{wait_css}">✅ Hồ sơ của bạn đã đủ. {next_text}</div>'
         else:
-            gate_btn_state = (f'<div style="{wait_css}">Đang hoàn thiện hồ sơ '
-                              f'({reviewed_count}/{expected} file). Khi đủ, Hằng sẽ duyệt '
-                              f'và mở tầng tiếp theo.</div>')
+            next_text = (
+                "Hằng sẽ duyệt và mở tầng tiếp theo."
+                if next_allowed else
+                "Hằng sẽ duyệt và chốt Gate này."
+            )
+            gate_btn_state = (
+                f'<div style="{wait_css}">Đang hoàn thiện hồ sơ '
+                f'({reviewed_count}/{expected} file). Khi đủ, {next_text}</div>'
+            )
 
     bulk_btn = (
         '<button id="approve-all-btn">Duyệt tất cả file còn lại</button>'
@@ -522,7 +555,7 @@ pre{{margin-top:14px;background:#0a0a0a;color:#fff;padding:16px;border-radius:8p
 
 <div style="margin-top:24px">{gate_btn_state}</div>
 
-<p><a href="/sdl/students/{student_id}/vault/export.zip" class="zip-link">⬇ Tải vault .zip</a></p>
+<p><a href="/sdl/students/{student_id}/vault/export.zip?sig={sig}" class="zip-link">⬇ Tải vault .zip</a></p>
 
 </div>
 

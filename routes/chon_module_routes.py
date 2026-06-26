@@ -123,10 +123,12 @@ async def run_chon_module(
     breakoutos_sid = body.get("breakoutos_student_id") or body.get("sdl_student_id")
     if breakoutos_sid:
         try:
-            from routes.sdl_routes import check_gate_passed, get_pool
+            from routes.sdl_routes import check_gate_passed, get_pool, require_level_access
             from uuid import UUID as _UUID
             sdl_pool = await get_pool()
-            passed = await check_gate_passed(sdl_pool, _UUID(str(breakoutos_sid)), "gate_2_customer_soft")
+            sid_uuid = _UUID(str(breakoutos_sid))
+            await require_level_access(sdl_pool, sid_uuid, 3, "Module CHỌN")
+            passed = await check_gate_passed(sdl_pool, sid_uuid, "gate_2_customer_soft")
             if not passed:
                 raise HTTPException(
                     status_code=403,

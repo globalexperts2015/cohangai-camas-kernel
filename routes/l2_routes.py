@@ -26,7 +26,7 @@ from pydantic import BaseModel, Field
 
 from agents.l2_extraction import L2_EXTRACTION_REGISTRY, extract_l2_canonical, render_l2_markdown
 from routes._auth import request_signature, require_student_signature
-from routes.sdl_routes import get_pool, check_gate_passed
+from routes.sdl_routes import get_pool, check_gate_passed, require_level_access
 
 
 log = logging.getLogger("camas.l2")
@@ -296,6 +296,7 @@ async def l2_intake(
     """Submit L2 Tier A 4 file. Triggers 7 Tier B AI extract async."""
     sig = request_signature(request)
     require_student_signature(str(payload.student_id), sig)
+    await require_level_access(pool, payload.student_id, 2, "L2 Customer Intelligence OS")
 
     # Check Gate 1 passed (L1 done)
     if not await check_gate_passed(pool, payload.student_id, "gate_1_founder"):

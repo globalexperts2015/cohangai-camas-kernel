@@ -14,7 +14,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from routes._auth import _verify_hmac
 from routes.freedom_score_routes import has_baseline
-from routes.sdl_routes import check_gate_passed, get_pool
+from routes.sdl_routes import check_gate_passed, get_pool, require_level_access
 
 
 router = APIRouter(tags=["intake-forms"])
@@ -248,6 +248,13 @@ async def l2_form(
             _error_page("Đường link không hợp lệ. Liên hệ Hằng qua Zalo."),
             status_code=403,
         )
+    try:
+        await require_level_access(pool, student_uuid, 2, "L2 Customer Intelligence OS")
+    except HTTPException as exc:
+        return HTMLResponse(
+            _error_page(exc.detail.get("message") if isinstance(exc.detail, dict) else str(exc.detail)),
+            status_code=403,
+        )
     if not await check_gate_passed(pool, student_uuid, "gate_1_founder"):
         return RedirectResponse(
             f"/sdl/students/{student_uuid}/output/L1?sig={sig}",
@@ -464,6 +471,13 @@ async def l3_form(
     if student_uuid is None:
         return HTMLResponse(
             _error_page("Đường link không hợp lệ. Liên hệ Hằng qua Zalo."),
+            status_code=403,
+        )
+    try:
+        await require_level_access(pool, student_uuid, 3, "L3 Value Proposition OS")
+    except HTTPException as exc:
+        return HTMLResponse(
+            _error_page(exc.detail.get("message") if isinstance(exc.detail, dict) else str(exc.detail)),
             status_code=403,
         )
     if not await check_gate_passed(pool, student_uuid, "gate_2_customer_soft"):
