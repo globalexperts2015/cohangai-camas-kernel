@@ -404,8 +404,12 @@ async def lock_gate_2a(
     sig: str = "",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
-    """Gate 2A Customer SOFT Cert."""
-    require_student_signature(str(student_id), request_signature(request, sig))
+    """Gate 2A Customer SOFT Cert.
+
+    Admin-only (Anna 2026-06-25): học viên không tự khóa Gate 2 / tự lên Level 3.
+    """
+    from routes.sdl_routes import require_admin_key
+    require_admin_key(request)
     from routes.sdl_routes import lock_gate as sdl_lock_gate
     return await sdl_lock_gate(student_id, "gate_2_customer_soft", pool)
 

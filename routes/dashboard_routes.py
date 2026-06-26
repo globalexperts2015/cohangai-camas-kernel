@@ -436,13 +436,17 @@ h1{{color:#d63031}}p{{color:#5a5453}}</style></head>
             gate_btn_state += f'<a class="next-btn" href="{cfg["next_path"]}?student={student_id}&sig={sig}">Mở {cfg["next_level"]} →</a>'
     elif cfg.get("gate_key"):
         expected = cfg.get("expected_count", total_count)
+        # Học viên KHÔNG tự khóa gate / tự lên cấp. Anna duyệt qua link admin
+        # trong alert Telegram. (Anna 2026-06-25)
+        wait_css = ("background:#eef7f0;border:1px solid #cde8d4;color:#1e6b3a;"
+                    "padding:14px 18px;border-radius:10px;font-weight:600;text-align:center")
         if all_reviewed:
-            lock_label = f'🔒 Khóa {cfg["title"]} và mở {cfg.get("next_level", "tầng sau")}'
-            lock_disabled = ""
+            gate_btn_state = (f'<div style="{wait_css}">✅ Hồ sơ của bạn đã đủ. '
+                              f'Hằng sẽ xem lại và mở tầng tiếp theo cho bạn.</div>')
         else:
-            lock_label = f'Cần duyệt đủ {expected} file để khóa Gate (hiện {reviewed_count}/{expected})'
-            lock_disabled = "disabled"
-        gate_btn_state = f'<button id="lock-gate-btn" {lock_disabled}>{lock_label}</button>'
+            gate_btn_state = (f'<div style="{wait_css}">Đang hoàn thiện hồ sơ '
+                              f'({reviewed_count}/{expected} file). Khi đủ, Hằng sẽ duyệt '
+                              f'và mở tầng tiếp theo.</div>')
 
     bulk_btn = (
         '<button id="approve-all-btn">Duyệt tất cả file còn lại</button>'

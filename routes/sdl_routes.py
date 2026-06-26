@@ -21,8 +21,8 @@ from typing import Any
 from uuid import UUID
 
 import asyncpg
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from routes._auth import sign_student, require_student_access, require_service_key
 from routes._email import send_brevo_email
@@ -43,6 +43,26 @@ from routes.sdl_schemas import (
 
 log = logging.getLogger("camas.sdl")
 router = APIRouter(prefix="/sdl", tags=["sdl"])
+
+
+# ============================================================
+# Admin gate-lock guard (Anna 2026-06-25)
+# Khóa gate = mở tầng tiếp theo = HÀNH ĐỘNG CỦA ANNA, không phải học viên.
+# Học viên Level 1 không tự mở Level 2 được. Anna duyệt qua link admin trong
+# alert Telegram (có sẵn admin key).
+# ============================================================
+BREAKOUTOS_ADMIN_KEY = os.environ.get("BREAKOUTOS_ADMIN_KEY", "")
+
+
+def _admin_ok(key: str | None) -> bool:
+    return bool(BREAKOUTOS_ADMIN_KEY) and key == BREAKOUTOS_ADMIN_KEY
+
+
+def require_admin_key(request: Request) -> None:
+    """Dependency / callable: chỉ admin (Anna) mới khóa gate, không phải học viên."""
+    key = request.query_params.get("key", "") or request.headers.get("X-Admin-Key", "")
+    if not _admin_ok(key):
+        raise HTTPException(403, "Chỉ Anna (admin) mới mở tầng tiếp theo cho học viên.")
 
 
 # ============================================================
@@ -576,12 +596,15 @@ async def validate_gate(
         raise HTTPException(400, f"Gate {gate_key} validation not implemented")
 
 
-@router.post("/students/{student_id}/gates/{gate_key}/lock", dependencies=[Depends(require_student_access)])
+@router.post("/students/{student_id}/gates/{gate_key}/lock", dependencies=[Depends(require_admin_key)])
 async def lock_gate(
     student_id: UUID, gate_key: str,
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
-    """Execute gate lock (Soft or Hard per Anna amendment 2026-06-12)."""
+    """Execute gate lock (Soft or Hard per Anna amendment 2026-06-12).
+
+    Admin-only (Anna 2026-06-25): học viên không tự khóa gate / tự lên cấp được.
+    """
     if gate_key not in GATE_REQUIREMENTS:
         raise HTTPException(404, f"Unknown gate {gate_key}")
 
@@ -704,6 +727,68 @@ async def lock_gate(
             "file_count": len(file_ids),
             "snapshot_files_created": req.get("snapshot_to", []),
         }
+
+
+_GATE_NEXT_LEVEL = {
+    "gate_1_founder": "Level 2 (Customer Intelligence)",
+    "gate_2_customer_soft": "Level 3 (Value Proposition)",
+    "gate_3_value_proposition": "Level 4",
+    "gate_4_business_operating": "Level 5",
+    "gate_5_revenue_growth": "Level 6",
+}
+
+
+def _approve_page(title: str, body: str, ok: bool = True) -> str:
+    color = "#27ae60" if ok else "#d63031"
+    return (
+        "<!DOCTYPE html><html lang=vi><head><meta charset=utf-8>"
+        "<meta name=viewport content='width=device-width,initial-scale=1'>"
+        "<title>Duyệt mở tầng</title><style>"
+        "body{font-family:system-ui,'Be Vietnam Pro';background:#fafaf7;padding:60px 20px;"
+        "text-align:center;color:#0a0a0a}h1{color:" + color + "}p{color:#5a5453;max-width:520px;margin:12px auto}"
+        "</style></head><body><h1>" + title + "</h1><p>" + body + "</p></body></html>"
+    )
+
+
+@router.get("/admin/approve-gate", response_class=HTMLResponse)
+async def admin_approve_gate(
+    student: str,
+    gate: str,
+    background: BackgroundTasks,
+    key: str = "",
+    pool: asyncpg.Pool = Depends(get_pool),
+) -> HTMLResponse:
+    """Anna duyệt mở tầng tiếp theo cho 1 học viên (admin-only, key trong link Telegram).
+
+    Thay cho việc học viên tự bấm Khóa Gate. Anna 2026-06-25.
+    """
+    if not _admin_ok(key):
+        return HTMLResponse(_approve_page("Sai admin key", "Link không hợp lệ.", ok=False), status_code=403)
+    if gate not in GATE_REQUIREMENTS:
+        return HTMLResponse(_approve_page("Gate không hợp lệ", f"Không có gate {gate}.", ok=False), status_code=400)
+    try:
+        sid = UUID(student)
+    except ValueError:
+        return HTMLResponse(_approve_page("student_id không hợp lệ", student, ok=False), status_code=400)
+    try:
+        await lock_gate(sid, gate, pool)
+    except HTTPException as exc:
+        detail = exc.detail if isinstance(exc.detail, str) else json.dumps(exc.detail, ensure_ascii=False)
+        return HTMLResponse(
+            _approve_page("Chưa mở được tầng", f"Học viên chưa đủ điều kiện. Chi tiết: {detail}", ok=False),
+            status_code=exc.status_code,
+        )
+    if gate == "gate_1_founder":
+        try:
+            from routes.l1_routes import _generate_ai_context
+            background.add_task(_generate_ai_context, pool, sid)
+        except Exception as exc:  # pragma: no cover
+            log.warning("approve-gate AI context skip: %r", exc)
+    nxt = _GATE_NEXT_LEVEL.get(gate, "tầng tiếp theo")
+    return HTMLResponse(_approve_page(
+        f"Đã mở {nxt}",
+        f"Học viên {student} đã được Anna duyệt và mở {nxt}. Học viên có thể vào tầng tiếp theo.",
+    ))
 
 
 @router.get("/students/{student_id}/gates", dependencies=[Depends(require_student_access)])

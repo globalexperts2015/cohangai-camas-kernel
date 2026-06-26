@@ -75,6 +75,18 @@ def _student_meta_block(student_id: str, email: str = "", name: str = "") -> str
     )
 
 
+def _approve_link(student_id: str, gate: str) -> str:
+    """Link admin Anna bấm để DUYỆT + mở tầng tiếp theo cho học viên.
+
+    Học viên không tự khóa gate được (Anna 2026-06-25). Chỉ link này (có admin key)
+    mới mở được tầng kế tiếp.
+    """
+    return (
+        f"https://os.breakout.live/sdl/admin/approve-gate"
+        f"?student={student_id}&gate={gate}&key={BREAKOUTOS_ADMIN_KEY}"
+    )
+
+
 # ============================================================
 # Event-specific alert builders
 # ============================================================
@@ -101,8 +113,10 @@ def alert_l1_intake_submitted(student_id: str, email: str = "", name: str = "") 
         f"{_student_meta_block(student_id, email, name)}\n"
         f"<b>Trạng thái:</b> 5 Tier A đã lưu, AI đang sinh 3 Tier B (~1-2 phút)\n"
         f"━━━━━━━━━━━━━━━━━━━━━\n"
-        f"<b>Action Anna:</b> Đợi AI extract xong, review canonical files với student qua Zalo:\n"
-        f"https://os.breakout.live/sdl/students/{student_id}/output/L1?sig={signature}"
+        f"<b>Action Anna:</b> Đợi AI extract xong, review canonical files với student:\n"
+        f"https://os.breakout.live/sdl/students/{student_id}/output/L1?sig={signature}\n"
+        f"<b>✅ Duyệt & mở Level 2</b> (chỉ Anna, học viên không tự mở):\n"
+        f"{_approve_link(student_id, 'gate_1_founder')}"
     )
     send_telegram_sync(msg)
 
@@ -136,8 +150,10 @@ def alert_l2_intake_submitted(student_id: str, fit_score: int, email: str = "", 
         f"<b>Customer Fit Score:</b> {fit_score}/100 {'✓' if fit_score >= 60 else '⚠ thấp'}\n"
         f"<b>AI đang sinh:</b> 7 Tier B (~3-5 phút)\n"
         f"━━━━━━━━━━━━━━━━━━━━━\n"
-        f"<b>Action:</b>\n"
-        f"https://os.breakout.live/sdl/students/{student_id}/output/L2?sig={signature}"
+        f"<b>Action:</b> review canonical files với student:\n"
+        f"https://os.breakout.live/sdl/students/{student_id}/output/L2?sig={signature}\n"
+        f"<b>✅ Duyệt & mở Level 3</b> (chỉ Anna, học viên không tự mở):\n"
+        f"{_approve_link(student_id, 'gate_2_customer_soft')}"
     )
     send_telegram_sync(msg)
 

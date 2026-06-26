@@ -25,10 +25,56 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
+import os
+
+import httpx
+
 from agents.l1_extraction import EXTRACTION_REGISTRY, extract_canonical, render_markdown
-from routes._auth import request_signature, require_student_signature
+from routes._auth import request_signature, require_student_signature, sign_student
 from routes.freedom_score_routes import has_baseline
 from routes.sdl_routes import get_pool
+
+
+BREAKOUT_APP_BASE = os.environ.get("BREAKOUT_APP_BASE", "https://app.breakout.live").rstrip("/")
+L1_COMPLETE_WEBHOOK_SECRET = os.environ.get("L1_COMPLETE_WEBHOOK_SECRET", "").strip()
+
+
+async def _notify_l1_complete(pool: asyncpg.Pool, student_id: UUID) -> None:
+    """Bao breakout-app gui email 8 file khi L1 hoan thanh (>=8 file reviewed).
+
+    Non-blocking. KHONG lock Gate 1 (G1 = HARD, Anna chot tay). Anna 2026-06-25.
+    """
+    try:
+        async with pool.acquire() as conn:
+            ready = await conn.fetchval(
+                "SELECT count(DISTINCT file_key) FROM breakoutos.canonical_files "
+                "WHERE student_id=$1 AND level=1 AND status IN ('reviewed','locked')",
+                student_id,
+            )
+            if (ready or 0) < 8:
+                log.info("L1 notify skip: %s/8 files ready for %s", ready, student_id)
+                return
+            meta = await conn.fetchrow(
+                "SELECT email, full_name FROM breakoutos.students WHERE id=$1", student_id,
+            )
+        if not meta or not meta["email"]:
+            return
+        headers = {"User-Agent": "camas-l1-notify/1.0"}
+        if L1_COMPLETE_WEBHOOK_SECRET:
+            headers["X-Webhook-Secret"] = L1_COMPLETE_WEBHOOK_SECRET
+        payload = {
+            "student_id": str(student_id),
+            "email": meta["email"],
+            "name": meta["full_name"] or "",
+            "sig": sign_student(str(student_id)),
+        }
+        async with httpx.AsyncClient(timeout=20) as client:
+            r = await client.post(
+                f"{BREAKOUT_APP_BASE}/webhooks/l1-completed", json=payload, headers=headers,
+            )
+        log.info("L1 notify -> breakout-app %s: %s", r.status_code, r.text[:200])
+    except Exception as exc:
+        log.warning("L1 notify failed (non-blocking): %r", exc)
 
 
 log = logging.getLogger("camas.l1")
@@ -169,6 +215,9 @@ async def _trigger_ai_extraction(
         await _persist_tier_b(pool, student_id, "founder-story", story_struct)
     except Exception as exc:
         log.exception("founder-story extract failed: %s", exc)
+
+    # L1 hoan thanh: bao breakout-app gui email 8 file cho hoc vien (Anna 2026-06-25)
+    await _notify_l1_complete(pool, student_id)
 
 
 async def _persist_tier_b(
@@ -450,8 +499,12 @@ async def lock_gate_1(
     sig: str = "",
     pool: asyncpg.Pool = Depends(get_pool),
 ) -> dict:
-    """Lock Gate 1 + generate AI Context 3 files in background."""
-    require_student_signature(str(student_id), request_signature(request, sig))
+    """Lock Gate 1 + generate AI Context 3 files in background.
+
+    Admin-only (Anna 2026-06-25): học viên không tự khóa Gate 1 / tự lên Level 2.
+    """
+    from routes.sdl_routes import require_admin_key
+    require_admin_key(request)
     from routes.sdl_routes import lock_gate as sdl_lock_gate
     result = await sdl_lock_gate(student_id, "gate_1_founder", pool)
     background.add_task(_generate_ai_context, pool, student_id)

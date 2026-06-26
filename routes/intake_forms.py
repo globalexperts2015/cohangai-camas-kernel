@@ -194,6 +194,48 @@ def _scale(name: str, max_val: int = 10) -> str:
     ) + '</div>'
 
 
+# L2 Opportunity Map: dropdown chấm điểm 0-10 dễ bấm trên điện thoại, thay format
+# textarea "Tên · 9 · 8 ·..." (dấu · khó gõ, hay ra 0 hết => kẹt gate L2).
+_OPP_CSS = (
+    ".opp{border:1px solid #e5e2dd;border-radius:12px;padding:14px;margin-bottom:14px;background:#fcfcfa}"
+    ".opp-pick{display:flex;align-items:center;gap:8px;font-weight:600;color:#0a0a0a;margin-bottom:10px}"
+    ".opp-pick input{width:auto;margin:0}"
+    ".opp input[type=text]{margin-bottom:10px}"
+    ".opp-scores{display:grid;gap:8px}"
+    ".score-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:#5a5453}"
+    ".score-row span{flex:1}"
+    ".score-sel{width:88px;padding:8px;border:1px solid #d8d4ce;border-radius:8px;font-size:16px;background:#fff}"
+    ".opp-total{margin-top:10px;font-size:14px;color:#5a5453}"
+    ".opp-total .opp-sum{color:#d63031;font-size:16px;font-weight:700}"
+    ".opp-warning{display:none;margin-top:10px;color:#fff;background:#d63031;padding:10px 12px;border-radius:8px;font-size:14px}"
+)
+
+
+def _score_select(name: str, max_val: int = 10) -> str:
+    opts = "".join(f'<option value="{i}">{i}</option>' for i in range(0, max_val + 1))
+    return f'<select name="{name}" class="score-sel">{opts}</select>'
+
+
+def _opp_block(idx: int) -> str:
+    req = " required" if idx == 0 else ""
+    checked = " checked" if idx == 0 else ""
+    dims = [("fit", "Founder fit (hợp với bạn)"), ("demand", "Market demand (thị trường cần)"),
+            ("monet", "Monetization (dễ ra tiền)"), ("ai", "AI leverage (AI gánh được)"),
+            ("conf", "Confidence (bạn tự tin)")]
+    rows = "".join(
+        f'<label class="score-row"><span>{lbl}</span>{_score_select(f"opp{idx}_{key}")}</label>'
+        for key, lbl in dims
+    )
+    return (
+        f'<div class="opp" data-idx="{idx}">'
+        f'<label class="opp-pick"><input type="radio" name="selected_opp" value="{idx}"{checked}> Chọn cơ hội này làm chính</label>'
+        f'<input type="text" name="opp{idx}_name" placeholder="Tên cơ hội {idx + 1}"{req}>'
+        f'<div class="opp-scores">{rows}</div>'
+        f'<p class="opp-total">Tổng điểm: <strong class="opp-sum">0</strong>/50</p>'
+        f'</div>'
+    )
+
+
 @router.get("/foundation/l2", response_class=HTMLResponse)
 async def l2_form(
     student: str = "",
@@ -217,7 +259,7 @@ async def l2_form(
 <title>L2 Customer Intelligence OS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>{_CSS}</style></head><body><div class="container">
+<style>{_CSS}</style><style>{_OPP_CSS}</style></head><body><div class="container">
 
 <div class="tag">Tầng 2 · Customer Intelligence · 4 file cốt lõi</div>
 <h1>Khách nào bạn có quyền phục vụ nhất?</h1>
@@ -287,11 +329,12 @@ async def l2_form(
   <input type="text" name="stmt_vehicle" required placeholder="BreakoutOS">
 </div>
 
-<div class="card"><h3>8. Opportunity Map (3-5 cơ hội bạn đang cân nhắc)</h3>
-  <p class="hint">Liệt kê opportunities cách dòng. Format: Tên · fit · demand · monetize · ai · confidence (mỗi điểm 0-10).</p>
-  <textarea name="opportunities_text" required placeholder="Bán khoá AI cho phụ nữ VP · 9 · 8 · 7 · 9 · 8&#10;Tư vấn 1-1 founder solo · 8 · 6 · 9 · 7 · 7"></textarea>
-  <label style="margin-top:14px">Cơ hội được chọn (1 trong list trên)</label>
-  <input type="text" name="selected_opportunity" required placeholder="Tên cơ hội đã chọn">
+<div class="card"><h3>8. Opportunity Map (chấm điểm 1-3 cơ hội)</h3>
+  <p class="hint">Nhập 1-3 cơ hội bạn đang cân nhắc. Mỗi cơ hội chọn điểm 0-10 cho 5 tiêu chí. Chọn 1 cơ hội làm chính. Cơ hội chính phải đạt tổng <strong>≥ 30/50</strong> mới qua được cổng L2.</p>
+  {_opp_block(0)}
+  {_opp_block(1)}
+  {_opp_block(2)}
+  <p id="opp-warning" class="opp-warning"></p>
 </div>
 
 <button type="submit" id="submit-btn">Lưu L2 và sinh 7 file AI →</button>
@@ -316,17 +359,25 @@ document.getElementById('l2-form').addEventListener('submit', async (e) => {{
   if (!sid) {{ alert('Thiếu student_id'); btn.disabled=false; btn.textContent='Lưu L2 →'; return; }}
 
   const splitLines = (k) => (fd.get(k)||'').split('\\n').filter(s=>s.trim());
-  const parseOpps = () => splitLines('opportunities_text').map(line => {{
-    const parts = line.split('·').map(s=>s.trim());
-    return {{
-      name: parts[0] || 'unnamed',
-      founder_fit_score: parseInt(parts[1] || 0),
-      market_demand_score: parseInt(parts[2] || 0),
-      monetization_score: parseInt(parts[3] || 0),
-      ai_leverage_score: parseInt(parts[4] || 0),
-      confidence_score: parseInt(parts[5] || 0),
-    }};
-  }});
+  const oppVal = (idx,k) => parseInt((document.querySelector('[name="opp'+idx+'_'+k+'"]')||{{}}).value || 0);
+  const oppName = (idx) => ((document.querySelector('[name="opp'+idx+'_name"]')||{{}}).value || '').trim();
+  const opps = [0,1,2].map(idx => ({{
+      name: oppName(idx),
+      founder_fit_score: oppVal(idx,'fit'),
+      market_demand_score: oppVal(idx,'demand'),
+      monetization_score: oppVal(idx,'monet'),
+      ai_leverage_score: oppVal(idx,'ai'),
+      confidence_score: oppVal(idx,'conf'),
+  }})).filter(o => o.name);
+  const selRadio = document.querySelector('input[name="selected_opp"]:checked');
+  const selIdx = selRadio ? selRadio.value : '0';
+  const selName = oppName(selIdx);
+  const warn = document.getElementById('opp-warning');
+  const resetBtn = () => {{ btn.disabled=false; btn.textContent='Lưu L2 và sinh 7 file AI →'; }};
+  if (!selName) {{ warn.textContent='Nhập tên cơ hội chính và bấm chọn nó làm cơ hội chính.'; warn.style.display='block'; resetBtn(); return; }}
+  const selSum = oppVal(selIdx,'fit')+oppVal(selIdx,'demand')+oppVal(selIdx,'monet')+oppVal(selIdx,'ai')+oppVal(selIdx,'conf');
+  if (selSum < 30) {{ warn.textContent='Cơ hội chính mới đạt '+selSum+'/50. Cần tổng \\u2265 30 để qua cổng L2. Tăng điểm 5 tiêu chí cho cơ hội bạn tin nhất.'; warn.style.display='block'; resetBtn(); return; }}
+  warn.style.display='none';
 
   const payload = {{
     student_id: sid,
@@ -362,8 +413,8 @@ document.getElementById('l2-form').addEventListener('submit', async (e) => {{
       desired_identity: fd.get('stmt_identity'),
       vehicle: fd.get('stmt_vehicle'),
     }},
-    opportunities: parseOpps(),
-    selected_opportunity: fd.get('selected_opportunity'),
+    opportunities: opps,
+    selected_opportunity: selName,
   }};
   try {{
     const r = await fetch('/sdl/l2/intake', {{method:'POST', headers:{{
@@ -379,6 +430,22 @@ document.getElementById('l2-form').addEventListener('submit', async (e) => {{
     document.getElementById('result').classList.add('show');
     window.scrollTo({{top:0, behavior:'smooth'}});
   }} catch(err) {{ alert('Lỗi: '+err.message); btn.disabled=false; btn.textContent='Lưu L2 →'; }}
+}});
+
+// Tổng điểm hiển thị trực tiếp khi đổi dropdown từng cơ hội
+document.querySelectorAll('.opp').forEach(div => {{
+  const idx = div.dataset.idx;
+  const sumEl = div.querySelector('.opp-sum');
+  const recompute = () => {{
+    let s = 0;
+    ['fit','demand','monet','ai','conf'].forEach(k => {{
+      const el = div.querySelector('[name="opp'+idx+'_'+k+'"]');
+      if (el) s += parseInt(el.value || 0);
+    }});
+    sumEl.textContent = s;
+  }};
+  div.querySelectorAll('.score-sel').forEach(sel => sel.addEventListener('change', recompute));
+  recompute();
 }});
 </script>
 </body></html>""")
