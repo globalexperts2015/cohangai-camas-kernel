@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -9,9 +10,11 @@ from routes.challenge_k3 import (
     Day1Request,
     Day2Request,
     EVENT_CONFIG,
+    K3_DAY3_MAX_TOKENS,
     RegisterRequest,
     _derive_token,
     _fake_output,
+    _strip_json_response,
     _normalize_day3_output,
     _token_hash,
 )
@@ -110,6 +113,22 @@ def test_day3_normalizer_pads_missing_assets() -> None:
     assert len(output["launch_content"]) == 30
     assert len(output["email_sequence"]) == 10
     assert all(len(output["roadmap_30_days"][f"week_{week}"]) >= 5 for week in range(1, 5))
+
+
+def test_day3_generation_has_larger_token_budget() -> None:
+    # Day 3 JSON is much larger than Day 1/2: 30 posts + 10 emails + roadmap.
+    assert K3_DAY3_MAX_TOKENS >= 8000
+
+
+def test_strip_json_response_removes_markdown_fence() -> None:
+    assert _strip_json_response("```json\n{\"ok\": true}\n```") == "{\"ok\": true}"
+
+
+def test_student_dashboard_requires_signed_access() -> None:
+    dashboard_routes = Path(__file__).resolve().parents[1] / "routes" / "dashboard_routes.py"
+    source = dashboard_routes.read_text(encoding="utf-8")
+    assert "require_student_signature(str(student_id)" in source
+    assert "request_signature(request, sig)" in source
 
 
 def test_completed_event_sets_day3_and_program_tags() -> None:

@@ -45,6 +45,8 @@ router = APIRouter(tags=["challenge-k3"])
 MODEL = os.getenv("K3_AI_MODEL", "claude-sonnet-4-6")
 MODEL_FREE = os.getenv("K3_AI_MODEL_FREE", "claude-haiku-4-5-20251001")
 MODEL_VIP = os.getenv("K3_AI_MODEL_VIP", MODEL)
+K3_LLM_MAX_TOKENS = int(os.getenv("K3_LLM_MAX_TOKENS", "6000"))
+K3_DAY3_MAX_TOKENS = int(os.getenv("K3_DAY3_MAX_TOKENS", "8000"))
 PUBLIC_BASE_URL = os.getenv("K3_PUBLIC_BASE_URL", "https://os.breakout.live").rstrip("/")
 
 # Pricing constants (USD per 1M tokens) - update khi model price thay doi
@@ -1202,30 +1204,61 @@ KIỂM TRA TRƯỚC KHI TRẢ:
 - JSON parse được, không markdown fence."""
 
 
-async def _llm_json(prompt: str, model: str | None = None) -> tuple[dict[str, Any], float]:
-    """Goi LLM, return (parsed_json, cost_usd). Cost tinh tu usage tokens."""
-    use_model = model or MODEL
-    response = await _client().messages.create(
-        model=use_model,
-        max_tokens=6000,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    raw = response.content[0].text.strip()
+def _strip_json_response(raw: str) -> str:
+    raw = raw.strip()
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1]
         raw = raw.rsplit("```", 1)[0].strip()
-    # Tinh cost theo usage tokens
-    cost = 0.0
+    return raw
+
+
+def _usage_cost_usd(response: Any, model: str) -> float:
     try:
         usage = getattr(response, "usage", None)
         if usage:
             in_tok = getattr(usage, "input_tokens", 0) or 0
             out_tok = getattr(usage, "output_tokens", 0) or 0
-            pricing = _MODEL_PRICING_USD.get(use_model, {"in": 3.0, "out": 15.0})
-            cost = (in_tok * pricing["in"] + out_tok * pricing["out"]) / 1_000_000
+            pricing = _MODEL_PRICING_USD.get(model, {"in": 3.0, "out": 15.0})
+            return (in_tok * pricing["in"] + out_tok * pricing["out"]) / 1_000_000
     except Exception:
         pass
-    return json.loads(raw), cost
+    return 0.0
+
+
+async def _repair_json_once(raw: str, model: str) -> tuple[dict[str, Any], float]:
+    response = await _client().messages.create(
+        model=model,
+        max_tokens=2000,
+        messages=[{
+            "role": "user",
+            "content": (
+                "Sửa đoạn dưới thành JSON thuần parse được. "
+                "Không thêm markdown, không giải thích, không đổi ngôn ngữ nội dung.\n\n"
+                f"{raw[:30000]}"
+            ),
+        }],
+    )
+    repaired = _strip_json_response(response.content[0].text)
+    return json.loads(repaired), _usage_cost_usd(response, model)
+
+
+async def _llm_json(prompt: str, model: str | None = None, max_tokens: int | None = None) -> tuple[dict[str, Any], float]:
+    """Goi LLM, return (parsed_json, cost_usd). Cost tinh tu usage tokens."""
+    use_model = model or MODEL
+    response = await _client().messages.create(
+        model=use_model,
+        max_tokens=max_tokens or K3_LLM_MAX_TOKENS,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    raw = _strip_json_response(response.content[0].text)
+    cost = _usage_cost_usd(response, use_model)
+    try:
+        return json.loads(raw), cost
+    except json.JSONDecodeError:
+        if getattr(response, "stop_reason", "") == "max_tokens":
+            raise
+        repaired, repair_cost = await _repair_json_once(raw, use_model)
+        return repaired, cost + repair_cost
 
 
 async def _track_api_spend(pool: asyncpg.Pool, session_id, kind: str, cost_usd: float, meta: dict | None = None) -> None:
@@ -1617,11 +1650,27 @@ async def _generate_for_job(
         if fake_ai:
             output = _fake_output(3, inputs)
         else:
-            output, cost = await _llm_json(
-                DAY3_PROMPT.replace("{inputs}", json.dumps(inputs, ensure_ascii=False, indent=2)),
-                model=model_for_tier,
-            )
-            await _track_api_spend(pool, sid, "llm_day3", cost, {"model": model_for_tier, "tier": access_tier})
+            try:
+                output, cost = await _llm_json(
+                    DAY3_PROMPT.replace("{inputs}", json.dumps(inputs, ensure_ascii=False, indent=2)),
+                    model=model_for_tier,
+                    max_tokens=K3_DAY3_MAX_TOKENS,
+                )
+                await _track_api_spend(pool, sid, "llm_day3", cost, {"model": model_for_tier, "tier": access_tier})
+            except json.JSONDecodeError as exc:
+                log.warning("K3 Day 3 JSON parse failed, using conservative fallback: %s", exc)
+                output = _fake_output(3, inputs)
+                output["_generation_fallback"] = {
+                    "reason": "llm_json_parse_failed",
+                    "detail": str(exc)[:200],
+                }
+                await _track_api_spend(
+                    pool,
+                    sid,
+                    "llm_day3_fallback",
+                    0.0,
+                    {"model": model_for_tier, "tier": access_tier, "error": str(exc)[:200]},
+                )
         output = _normalize_day3_output(output)
         confidence = 0.6
     return output, evidence, evidence_status, confidence
