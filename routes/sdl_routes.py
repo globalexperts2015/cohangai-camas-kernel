@@ -522,12 +522,13 @@ def _l1_complete_email_html(full_name: str | None, download_url: str) -> str:
     return f"""\
 <div style="font-family:-apple-system,'Be Vietnam Pro',sans-serif;color:#222;line-height:1.65;font-size:15px">
 <p>Chào {name},</p>
-<p>Bạn vừa hoàn thành 8 file nền tảng của Founder OS. Đây là lớp đầu tiên trong Bộ Não Số của bạn.</p>
+<p>Bạn vừa hoàn thành Founder OS. Hệ thống đã sinh bộ vault đầy đủ để bạn setup Bộ Não Số ngay.</p>
+<p>Trong file .zip có 4 file setup ở gốc vault: <strong>soul.md, CLAUDE.md, index.md, log.md</strong>. Ngoài ra còn có 8 file Founder OS của bạn trong thư mục <strong>01 Founder OS</strong>.</p>
 <p>Bấm nút dưới để tải toàn bộ file về máy:</p>
 <p style="margin:24px 0">
   <a href="{download_url}" style="background:#d63031;color:#fff;padding:14px 28px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:700">Tải Bộ Não Số (.zip)</a>
 </p>
-<p>File gồm: sứ mệnh, tầm nhìn, nhận diện founder, nguyên tắc quyết định, anti-vision, cùng phần AI viết lại từ chính câu trả lời của bạn.</p>
+<p>Giải nén file, mở thư mục bằng Obsidian, rồi bắt đầu từ soul.md và index.md.</p>
 <p>Giữ kỹ thư mục này. Đây là tài sản dùng lại suốt hành trình, không phải bài tập nộp một lần rồi quên.</p>
 <p>Bước tiếp theo là Customer Intelligence, hiểu khách hàng đầu tiên của bạn. Bạn vào lại hệ thống khi sẵn sàng.</p>
 <p style="margin-top:24px">Hằng</p>

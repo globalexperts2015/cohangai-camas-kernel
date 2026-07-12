@@ -40,7 +40,7 @@ L1_COMPLETE_WEBHOOK_SECRET = os.environ.get("L1_COMPLETE_WEBHOOK_SECRET", "").st
 
 
 async def _notify_l1_complete(pool: asyncpg.Pool, student_id: UUID) -> None:
-    """Bao breakout-app gui email 8 file khi L1 hoan thanh (>=8 file reviewed).
+    """Bao breakout-app gui email vault khi L1 hoan thanh (>=8 file reviewed).
 
     Non-blocking. KHONG lock Gate 1 (G1 = HARD, Anna chot tay). Anna 2026-06-25.
     """
@@ -216,7 +216,7 @@ async def _trigger_ai_extraction(
     except Exception as exc:
         log.exception("founder-story extract failed: %s", exc)
 
-    # L1 hoan thanh: bao breakout-app gui email 8 file cho hoc vien (Anna 2026-06-25)
+    # L1 hoan thanh: bao breakout-app gui email vault setup + Founder OS cho hoc vien.
     await _notify_l1_complete(pool, student_id)
 
 

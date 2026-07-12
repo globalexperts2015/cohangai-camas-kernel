@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import zipfile
+from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
@@ -28,6 +29,142 @@ if not ADMIN_KEY:
 def _check_admin(key: str | None) -> None:
     if not key or key != ADMIN_KEY:
         raise HTTPException(401, "Invalid admin key")
+
+
+def _plain_file_text(files_by_key: dict[str, dict[str, Any]], key: str) -> str:
+    content = files_by_key.get(key, {}).get("markdown_content") or ""
+    if not content:
+        return ""
+    if content.startswith("---"):
+        parts = content.split("---", 2)
+        if len(parts) == 3:
+            content = parts[2]
+    return content.strip()
+
+
+def _json_payload(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+            return parsed if isinstance(parsed, dict) else {}
+        except Exception:
+            return {}
+    return {}
+
+
+def _build_vault_scaffold_files(
+    student_id: UUID,
+    student: asyncpg.Record | None,
+    files: list[asyncpg.Record],
+    events: list[asyncpg.Record],
+) -> dict[str, str]:
+    """Root-level Obsidian starter files that wrap the canonical Founder OS files."""
+    files_by_key = {str(r["file_key"]): dict(r) for r in files}
+    name = (student["full_name"] if student and "full_name" in student else "") or "Founder"
+    exported_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+    def file_section(title: str, key: str) -> str:
+        body = _plain_file_text(files_by_key, key)
+        return f"## {title}\n\n{body or '[chua co du lieu]'}\n"
+
+    soul_md = "\n".join([
+        "# Soul, toi la ai",
+        "",
+        f"> Auto-gen tu Founder OS cua {name}. Cap nhat lan cuoi: {exported_at}.",
+        "",
+        file_section("1. Su menh doi", "life-mission"),
+        file_section("2. Tam nhin", "vision-statement"),
+        file_section("3. Nhan dien founder", "founder-identity"),
+        file_section("4. Nguyen tac quyet dinh", "decision-principles"),
+        file_section("5. Toi khong muon", "anti-vision"),
+        file_section("6. Vi sao toi lam viec nay", "why-statement"),
+        file_section("7. Tai san cua toi", "founder-assets"),
+        file_section("8. Cau chuyen founder", "founder-story"),
+    ])
+
+    claude_md = """# CLAUDE.md, huong dan AI van hanh Bo Nao So cua ban
+
+## Doc truoc moi phien
+1. `soul.md`, ban nen mot trang ve founder.
+2. `index.md`, ban do vault.
+3. `01 Founder OS/`, 8 file nen tang da tao trong BreakoutOS.
+4. `log.md`, nhat ky hanh trinh.
+
+## Vault nay la gi
+Day la Bo Nao So cua mot founder van hanh doanh nghiep mot nguoi bang AI. Moi cau tra loi phai dua tren du lieu trong vault truoc, khong bat founder nhap lai tu dau.
+
+## Quy tac lam viec
+- Tieng Viet mac dinh, cau ngan, thuc te.
+- Bat dau tu khach hang, khong tu san pham.
+- Khong bia so lieu. Khong chac thi ghi `[can xac minh]`.
+- Khong dung dau em dash.
+- Moi de xuat phai phu hop voi mot nguoi lam solo.
+
+## Khi toi hoi
+1. Doc `index.md` de tim file lien quan.
+2. Doc file nguon truoc khi tra loi.
+3. Tra loi ngan, co buoc tiep theo ro rang.
+"""
+
+    canonical_lines = []
+    for r in files:
+        level = r["level"]
+        file_name = r["file_name"]
+        folder = {
+            1: "01 Founder OS",
+            2: "02 Customer Origin",
+            3: "03 Value Proposition OS",
+            4: "04 Business Operating OS",
+            5: "05 Revenue Growth OS",
+            6: "06a Founder Freedom OS",
+        }.get(level, "00 Other")
+        canonical_lines.append(f"- `{folder}/{file_name}`")
+    index_md = "\n".join([
+        "# Bo Nao So, ban do dieu huong",
+        "",
+        "## Doc truoc",
+        "- `soul.md`",
+        "- `CLAUDE.md`",
+        "- `log.md`",
+        "",
+        "## File da co trong export nay",
+        *(canonical_lines or ["- [chua co file canonical]"]),
+        "",
+        "## Cau truc hanh trinh",
+        "- `01 Founder OS/`, toi la ai va vi sao toi muon phuc vu.",
+        "- `02 Customer Origin/`, khach hang nao toi co quyen phuc vu nhat.",
+        "- `03 Value Proposition OS/`, transformation va offer.",
+        "- `04 Business Operating OS/`, AI COO, automation, SOP.",
+        "- `05 Revenue Growth OS/`, traffic, lead, sales, retention.",
+        "- `06a Founder Freedom OS/`, freedom score va weekly review.",
+    ])
+
+    log_lines = [
+        "# Log, nhat ky Bo Nao So",
+        "",
+        f"## {exported_at[:10]} export | Tai vault tu BreakoutOS",
+        f"- student_id: `{student_id}`",
+        f"- exported_at: `{exported_at}`",
+        "",
+        "## Su kien gan day",
+    ]
+    for event in events:
+        payload = _json_payload(event["payload_json"])
+        detail = payload.get("to") or payload.get("email") or payload.get("download_url") or ""
+        log_lines.append(
+            f"- {event['created_at'].date()} {event['event_type']} | {detail}".rstrip()
+        )
+    if not events:
+        log_lines.append("- [chua co event]")
+
+    return {
+        "soul.md": soul_md,
+        "CLAUDE.md": claude_md,
+        "index.md": index_md,
+        "log.md": "\n".join(log_lines),
+    }
 
 
 # ============================================================
@@ -284,6 +421,11 @@ async def export_vault_zip(
         require_student_signature(str(student_id), request_signature(request, sig))
     _, max_level = await get_student_level_cap(pool, student_id)
     async with pool.acquire() as conn:
+        student = await conn.fetchrow(
+            "SELECT email, full_name, program_id, cohort_id, current_level, current_gate "
+            "FROM breakoutos.students WHERE id=$1",
+            student_id,
+        )
         rows = await conn.fetch(
             """
             SELECT DISTINCT ON (file_key) level, file_key, file_name, markdown_content, tier
@@ -292,6 +434,16 @@ async def export_vault_zip(
             ORDER BY file_key, version DESC
             """,
             student_id, max_level,
+        )
+        events = await conn.fetch(
+            """
+            SELECT event_type, payload_json, created_at
+            FROM breakoutos.student_events
+            WHERE student_id=$1
+            ORDER BY created_at DESC
+            LIMIT 30
+            """,
+            student_id,
         )
 
     AI_CONTEXT_KEYS = {"founder-dna", "brand-voice", "ai-instructions"}
@@ -315,12 +467,18 @@ async def export_vault_zip(
             "README.md",
             f"# Bộ Não Số · Student {student_id}\n\n"
             f"Exported from BreakoutOS at {__import__('datetime').datetime.utcnow().isoformat()}Z\n\n"
-            f"Total files: {len(rows)}\n\n"
+            f"Setup files: 4\n"
+            f"Canonical files: {len(rows)}\n\n"
             f"## Folder structure\n"
+            f"- soul.md\n- CLAUDE.md\n- index.md\n- log.md\n"
             f"- 01 Founder OS\n- 02 Customer Origin\n- 03 Value Proposition OS\n"
             f"- 04 Business Operating OS\n- 05 Revenue Growth OS\n"
             f"- 06a Founder Freedom OS\n- 04 AI Context\n- 05 Canonical Outputs\n"
         )
+        for path, content in _build_vault_scaffold_files(
+            student_id, student, list(rows), list(events)
+        ).items():
+            zf.writestr(path, content)
         for r in rows:
             fkey = r["file_key"]
             if fkey in AI_CONTEXT_KEYS:
