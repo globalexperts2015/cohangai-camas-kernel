@@ -29,6 +29,13 @@ async def coaching_landing() -> HTMLResponse:
     return HTMLResponse(_LANDING_FILE.read_text(encoding="utf-8"))
 
 
+@router.get("/thanh-toan-coaching", response_class=HTMLResponse, include_in_schema=False)
+async def coaching_payment_private() -> HTMLResponse:
+    """Trang thanh toan kin, Anna gui rieng sau khi khach dong y (2026-08-06)."""
+    _f = Path(__file__).resolve().parent.parent / "static" / "thanh-toan-coaching.html"
+    return HTMLResponse(_f.read_text(encoding="utf-8"))
+
+
 @router.get("/coaching/apply", include_in_schema=False)
 @router.get("/mentoring/apply", include_in_schema=False)
 async def coaching_apply_redirect() -> RedirectResponse:
