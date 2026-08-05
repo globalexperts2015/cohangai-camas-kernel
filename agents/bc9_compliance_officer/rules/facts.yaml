@@ -23,7 +23,7 @@ banned_phrases:
   - id: facts.wrong.breakout.pricing.tiers
     pattern: "(Breakout|VIP|Foundation|Customer|Growth)[\\s\\S]{0,30}(99k|2M|4M|10M|20M|30M|100M)"
     severity: soft
-    reason: "Breakout pricing 2026-06-05: VIP 199k / Foundation 3M / Customer 6M / Growth 15M / Coaching 50M (project-breakout-pricing)"
+    reason: "Breakout pricing 2026-08-05: VIP 199k / Foundation 3M / Customer 6M / Growth 15M / Breakout Coaching 52 tuần 150M (project-breakout-pricing)"
   - id: facts.wrong.master.location
     pattern: "(master|thạc sĩ)[\\s\\S]{0,40}(Sydney|Melbourne|Brisbane|Canberra)"
     severity: soft

@@ -20,7 +20,7 @@ giảng LIVE 22/6, access quay sẵn ngay sau khi mua). 5 trigger event:
 
 4. `launch.post_24h` (24h sau launch)
    - Outcome report: tổng register/paid theo 5 tier giá
-     (VIP 199k, Foundation 3M, Customer 6M, Growth 15M, Coaching 50M)
+     (VIP 199k, Foundation 3M, Customer 6M, Growth 15M, Breakout Coaching 52 tuan 150M)
    - Conversion funnel + revenue VND + AUD
    - Telegram + emit memory tag launch_outcome cho cron Mac archive
 
@@ -837,7 +837,7 @@ class BC4K2Launch(BaseBC):
             ("foundation", "Foundation 3M"),
             ("customer", "Customer 6M"),
             ("growth", "Growth 15M"),
-            ("coaching", "Coaching 50M"),
+            ("coaching", "Breakout Coaching 52 tuan 150M"),
         ]
         for key, label in tier_labels:
             cnt = int(by_tier.get(key, 0))

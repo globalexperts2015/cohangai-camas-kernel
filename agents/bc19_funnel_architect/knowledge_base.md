@@ -32,7 +32,7 @@
 ### Phase 6: Change Selling Environment
 - Mục đích: high ticket cần phone/in-person/webinar
 - Tactic: Discovery call 30 phút + Coaching qualify
-- Anna: Coaching 50M qualify call
+- Anna: Breakout Coaching 52 tuần (150M), thanh toán trực tiếp không cần qualify call
 
 ### Phase 7: Identity Shift
 - Mục đích: KH thành identity ("Speakout-er", "Breakouter")
@@ -80,7 +80,7 @@
 - **Giữa phễu** (mid): Customer 6M + Growth 15M
   - Purpose: deepen relationship, deliver depth
   - Volume: 10-30% paid customers
-- **Cuối phễu** (high-touch): Coaching 50M
+- **Cuối phễu** (high-touch): Breakout Coaching 52 tuần (150M)
   - Purpose: transformation 1on1
   - Volume: 1-5% paid customers
 

@@ -228,7 +228,7 @@ nhưng paraphrased / semantic violation có thể lọt. Kiểm thêm 7 layer:
    wrong display name (Hằng Coaching/Anna Đào), team mention, William trong BMCorner,
    em-dash "—", cross-promote Speakout/Breakout trong personal brand Hằng.
 7. FACTS: số liệu Speakout (33k+ contacts, 5k paid), Breakout pricing 5 tier,
-   MARA license 1/2027, Master Adelaide, Coaching 6 tháng.
+   MARA license 1/2027, Master Adelaide, Breakout Coaching 52 tuần 150M.
 
 Step 2: VERDICT từng layer (clean / soft / hard).
 Step 3: Tổng hợp verdict:

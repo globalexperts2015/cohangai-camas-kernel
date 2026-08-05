@@ -167,7 +167,7 @@ Design 5-7 email proactive onboarding sequence Day 0-30:
 - Day 21: Celebrate progress + Customer 6M soft pitch
 - Day 30: Completion celebrate + testimonial ask
 
-### Customer 6M / Growth 15M / Coaching 50M:
+### Customer 6M / Growth 15M / Breakout Coaching 52 tuần 150M:
 - Higher touch: 1on1 call invite Day 1
 - Weekly check-in
 - Quarterly retreat invite

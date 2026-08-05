@@ -130,8 +130,8 @@ Step 6: Output revised offer statement
 - Effort: Anna 1on1 audit + community → 8/10
 - Total: 7.75/10 (mid balanced)
 
-### Coaching 50M (high ticket benchmark)
-- Dream: "Custom AIOS instance + 6 tháng 1on1 + scale 50tr→500tr/tháng" → 9/10
+### Breakout Coaching 52 tuần, 150M (high ticket benchmark)
+- Dream: "Xây trọn BreakoutOS + 52 tuần cầm tay chỉ việc + scale doanh thu" → 9/10
 - Likelihood: Anna's CAMAS Kernel build solo + 6 venture → 10/10
 - Time Delay: Daily Telegram + weekly call → 9/10
 - Effort: 100% done-with-you + AI heavy → 9/10

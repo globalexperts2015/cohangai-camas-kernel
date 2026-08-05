@@ -91,7 +91,7 @@
 **Expected Gains** (Kỳ vọng): mong đợi cơ bản trong tier giá đó
 - Foundation 3M: 10 module video + download lifetime + support group
 - Breakout K2: 3 buổi live + record + Telegram support
-- Coaching 50M: 1on1 + group call + exclusive content
+- Breakout Coaching 52 tuần (150M): 104 buổi coaching trực tiếp + hỗ trợ 1-1 24/7
 
 **Desired Gains** (Mong muốn): thêm vào sẽ thích
 - Bonus 1on1 30 phút audit

@@ -36,7 +36,7 @@ Joy mapping = response 1:1 với Pain. Mỗi pain → ít nhất 1 joy resolutio
 - Community group
 - Email support 24-48h response
 
-**Coaching 50M required**:
+**Breakout Coaching 52 tuần (150M) required**:
 - 1on1 weekly Anna
 - Group session monthly
 - Telegram exclusive
@@ -56,7 +56,7 @@ Joy mapping = response 1:1 với Pain. Mỗi pain → ít nhất 1 joy resolutio
 - Foundation 3M: framework Eagle Camp + Shopify setup + 1 month support
 - Customer 6M: CIS Module 1-6 + persona discovery workshop
 - Growth 15M: 15 strategies Eagle Camp deep + IPS 19 bước + 3 month support
-- Coaching 50M: 1on1 weekly 6 tháng + group call + exclusive workshop
+- Breakout Coaching 52 tuần (150M): 104 buổi coaching trực tiếp + hỗ trợ 1-1 24/7
 
 ### Desired Gains (Mong muốn)
 "Thêm vào sẽ thích, không bắt buộc."
