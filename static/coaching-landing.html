@@ -67,7 +67,7 @@ section.white .section-sub { color: #555; }
 .shift-old li::before { content: "\2715"; position: absolute; left: 0; color: #7a4a4a; font-weight: 800; }
 .shift-new li::before { content: "\2713"; position: absolute; left: 0; color: var(--red); font-weight: 800; }
 .shift-arrow { font-size: 40px; color: var(--red); font-weight: 300; }
-.two-model { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.two-model { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .model-card { background: var(--gray-1); border: 1px solid var(--gray-2); border-top: 3px solid var(--red); border-radius: 14px; padding: 30px; }
 .model-card h3 { font-size: 25px; margin-bottom: 8px; }
 .model-card .model-desc { color: var(--gray); font-size: 16px; margin-bottom: 18px; }
@@ -253,7 +253,7 @@ section.white .section-sub { color: #555; }
 <section class="dark-alt">
   <div class="container">
     <div class="eyebrow">Có thể bạn đang ở đây</div>
-    <h2 class="section-headline">Bạn không thiếu cố gắng. Bạn thiếu một hệ thống chạy được cả khi bạn nghỉ.</h2>
+    <h2 class="section-headline">Bạn đã đủ chăm chỉ rồi. Thứ bạn thiếu là một hệ thống chạy được cả khi bạn nghỉ.</h2>
     <p class="section-sub">Đọc ba tình huống dưới đây. Nếu bạn thấy mình trong ít nhất một, chương trình này viết cho bạn.</p>
     <div class="pain-grid">
       <div class="pain-card">
@@ -280,8 +280,8 @@ section.white .section-sub { color: #555; }
 <section class="alt">
   <div class="container">
     <div class="eyebrow">Đây không phải một khoá học</div>
-    <h2 class="section-headline">Bạn không đến để nghe. Bạn đến để xây một doanh nghiệp thật.</h2>
-    <p class="section-sub">Đây là chương trình đồng hành 52 tuần để xây trọn một Business Operating System, ngay trên doanh nghiệp của bạn. Không phải ngồi nghe rồi tự về làm. Là cầm tay chỉ việc, làm tới đâu chạy tới đó.</p>
+    <h2 class="section-headline">Bạn không gặp Hằng để ngồi nghe. Bạn gặp Hằng để cùng xây và chuyển giao một hệ thống đúng với doanh nghiệp của bạn.</h2>
+    <p class="section-sub">Không phải nghe Hằng nói hay xem hướng dẫn trên máy tính rồi tự về làm một mình. Trong 52 tuần, Hằng cầm tay chỉ việc ngay trên doanh nghiệp của bạn, làm tới đâu hệ thống chạy tới đó, xong phần nào chuyển giao phần đó để bạn tự vận hành.</p>
     <div class="shift-grid">
       <div class="shift-card shift-old">
         <h4>Một khoá học thông thường</h4>
@@ -310,15 +310,15 @@ section.white .section-sub { color: #555; }
 <section class="dark-alt">
   <div class="container">
     <div class="eyebrow">Cơ chế mới</div>
-    <h2 class="section-headline">Khoá học đo số bài đã học. BreakoutOS đo Founder Freedom Score.</h2>
-    <p class="section-sub">BreakoutOS không phải LMS, không phải kho video bài giảng. Nó là hệ điều hành cho công ty một người: 6 mảnh ráp vào nhau thành một cỗ máy, và một thước đo duy nhất cho biết bạn đang tự do hơn hay đang kẹt lại.</p>
+    <h2 class="section-headline">Khoá học đo số bài đã học. BreakoutOS đo Điểm Tự Do của bạn.</h2>
+    <p class="section-sub">BreakoutOS không phải nền tảng học online, không phải kho video bài giảng. Nó là hệ điều hành cho công ty một người: 6 mảnh ráp vào nhau thành một cỗ máy, và một thước đo duy nhất, Điểm Tự Do (Founder Freedom Score), cho biết bạn đang tự do hơn hay đang kẹt lại.</p>
     <div class="os-menu">
-      <div class="os-card"><h3>Customer Clarity</h3><ul class="os-points"><li>Biết chắc khách của bạn là ai, đau gì, mua vì sao</li><li>Mọi quyết định phía sau đều đứng trên nền này</li></ul></div>
-      <div class="os-card"><h3>Offer rõ, bán được</h3><ul class="os-points"><li>Biến chuyên môn hoặc sản phẩm thành offer khách nhìn là hiểu</li><li>Có thang giá, có biên lợi nhuận, không bán rẻ sức mình</li></ul></div>
-      <div class="os-card"><h3>Sales System</h3><ul class="os-points"><li>Từ nội dung tới cuộc hẹn, tới link thanh toán</li><li>Pipeline, follow-up, CRM, không để khách rơi giữa đường</li></ul></div>
-      <div class="os-card"><h3>Delivery System</h3><ul class="os-points"><li>Giao sản phẩm, dịch vụ ổn định khi chỉ có một người</li><li>Khách trả tiền là chắc chắn nhận đúng thứ đã hứa</li></ul></div>
-      <div class="os-card"><h3>AI Operations</h3><ul class="os-points"><li>AI gánh việc lặp lại theo quy trình có kiểm soát</li><li>Giảm việc tay chân, không tạo thêm hỗn loạn</li></ul></div>
-      <div class="os-card"><h3>Founder Freedom Score</h3><ul class="os-points"><li>Thước đo duy nhất: bạn tự do tới đâu về tiền, thời gian, sự rõ ràng, vận hành</li><li>Đo từ lúc bắt đầu, theo dõi suốt hành trình</li></ul></div>
+      <div class="os-card"><h3>Rõ khách hàng</h3><ul class="os-points"><li>Biết chắc khách của bạn là ai, đau gì, mua vì sao</li><li>Mọi quyết định phía sau đều đứng trên nền này</li></ul></div>
+      <div class="os-card"><h3>Sản phẩm rõ, bán được</h3><ul class="os-points"><li>Biến chuyên môn hoặc sản phẩm thành gói bán khách nhìn là hiểu</li><li>Có thang giá, có biên lợi nhuận, không bán rẻ sức mình</li></ul></div>
+      <div class="os-card"><h3>Hệ thống bán hàng</h3><ul class="os-points"><li>Từ nội dung tới cuộc hẹn, tới link thanh toán</li><li>Chuỗi theo khách, nhắc hẹn, sổ khách hàng, không để khách rơi giữa đường</li></ul></div>
+      <div class="os-card"><h3>Hệ thống giao sản phẩm, dịch vụ</h3><ul class="os-points"><li>Giao sản phẩm, dịch vụ ổn định khi chỉ có một người</li><li>Khách trả tiền là chắc chắn nhận đúng thứ đã hứa</li></ul></div>
+      <div class="os-card"><h3>AI vận hành</h3><ul class="os-points"><li>AI gánh việc lặp lại theo quy trình có kiểm soát</li><li>Giảm việc tay chân, không tạo thêm hỗn loạn</li></ul></div>
+      <div class="os-card"><h3>Điểm Tự Do (Founder Freedom Score)</h3><ul class="os-points"><li>Thước đo duy nhất: bạn tự do tới đâu về tiền, thời gian, sự rõ ràng, vận hành</li><li>Đo từ lúc bắt đầu, theo dõi suốt hành trình</li></ul></div>
     </div>
   </div>
 </section>
@@ -336,6 +336,7 @@ section.white .section-sub { color: #555; }
       <div class="imagine-item"><p><b>Trả lời comment Facebook tự động</b> bằng đúng giọng của Hằng. Comment nhạy cảm hay hỏi giá thì tự xếp vào hàng chờ để Hằng duyệt tay. Có nút tắt khẩn cấp.</p></div>
       <div class="imagine-item"><p><b>5 Operation chạy theo lịch, không ai phải bấm nút:</b> quét đối thủ, báo cáo buổi sáng, tuần tra hạ tầng, chào mừng khách mới, báo cáo tuần.</p></div>
       <div class="imagine-item"><p><b>Đo được tới đồng tiền:</b> tracking pixel ghi nguồn khách trên từng đơn, báo cáo tuần tự động gửi vào email mỗi sáng Thứ Hai với số lead, engagement từng kênh và SEO Google. Không phải tự đi gom số.</p></div>
+      <div class="imagine-item"><p><b>Và chưa hết:</b> blog chuẩn SEO tự viết tự đăng mỗi tuần, khoá học số hoá đưa lên hệ thống qua API, widget luyện phát âm chấm điểm ngay trong bài học, webinar instant xem ngay sau khi đăng ký, phễu đặt lịch tư vấn tự báo về máy khi có khách đặt.</p></div>
     </div>
     <p class="imagine-close">Trong 52 tuần, bạn không copy hệ thống của Hằng. Bạn xây phiên bản của riêng bạn, trên doanh nghiệp của bạn, bằng no-code, AI hay code, tuỳ năng lực.</p>
   </div>
@@ -344,19 +345,24 @@ section.white .section-sub { color: #555; }
 <!-- TWO BUSINESS MODELS -->
 <section class="dark-alt">
   <div class="container">
-    <div class="eyebrow">Áp dụng cho cả hai mô hình</div>
+    <div class="eyebrow">Áp dụng cho cả ba mô hình</div>
     <h2 class="section-headline">Bạn xây gì trong 52 tuần</h2>
-    <p class="section-sub">Không chỉ học AI. Bạn xây hoàn chỉnh hệ thống kinh doanh cho doanh nghiệp của mình, dù bạn bán sản phẩm số hay sản phẩm vật lý.</p>
+    <p class="section-sub">Không chỉ học AI. Bạn xây hoàn chỉnh hệ thống kinh doanh cho doanh nghiệp của mình, dù bạn bán sản phẩm số, sản phẩm vật lý hay dịch vụ.</p>
     <div class="two-model">
       <div class="model-card">
         <h3>Hệ thống kinh doanh sản phẩm số</h3>
         <div class="model-desc">Bán chất xám, sản phẩm số hoá, scale không tồn kho.</div>
-        <div class="model-tags"><span>Huấn luyện 1-1</span><span>Tư vấn</span><span>Hội viên</span><span>Gói thuê bao</span><span>Khoá học số</span><span>Sản phẩm số</span></div>
+        <div class="model-tags"><span>Khoá học số</span><span>Sản phẩm số</span><span>Hội viên</span><span>Gói thuê bao</span></div>
       </div>
       <div class="model-card">
         <h3>Hệ thống kinh doanh sản phẩm vật lý</h3>
         <div class="model-desc">Bán hàng thật, dựng thương hiệu sản phẩm, vận hành có hệ thống.</div>
         <div class="model-tags"><span>Shopify</span><span>Thương mại điện tử</span><span>Thương hiệu sản phẩm</span><span>Quản lý kho</span><span>Xử lý đơn</span><span>Tiếp thị</span><span>Tự động hoá</span></div>
+      </div>
+      <div class="model-card">
+        <h3>Hệ thống kinh doanh dịch vụ, tư vấn</h3>
+        <div class="model-desc">Bán chuyên môn và thời gian có hệ thống, không kiệt sức.</div>
+        <div class="model-tags"><span>Tư vấn</span><span>Huấn luyện 1-1</span><span>Dịch vụ chuyên môn</span><span>Đặt lịch tư vấn</span><span>Chăm sóc khách</span></div>
       </div>
     </div>
     <p class="two-model-note">Dù bạn đi mô hình nào, bạn đều xây trọn một <b>Business Operating System</b> vận hành bằng hệ thống, AI và quy trình.</p>
@@ -474,7 +480,7 @@ section.white .section-sub { color: #555; }
 <section class="alt">
   <div class="container">
     <h2 class="section-headline">Chương trình này dành cho ai?</h2>
-    <p class="section-sub">Chương trình đồng hành 52 tuần để xây một doanh nghiệp có hệ thống, dù bạn bán sản phẩm số hay vật lý.</p>
+    <p class="section-sub">Chương trình đồng hành 52 tuần để xây một doanh nghiệp có hệ thống, dù bạn bán sản phẩm số, vật lý hay dịch vụ.</p>
     <div class="fit-grid">
       <div class="fit-card fit-yes">
         <h3>Phù hợp nếu bạn:</h3>
@@ -521,7 +527,7 @@ section.white .section-sub { color: #555; }
     </div>
     <div class="ba-grid">
       <div class="ba-card ba-before">
-        <h4>Hằng năm 2018</h4>
+        <h4>Hằng năm 2022</h4>
         <p>Vận hành một công ty khoảng 70 con người, nhiều mảng cùng lúc. Làm từ sáng sớm tới khuya, mất luôn cả Tết, hai năm gần như không có ngày nghỉ. Trên giấy là ổn. Bên trong là kiệt sức, tóc bạc sớm.</p>
       </div>
       <div class="ba-card ba-after">
@@ -624,7 +630,7 @@ section.white .section-sub { color: #555; }
       <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Tôi mới bắt đầu, chưa rõ khách hàng, chưa rõ sản phẩm, có nên vào không? <span class="tog">+</span></div><div class="faq-a">Được, nếu bạn nghiêm túc. Quý đầu tiên của chương trình dành đúng cho việc đó: làm rõ bạn là ai, khách là ai, offer là gì. Người đi từ đầu thường xây nhanh hơn người phải gỡ thói quen cũ. Điều kiện duy nhất là bạn dành được thời gian đều đặn mỗi tuần và bắt tay làm thật. Nếu bạn chỉ muốn nghe cho biết, chương trình này chưa dành cho bạn.</div></div>
       <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Chương trình kéo dài bao lâu và học thế nào? <span class="tog">+</span></div><div class="faq-a">52 tuần đồng hành, 104 buổi coaching trực tiếp cùng Hằng, cố định Thứ Ba và Thứ Sáu mỗi tuần lúc 12:00-13:00 giờ Việt Nam, đều đặn suốt 52 tuần, kèm review bài hàng tuần và hỗ trợ 1-1 xuyên suốt, 24/7.</div></div>
       <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Nếu tôi bận không dự được buổi live thì sao? <span class="tog">+</span></div><div class="faq-a">Toàn bộ chương trình có video ghi hình. Bận buổi nào bạn xem lại buổi đó, không cần học bù, không bị bỏ lại phía sau.</div></div>
-      <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Tôi bán sản phẩm vật lý, chương trình có phù hợp không? <span class="tog">+</span></div><div class="faq-a">Có. Chương trình áp dụng cho cả hai mô hình: sản phẩm số (coaching, consulting, membership, subscription, digital course, digital products) và sản phẩm vật lý (Shopify, ecommerce, product brand, inventory, fulfillment, marketing, automation). Bạn xây hệ thống đúng theo mô hình của mình.</div></div>
+      <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Tôi bán sản phẩm vật lý, chương trình có phù hợp không? <span class="tog">+</span></div><div class="faq-a">Có. Chương trình áp dụng cho cả ba mô hình: sản phẩm vật lý (Shopify, thương mại điện tử, thương hiệu sản phẩm, kho và đơn hàng), sản phẩm số (khoá học, sản phẩm số hoá, hội viên, thuê bao) và dịch vụ, tư vấn (huấn luyện 1-1, tư vấn, dịch vụ chuyên môn). Bạn xây hệ thống đúng theo mô hình của mình.</div></div>
       <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Đây là học lý thuyết hay làm thật? <span class="tog">+</span></div><div class="faq-a">Làm thật. Không ngồi nghe rồi tự về làm. Mọi module triển khai trực tiếp trên chính doanh nghiệp của bạn, Hằng cầm tay chỉ việc tới khi từng hệ thống chạy được.</div></div>
       <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Tôi không rành công nghệ hay code, có theo được không? <span class="tog">+</span></div><div class="faq-a">Được. Bạn đi bằng con đường hợp với năng lực của mình: no-code, AI, hay code nếu bạn muốn tiến xa hơn. Hằng hướng dẫn dựng automation, AI agent, workflow từng bước. Việc của bạn là ra quyết định đúng, AI và hệ thống lo phần thực thi.</div></div>
       <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Sau 52 tuần tôi có được gì? <span class="tog">+</span></div><div class="faq-a">Bạn tự xây dựng được doanh nghiệp của riêng mình với đầy đủ hệ thống, quy trình, AI và nền tảng vận hành, để tiếp tục phát triển độc lập. Không phải kiến thức để đó, là một cỗ máy chạy được.</div></div>
