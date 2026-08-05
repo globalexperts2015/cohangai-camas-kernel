@@ -123,12 +123,12 @@ Total bonus value: 28M (>9x price)
 - Monthly Q&A live với Anna (value 15M)
 Total bonus value: 46M (>7x price)
 
-### Coaching 50M bonuses
+### Breakout Coaching 52 tuần (150M) bonuses
 - Custom AIOS instance build (value 100M)
 - Daily Telegram direct Anna (value 50M)
 - Quarterly retreat in-person (value 30M)
 - Lifetime mentor network access (value 50M)
-- 1on1 weekly 6 tháng (value 60M)
+- 104 buổi coaching trực tiếp trong 52 tuần (value 150M)
 Total bonus value: 290M (>5x price)
 
 ## 8. Scarcity + Urgency

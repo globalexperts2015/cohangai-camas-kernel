@@ -23,7 +23,7 @@ facts:
 
   # === PRICING (Empire Stack 5-tier) ===
   - category: pricing
-    content: "Breakout có 5 tier Empire Stack: VIP 199k VND, Foundation System 3,000,000 VND, Customer System 6,000,000 VND, Growth System 15,000,000 VND, Coaching 6 tháng 50,000,000 VND. Total ladder 74,199,000 VND per customer."
+    content: "Breakout có 5 tier Empire Stack: VIP 199k VND, Foundation System 3,000,000 VND, Customer System 6,000,000 VND, Growth System 15,000,000 VND, Breakout Coaching 52 tuần 150,000,000 VND (104 buổi coaching trực tiếp, thanh toán trực tiếp, không cần ứng tuyển hay xét duyệt). Total ladder 174,199,000 VND per customer."
     tags: [canonical, pricing, empire-stack, ladder]
 
   - category: pricing

@@ -1,6 +1,6 @@
 """BC10 Coaching Delivery agent.
 
-Mục tiêu: support Anna (Đào Thị Hằng) deliver 1on1 coaching tier 50tr (6 tháng)
+Mục tiêu: support Anna (Đào Thị Hằng) deliver coaching tier Breakout Coaching 52 tuần (150tr, 104 buổi)
 cho Breakout + Cohangai + Speakout. BC10 chuẩn bị brief trước call, tổng kết sau
 call và đẩy accountability check-in hàng tuần để tiết kiệm thời gian Anna trên
 mỗi coachee về dưới 6h/tháng.
@@ -33,7 +33,7 @@ Four trigger events:
 4. Unknown event → success=False.
 
 Architectural decisions:
-    - Opus 4.7 cho pre_call + post_call: customer tier 50tr/6 tháng = ROI cao,
+    - Opus 4.7 cho pre_call + post_call: customer tier 150tr/52 tuần = ROI cao,
       chất lượng > tốc độ (1 brief sai ý có thể làm Anna mất 90 phút call).
       Haiku 4.5 chỉ dùng cho weekly check-in (1-2 câu, cost-sensitive nhân số
       coachee active 5-10 người).
@@ -41,7 +41,7 @@ Architectural decisions:
       đọc + tweak agenda nhưng đủ gần để context còn fresh, khớp Anna time
       budget brief 15 phút review trong brief.
     - customer_360.notes append-only với timestamp prefix: giữ history toàn
-      bộ trajectory coaching 6 tháng để Anna lookback, không bao giờ overwrite.
+      bộ trajectory coaching 52 tuần để Anna lookback, không bao giờ overwrite.
 """
 from __future__ import annotations
 
@@ -75,7 +75,7 @@ DEFAULT_TELEGRAM_TIMEOUT = 30.0
 DEFAULT_TELEGRAM_GROUP_ID = "-1003813280155"  # Breakout Ops
 
 VALID_SESSION_TYPES = {"kickoff", "weekly", "biweekly", "midpoint", "final"}
-COACHING_LTV_THRESHOLD_VND = 50_000_000
+COACHING_LTV_THRESHOLD_VND = 50_000_000  # giu 50M de bao gom ca coachee goi cu 50tr lan goi hien hanh 150tr (52 tuan)
 ANNA_PRIMARY_INBOX = "hang.dao.bbb@gmail.com"
 
 
@@ -979,7 +979,7 @@ class BC10CoachingDelivery(BaseBC):
         prompt = (
             "Bạn là Coaching Delivery Analyst cho Đào Thị Hằng (Hằng/Anna), "
             "venture Breakout (training Shopify cho người Việt). "
-            "Coachee đang ở gói coaching 50tr/6 tháng, tier cao nhất ladder. "
+            "Coachee đang ở gói Breakout Coaching 52 tuần, tier cao nhất ladder. "
             "Anna sẽ nhận brief này 30 phút trước call.\n\n"
             "NHIỆM VỤ: sinh pre-call brief qua tool `submit_pre_call_brief`.\n\n"
             f"CUSTOMER PROFILE (long-term identity):\n{profile_nl}\n\n"
@@ -1144,7 +1144,7 @@ class BC10CoachingDelivery(BaseBC):
         return (
             "Bạn là Coaching Delivery Analyst cho Đào Thị Hằng (Hằng/Anna), "
             "venture Breakout (training Shopify cho người Việt). "
-            "Coachee đang ở gói coaching 50tr/6 tháng, tier cao nhất ladder. "
+            "Coachee đang ở gói Breakout Coaching 52 tuần, tier cao nhất ladder. "
             "Anna sẽ nhận brief này 30 phút trước call.\n\n"
             "NHIỆM VỤ: sinh pre-call brief qua tool `submit_pre_call_brief`.\n\n"
             f"COACHEE: {cust_name}\n"

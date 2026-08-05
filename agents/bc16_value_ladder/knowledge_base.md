@@ -30,7 +30,7 @@ Nha sỹ free teeth cleaning → Brunson đi vào → mua whitening ($297) → b
 | Foundation | 3,000,000 | Frontend | "Shopify Foundation System" |
 | Customer | 6,000,000 | Mid | "Customer Insight System" |
 | Growth | 15,000,000 | High ticket | "Shopify Business Growth System" |
-| Coaching | 50,000,000 | Continuity premium | "Breakout Coaching 6 tháng 1on1" |
+| Coaching | 150,000,000 | Continuity premium | "Breakout Coaching 52 tuần, 104 buổi" |
 
 Total ladder per customer: 74,199,000 VND.
 
@@ -64,7 +64,7 @@ Total ladder per customer: 74,199,000 VND.
 ### D. High Ticket = 1-on-1 hoặc small group
 - Personal touch (Anna direct)
 - 5-25K USD typical
-- Anna Coaching 50M = high ticket 1on1 6 tháng
+- Anna Breakout Coaching 150M = high ticket 52 tuần, 104 buổi coaching trực tiếp
 
 ### E. Continuity = recurring (Brunson + Hormozi đồng ý)
 - Subscription monthly/quarterly
@@ -78,7 +78,7 @@ Total ladder per customer: 74,199,000 VND.
 - Income: 15-25tr/tháng
 - Affordable tier: VIP 199k + Foundation 3M
 - Stretch tier: Customer 6M (cần thuyết phục + payment plan)
-- KHÔNG fit: Coaching 50M (over budget)
+- KHÔNG fit: Breakout Coaching 150M (over budget)
 
 ### Persona Mẹ bỉm sữa (25-40)
 - Income: phụ thuộc chồng
@@ -90,7 +90,7 @@ Total ladder per customer: 74,199,000 VND.
 - Income: 50-200tr doanh thu/tháng
 - Affordable tier: Foundation 3M + Customer 6M
 - Stretch: Growth 15M (rebrand digital)
-- Possible: Coaching 50M (nếu doanh thu giảm khẩn)
+- Possible: Breakout Coaching 150M (nếu doanh thu giảm khẩn)
 
 ### Persona Cohort 1 student (Cohangai)
 - Income: variable solo founder

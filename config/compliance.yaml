@@ -72,7 +72,7 @@ required_disclaimers:
 
   - content_type: "coaching_outcome"
     text: "Kết quả phụ thuộc nỗ lực + điều kiện cụ thể venture của bạn"
-    apply_when: "Content promote Coaching 50M tier"
+    apply_when: "Content promote Breakout Coaching 52 tuần (150M) tier"
 
 # Escalation policy
 escalation:
