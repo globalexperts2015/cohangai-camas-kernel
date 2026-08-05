@@ -27,8 +27,12 @@ facts:
     tags: [canonical, pricing, empire-stack, ladder]
 
   - category: pricing
-    content: "Coaching tier 50M là 6 THÁNG (KHÔNG phải 12 tháng). 1on1 + group sessions + 24/7 Telegram support + AIOS instance custom build cho venture của student. Anna correct Claude 5/6 incident sai duration."
+    content: "Breakout Coaching hiện hành (từ 07/2026): 52 TUẦN, 104 buổi coaching trực tiếp, 150,000,000 VND trọn gói. Offer cũ 50M/6 tháng đã NGƯNG, không dùng trong content. Học phí không công khai trên landing, chốt trong buổi trò chuyện; link thanh toán riêng os.breakout.live/thanh-toan-coaching."
     tags: [canonical, pricing, coaching, duration]
+
+  - category: pricing
+    content: "Credit upgrade lên Breakout Coaching (Anna chốt 2026-08-06): học phí ĐÃ THANH TOÁN THẬT cho các tầng nền (Foundation 3M, Customer 6M, Growth/Business 15M) được khấu trừ toàn bộ vào học phí Coaching 150M. Ví dụ: đã học Foundation còn 147M; Foundation+Customer còn 141M; đủ 3 tầng còn 126M. KHÔNG tính phần được tặng, coupon 100%, khoản đã hoàn tiền hoặc chưa thanh toán. Hằng kiểm tra lịch sử mua và xác nhận số còn lại trước khi gửi link thanh toán. Đây là chính sách nâng cấp nội bộ, không phải cam kết lợi nhuận."
+    tags: [canonical, pricing, coaching, upgrade-credit]
 
   # === SCHEDULE (K2 launch + ongoing) ===
   - category: schedule
