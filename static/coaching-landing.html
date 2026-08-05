@@ -683,8 +683,7 @@ section.white .section-sub { color: #555; }
     </div>
 
     <a href="https://wa.me/61484514733?text=Em%20mu%E1%BB%91n%20ki%E1%BB%83m%20tra%20m%C3%ACnh%20c%C3%B3%20ph%C3%B9%20h%E1%BB%A3p%20v%E1%BB%9Bi%20Breakout%20Coaching%2052%20tu%E1%BA%A7n%20kh%C3%B4ng" class="btn btn-primary btn-lg">Nhắn Hằng kiểm tra có phù hợp không</a>
-    <div style="margin-top:14px;"><a href="javascript:void(0)" onclick="openPayForm()" class="btn btn-ghost">Tôi đã nói chuyện với Hằng, tiếp tục thanh toán &rarr;</a></div>
-    <p style="color: var(--gray); font-size: 13px; margin-top: 14px;">Nút thanh toán dành cho người đã chốt học phí với Hằng trong buổi trò chuyện.</p>
+    <p style="color: var(--gray); font-size: 13px; margin-top: 14px;">Chốt học phí xong trong buổi trò chuyện, Hằng gửi link thanh toán riêng cho bạn.</p>
   </div>
 </section>
 
@@ -752,7 +751,6 @@ section.white .section-sub { color: #555; }
     <p class="line">Không phải kiến thức để đó. Là một cỗ máy chạy được.</p>
     <div class="price-tag">Trọn gói 52 tuần, học phí chốt trong buổi trò chuyện</div>
     <a href="https://wa.me/61484514733?text=Em%20mu%E1%BB%91n%20ki%E1%BB%83m%20tra%20m%C3%ACnh%20c%C3%B3%20ph%C3%B9%20h%E1%BB%A3p%20v%E1%BB%9Bi%20Breakout%20Coaching%2052%20tu%E1%BA%A7n%20kh%C3%B4ng" class="btn btn-primary btn-lg" style="margin-top:10px;">Nhắn Hằng kiểm tra có phù hợp không</a>
-    <div style="margin-top:12px;"><a href="javascript:void(0)" onclick="openPayForm()" class="btn btn-ghost">Tôi đã nói chuyện với Hằng, tiếp tục thanh toán &rarr;</a></div>
     <p class="closing">Phân vân? Nhắn Hằng qua WhatsApp <a href="https://wa.me/61484514733" style="color:var(--white);font-weight:800;text-decoration:none;">+61 484 514 733</a>, kể Hằng nghe bạn đang ở đâu.</p>
     <p style="margin-top:40px;font-size:24px;font-weight:800;color:var(--red);letter-spacing:.5px;">Vì sự tự do của bạn.</p>
   </div>
@@ -769,38 +767,5 @@ section.white .section-sub { color: #555; }
 
 
 
-<!-- PAY FORM MINI (cho người đã chốt học phí với Hằng) -->
-<div id="pay-form-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.82);display:none;z-index:300;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:var(--gray-1);border:1.5px solid var(--red);border-radius:16px;max-width:440px;width:100%;padding:28px;position:relative;">
-    <a href="javascript:void(0)" onclick="closePayForm()" style="position:absolute;top:10px;right:16px;color:var(--gray);font-size:22px;text-decoration:none;">&times;</a>
-    <h3 style="font-size:20px;margin-bottom:6px;">Thông tin nhận quyền truy cập</h3>
-    <p style="color:var(--gray);font-size:14px;margin-bottom:18px;">Dành cho người đã chốt học phí với Hằng. Điền 3 dòng để hệ thống mở tài khoản đúng người và gửi xác nhận.</p>
-    <label style="display:block;font-size:13px;font-weight:700;margin-bottom:5px;">Họ tên</label>
-    <input id="pf-name" type="text" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--gray-3);background:var(--gray-2);color:var(--white);font-size:15px;margin-bottom:12px;">
-    <label style="display:block;font-size:13px;font-weight:700;margin-bottom:5px;">Email</label>
-    <input id="pf-email" type="email" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--gray-3);background:var(--gray-2);color:var(--white);font-size:15px;margin-bottom:12px;">
-    <label style="display:block;font-size:13px;font-weight:700;margin-bottom:5px;">Số điện thoại (Zalo hoặc WhatsApp)</label>
-    <input id="pf-phone" type="tel" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--gray-3);background:var(--gray-2);color:var(--white);font-size:15px;margin-bottom:8px;">
-    <p id="pf-err" style="color:var(--red);font-size:13px;min-height:18px;margin-bottom:8px;"></p>
-    <a href="javascript:void(0)" onclick="submitPayForm()" class="btn btn-primary btn-block">Tiếp tục thanh toán &rarr;</a>
-  </div>
-</div>
-<script>
-function openPayForm(){document.getElementById('pay-form-overlay').style.display='flex';}
-function closePayForm(){document.getElementById('pay-form-overlay').style.display='none';}
-function submitPayForm(){
-  var name=document.getElementById('pf-name').value.trim();
-  var email=document.getElementById('pf-email').value.trim();
-  var phone=document.getElementById('pf-phone').value.trim();
-  var err=document.getElementById('pf-err');
-  if(!name){err.textContent='Bạn điền giúp Hằng họ tên nhé.';return;}
-  if(!email||email.indexOf('@')===-1){err.textContent='Email chưa đúng, bạn kiểm tra lại giúp Hằng.';return;}
-  if(!phone||phone.replace(/[^0-9]/g,'').length<8){err.textContent='Số điện thoại chưa đúng, bạn kiểm tra lại giúp Hằng.';return;}
-  window.location.href='https://breakout-zns-production.up.railway.app/thanh-toan.html?product=coaching-52w'
-    +'&email='+encodeURIComponent(email)
-    +'&phone='+encodeURIComponent(phone)
-    +'&name='+encodeURIComponent(name);
-}
-</script>
 </body>
 </html>
