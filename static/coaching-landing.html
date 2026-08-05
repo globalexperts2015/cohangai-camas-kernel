@@ -187,8 +187,16 @@ section.white .section-sub { color: #555; }
 .story-prose { max-width:840px; }
 .story-prose p { color: var(--gray-light); font-size:16.5px; line-height:1.75; margin-bottom:16px; }
 .story-prose p:last-child { margin-bottom:0; }
+.jn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.jn-card { background: var(--gray-1); border: 1px solid var(--gray-2); border-left: 3px solid var(--red); border-radius: 10px; padding: 22px; }
+.jn-card h3 { font-size: 19px; margin-bottom: 4px; color: var(--white); }
+.jn-sub { color: var(--gray); font-size: 14.5px; margin-bottom: 14px; }
+.jn-row { margin-bottom: 10px; }
+.jn-row:last-child { margin-bottom: 0; }
+.jn-label { display: inline-block; color: var(--red); font-weight: 800; font-size: 11.5px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+.jn-row p { color: var(--gray-light); font-size: 15px; line-height: 1.55; margin: 0; }
 @media (max-width: 900px) {
-  .pain-grid, .ba-grid, .tmb-grid { grid-template-columns: 1fr; }
+  .pain-grid, .ba-grid, .tmb-grid, .jn-grid { grid-template-columns: 1fr; }
   .pain-close, .imagine-close { font-size: 18px; }
   .hero { padding: 50px 0 60px; }
   .hero-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -328,17 +336,58 @@ section.white .section-sub { color: #555; }
 <section class="alt">
   <div class="container">
     <div class="eyebrow">Không nói suông</div>
-    <h2 class="section-headline">Hành trình 32 hệ thống: mỗi chặng gỡ một cái kẹt của người chủ</h2>
-    <p class="section-sub">Bạn có quyền hỏi: người dạy có tự làm được không? Hằng đã xây và đang dùng các lớp hệ thống này ở nhiều mức độ trong các venture của mình: có lớp đang vận hành live, có lớp là hạ tầng nội bộ, có lớp là guardrail để tránh sai. Dưới đây là hành trình đó, kể bằng đúng thứ bạn nhận được ở mỗi chặng.</p>
-    <div class="imagine-list">
-      <div class="imagine-item"><p><b>Hệ thống 0, Nhân chính chủ.</b> Cái kẹt: thuê AI viết thì ra giọng robot, kiến thức kinh nghiệm nằm rải rác trong đầu, dạy AI tuần này tuần sau nó quên. Lối ra: nhân bản giọng, cách nghĩ, câu chuyện và giới hạn của bạn vào một cái nhân; mỗi bài học kinh doanh thành một luật, dạy một lần nhớ mãi; tài sản làm một lần dùng mãi (script, footage, template, SOP). Bạn sở hữu: bộ não thứ hai của doanh nghiệp. Kết quả: content vẫn giống con người thật đứng sau thương hiệu. Nhân của Hằng đang gánh gần một nghìn trang tri thức và hơn sáu nghìn mẫu văn thật.</p></div>
-      <div class="imagine-item"><p><b>Giai đoạn 1, Đứng vững.</b> Cái kẹt: mông lung, không rõ bán cho ai, giá nào, nói câu gì khách cũng thấy nhạt. Lối ra: làm rõ mình là ai trong một dòng; hiểu khách sâu tới mức họ đọc là thấy "đúng là mình" (phỏng vấn tự thành hồ sơ, máy theo dõi đối thủ, kiểm chứng nhu cầu bằng số tìm kiếm thật); thang sản phẩm khách mua rồi mua tiếp. Bạn sở hữu: bản định vị, hồ sơ khách, thang giá. Kết quả: hết đoán mò, mọi quyết định phía sau đứng trên nền chắc.</p></div>
-      <div class="imagine-item"><p><b>Giai đoạn 2, Khách tìm đến đều.</b> Cái kẹt: đăng bài phập phù, kênh nào cũng dở dang, tháng đông tháng vắng, sợ đốt tiền ads. Lối ra: đội AI gánh phần lặp lại của content để bạn ra bài đều tay mà không kiệt sức; một video phủ 6 kênh không trùng giờ, lịch trống có máy tự vá; webinar chạy cả khi bạn ngủ; quảng cáo có trần ngân sách và report rõ ràng, đốt là biết ngay. Bạn sở hữu: cỗ máy thu hút chạy hằng ngày. Kết quả: khách vào đều thay vì hên xui.</p></div>
-      <div class="imagine-item"><p><b>Giai đoạn 3, Ra tiền và giữ khách.</b> Cái kẹt: khách quan tâm rồi im lặng; khách trả tiền xong phải chờ; chủ thức đêm dò từng đơn. Lối ra: phễu dẫn khách từng bước tới thanh toán; khách trả tiền xong không bị rơi giữa đường, hệ thống tự xác nhận, tự mở quyền truy cập, tự kiểm tra lại, kẹt đâu tự sửa đó; comment, review, email có máy trả lời đúng giọng bạn, việc nhạy cảm xếp hàng chờ bạn duyệt; cổng học mở bài theo ngày, khách biết mình đang ở đâu. Bạn sở hữu: kho khách hàng là tài sản của bạn, không nằm trong tay nền tảng nào. Kết quả: không rơi đơn, không rơi khách, khách cũ quay lại.</p></div>
-      <div class="imagine-item"><p><b>Giai đoạn 4, Rút mình ra.</b> Cái kẹt: nghỉ một ngày là việc dồn một đống, mở máy không biết nhìn số nào trước, và luôn nơm nớp lỡ AI đăng bậy. Lối ra: việc lặp lại chạy theo lịch, không ai phải bấm nút; AI được phân quyền rõ, làm tới đâu thì phải hỏi chủ; có tường lửa để chuyện riêng, case chưa đủ quyền, số liệu chưa chắc không bao giờ bị đưa ra công khai làm hỏng uy tín; hệ thống tự báo khi nó ốm, không đợi khách phát hiện. Bạn sở hữu: một báo cáo tuần duy nhất đổ về email và Chỉ số Tự do đo mình tự do tới đâu. Kết quả: bạn ngồi ghế điều hành, biết chính xác số nào cần nhìn.</p></div>
-      <div class="imagine-item"><p><b>Tầng tài sản dài hạn, Mạng lưới quan hệ.</b> Cái kẹt: bán xong là hết quan hệ, năm nào cũng phải đi săn khách lạ từ đầu. Lối ra: người theo bạn được ghi nhớ có hệ thống: ai tin tới đâu, đang ở chặng nào, ai giới thiệu ai. Bạn sở hữu: mạng lưới quan hệ là tài sản lớn dần theo năm. Kết quả: càng làm lâu càng dễ bán. Fan Hub của Hằng đang giữ hơn 32.000 mối quan hệ như vậy.</p></div>
+    <h2 class="section-headline">6 chặng để doanh nghiệp bớt phụ thuộc vào bạn</h2>
+    <p class="section-sub">Hằng không bán lý thuyết. Các lớp hệ thống dưới đây có lớp đang vận hành live, có lớp là hạ tầng nội bộ, có lớp là guardrail để tránh sai. Trong chương trình này, bạn không copy hệ thống của Hằng. Bạn xây phiên bản phù hợp với doanh nghiệp của mình.</p>
+    <div class="jn-grid">
+      <div class="jn-card">
+        <h3>Hệ thống 0: Nhân chính chủ</h3>
+        <p class="jn-sub">Từ AI viết như robot sang AI mang giọng và cách nghĩ của bạn.</p>
+        <div class="jn-row"><span class="jn-label">Cái kẹt</span><p>Kiến thức, kinh nghiệm, câu chuyện và giọng của bạn nằm rải rác trong đầu. Dạy AI hôm nay, tuần sau nó lại quên.</p></div>
+        <div class="jn-row"><span class="jn-label">Lối ra</span><p>Đóng giọng, cách nghĩ, câu chuyện, luật riêng và tài sản tái dùng vào một cái nhân.</p></div>
+        <div class="jn-row"><span class="jn-label">Bạn sở hữu</span><p>Bộ não thứ hai của doanh nghiệp: voice, story bank, template, prompt, SOP.</p></div>
+        <div class="jn-row"><span class="jn-label">Kết quả</span><p>Content và automation vẫn giống con người thật đứng sau thương hiệu.</p></div>
+      </div>
+      <div class="jn-card">
+        <h3>Giai đoạn 1: Đứng vững</h3>
+        <p class="jn-sub">Từ mông lung sang rõ mình bán cho ai.</p>
+        <div class="jn-row"><span class="jn-label">Cái kẹt</span><p>Bạn không rõ khách là ai, bán giá nào, nói câu gì khách cũng thấy nhạt.</p></div>
+        <div class="jn-row"><span class="jn-label">Lối ra</span><p>Làm rõ định vị một dòng, hồ sơ khách, nỗi đau thật và nhu cầu có số kiểm chứng.</p></div>
+        <div class="jn-row"><span class="jn-label">Bạn sở hữu</span><p>Bản định vị, hồ sơ khách, thang sản phẩm, bảng giá.</p></div>
+        <div class="jn-row"><span class="jn-label">Kết quả</span><p>Hết đoán mò. Mọi quyết định phía sau đứng trên nền chắc.</p></div>
+      </div>
+      <div class="jn-card">
+        <h3>Giai đoạn 2: Khách tìm đến đều</h3>
+        <p class="jn-sub">Từ đăng bài phập phù sang có cỗ máy thu hút hằng ngày.</p>
+        <div class="jn-row"><span class="jn-label">Cái kẹt</span><p>Tháng đông tháng vắng, kênh nào cũng dở dang, sợ đốt tiền ads.</p></div>
+        <div class="jn-row"><span class="jn-label">Lối ra</span><p>Nội dung ra đều, video phân phối nhiều kênh, webinar chạy lại được, quảng cáo có trần ngân sách.</p></div>
+        <div class="jn-row"><span class="jn-label">Bạn sở hữu</span><p>Cỗ máy thu hút khách: content, video, webinar, phân phối, paid acquisition.</p></div>
+        <div class="jn-row"><span class="jn-label">Kết quả</span><p>Khách vào đều hơn, không phụ thuộc vào cảm hứng đăng bài.</p></div>
+      </div>
+      <div class="jn-card">
+        <h3>Giai đoạn 3: Ra tiền và giữ khách</h3>
+        <p class="jn-sub">Từ khách quan tâm rồi rơi mất sang một luồng bán hàng khép kín.</p>
+        <div class="jn-row"><span class="jn-label">Cái kẹt</span><p>Khách hỏi rồi im lặng. Khách trả tiền xong phải chờ. Chủ thức đêm dò từng đơn.</p></div>
+        <div class="jn-row"><span class="jn-label">Lối ra</span><p>Phễu dẫn khách tới thanh toán, hệ thống xác nhận đơn, mở quyền truy cập và chăm sóc lại.</p></div>
+        <div class="jn-row"><span class="jn-label">Bạn sở hữu</span><p>Sales system, payment, CRM, email, onboarding và learning experience.</p></div>
+        <div class="jn-row"><span class="jn-label">Kết quả</span><p>Không rơi đơn, không rơi khách, khách cũ có đường quay lại.</p></div>
+      </div>
+      <div class="jn-card">
+        <h3>Giai đoạn 4: Rút mình ra</h3>
+        <p class="jn-sub">Từ ôm hết mọi việc sang ngồi ghế điều hành.</p>
+        <div class="jn-row"><span class="jn-label">Cái kẹt</span><p>Nghỉ một ngày là việc dồn lại. Mở máy không biết nhìn số nào. Sợ AI làm sai hoặc đăng bậy.</p></div>
+        <div class="jn-row"><span class="jn-label">Lối ra</span><p>Việc lặp lại chạy theo lịch, AI được phân quyền, có gate kiểm soát và cảnh báo khi hệ thống có vấn đề.</p></div>
+        <div class="jn-row"><span class="jn-label">Bạn sở hữu</span><p>Automation, governance, báo cáo tuần, dashboard, SOP, backup, Founder Freedom Score.</p></div>
+        <div class="jn-row"><span class="jn-label">Kết quả</span><p>Bạn biết chính xác số nào cần nhìn và việc nào thật sự cần mình.</p></div>
+      </div>
+      <div class="jn-card">
+        <h3>Tầng tài sản dài hạn: Mạng lưới quan hệ</h3>
+        <p class="jn-sub">Từ bán xong là mất dấu sang mỗi khách là một tài sản dài hạn.</p>
+        <div class="jn-row"><span class="jn-label">Cái kẹt</span><p>Năm nào cũng phải đi săn khách lạ từ đầu.</p></div>
+        <div class="jn-row"><span class="jn-label">Lối ra</span><p>Ghi nhớ người theo bạn: họ là ai, tin tới đâu, đang ở chặng nào, ai giới thiệu ai.</p></div>
+        <div class="jn-row"><span class="jn-label">Bạn sở hữu</span><p>Relationship OS và Fan Hub của riêng bạn.</p></div>
+        <div class="jn-row"><span class="jn-label">Kết quả</span><p>Càng làm lâu càng dễ bán, vì niềm tin được tích luỹ thành tài sản.</p></div>
+      </div>
     </div>
-    <p class="imagine-close">Trong 52 tuần, bạn không copy hệ thống của Hằng. Bạn xây phiên bản của riêng bạn, trên doanh nghiệp của bạn, bằng no-code, AI hay code, tuỳ năng lực.</p>
   </div>
 </section>
 
