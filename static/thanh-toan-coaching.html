@@ -71,6 +71,14 @@ document.querySelectorAll('input[name="tier"]').forEach(function(r){
     document.getElementById('price-display').textContent=this.getAttribute('data-price')+' VND';
   });
 });
+// Sync gia hien thi theo radio dang chon: luc tai trang + khi trinh duyet restore tu bfcache (pageshow),
+// tranh lech gia hien thi khi browser giu lai lua chon cu sau refresh. KHONG doi logic tien/amount.
+function syncPrice(){
+  var c=document.querySelector('input[name="tier"]:checked');
+  if(c)document.getElementById('price-display').textContent=c.getAttribute('data-price')+' VND';
+}
+window.addEventListener('pageshow',syncPrice);
+syncPrice();
 function goPay(){
   var name=document.getElementById('pf-name').value.trim();
   var email=document.getElementById('pf-email').value.trim();
