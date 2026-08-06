@@ -15,7 +15,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import APIRouter
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
 
 
 router = APIRouter(tags=["mentoring-landing"])
@@ -34,6 +34,12 @@ async def coaching_payment_private() -> HTMLResponse:
     """Trang thanh toan kin, Anna gui rieng sau khi khach dong y (2026-08-06)."""
     _f = Path(__file__).resolve().parent.parent / "static" / "thanh-toan-coaching.html"
     return HTMLResponse(_f.read_text(encoding="utf-8"))
+
+
+@router.get("/google{gsc_token}.html", include_in_schema=False)
+async def gsc_verification_file(gsc_token: str) -> PlainTextResponse:
+    """Google Search Console FILE verification (2026-08-06)."""
+    return PlainTextResponse(f"google-site-verification: google{gsc_token}.html")
 
 
 @router.get("/coaching/apply", include_in_schema=False)
