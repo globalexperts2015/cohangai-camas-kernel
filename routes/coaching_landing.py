@@ -36,9 +36,15 @@ async def coaching_payment_private() -> HTMLResponse:
     return HTMLResponse(_f.read_text(encoding="utf-8"))
 
 
+GSC_VERIFICATION_TOKENS = {"c66fa30bfc653b0e"}  # token file GSC cua Anna
+
+
 @router.get("/google{gsc_token}.html", include_in_schema=False)
 async def gsc_verification_file(gsc_token: str) -> PlainTextResponse:
-    """Google Search Console FILE verification (2026-08-06)."""
+    """GSC FILE verification: chi tra token da biet, ten khac 404 (Google probe chong catch-all)."""
+    if gsc_token not in GSC_VERIFICATION_TOKENS:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Not found")
     return PlainTextResponse(f"google-site-verification: google{gsc_token}.html")
 
 
