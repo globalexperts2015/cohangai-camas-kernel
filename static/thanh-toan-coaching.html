@@ -33,7 +33,7 @@ input { width:100%; padding:12px; border-radius:8px; border:1px solid var(--gray
   <div class="logo">BREAK<b>OUT</b> COACHING</div>
   <h1>Thanh toán Breakout Coaching, 52 tuần</h1>
   <p class="sub">Trang này Hằng gửi riêng cho bạn sau khi hai bên đã trao đổi và chốt tham gia.</p>
-  <div class="price">150.000.000 VND</div>
+  <div class="price" id="price-display">150.000.000 VND</div>
   <p class="price-note">Trọn gói toàn bộ chương trình, không phí ẩn.</p>
   <p class="price-note" style="color:var(--red);">Nếu bạn đã học Foundation, Customer hoặc Growth/Business mà số tiền trên chưa trừ phần đã đóng, dừng lại và nhắn Hằng trước khi thanh toán.</p>
   <div style="background:var(--gray-2);border:1px solid var(--gray-3);border-left:3px solid var(--red);border-radius:10px;padding:14px 16px;margin-bottom:18px;">
@@ -47,6 +47,14 @@ input { width:100%; padding:12px; border-radius:8px; border:1px solid var(--gray
     <li>Video ghi hình toàn bộ chương trình</li>
     <li>Hoàn phí 14 ngày theo <a href="https://app.breakout.live/chinh-sach-hoan-phi" style="color:var(--red);text-decoration:none;font-weight:700;">chính sách hoàn phí</a></li>
   </ul>
+  <label>Bạn đã học tầng nền nào của Breakout?</label>
+  <div id="tier-select" style="margin-bottom:14px;">
+    <label style="display:block;font-weight:400;font-size:14px;padding:9px 12px;border:1px solid var(--gray-3);border-radius:8px;margin-bottom:8px;cursor:pointer;"><input type="radio" name="tier" value="coaching-52w" data-price="150.000.000" checked style="margin-right:8px;">Chưa học tầng nền nào &middot; 150.000.000</label>
+    <label style="display:block;font-weight:400;font-size:14px;padding:9px 12px;border:1px solid var(--gray-3);border-radius:8px;margin-bottom:8px;cursor:pointer;"><input type="radio" name="tier" value="coaching-52w-f" data-price="147.000.000" style="margin-right:8px;">Đã học Foundation &middot; 147.000.000</label>
+    <label style="display:block;font-weight:400;font-size:14px;padding:9px 12px;border:1px solid var(--gray-3);border-radius:8px;margin-bottom:8px;cursor:pointer;"><input type="radio" name="tier" value="coaching-52w-fc" data-price="141.000.000" style="margin-right:8px;">Foundation + Customer &middot; 141.000.000</label>
+    <label style="display:block;font-weight:400;font-size:14px;padding:9px 12px;border:1px solid var(--gray-3);border-radius:8px;margin-bottom:0;cursor:pointer;"><input type="radio" name="tier" value="coaching-52w-fcg" data-price="126.000.000" style="margin-right:8px;">Foundation + Customer + Growth/Business &middot; 126.000.000</label>
+  </div>
+  <p style="color:var(--gray);font-size:12.5px;margin-bottom:14px;">Chọn đúng mức bạn đã thanh toán thật. Hằng đối chiếu lịch sử thanh toán trước khi mở quyền truy cập.</p>
   <label>Họ tên</label>
   <input id="pf-name" type="text">
   <label>Email</label>
@@ -58,6 +66,11 @@ input { width:100%; padding:12px; border-radius:8px; border:1px solid var(--gray
   <p class="foot">Bấm nút sẽ hiện mã QR kèm mã đơn riêng của bạn. Chuyển khoản xong hệ thống tự xác nhận và mở quyền truy cập.<br>Cần hỗ trợ: <a href="mailto:support@daothihang.com">support@daothihang.com</a></p>
 </div>
 <script>
+document.querySelectorAll('input[name="tier"]').forEach(function(r){
+  r.addEventListener('change', function(){
+    document.getElementById('price-display').textContent=this.getAttribute('data-price')+' VND';
+  });
+});
 function goPay(){
   var name=document.getElementById('pf-name').value.trim();
   var email=document.getElementById('pf-email').value.trim();
@@ -66,7 +79,8 @@ function goPay(){
   if(!name){err.textContent='Bạn điền giúp Hằng họ tên nhé.';return;}
   if(!email||email.indexOf('@')===-1){err.textContent='Email chưa đúng, bạn kiểm tra lại giúp Hằng.';return;}
   if(!phone||phone.replace(/[^0-9]/g,'').length<8){err.textContent='Số điện thoại chưa đúng, bạn kiểm tra lại giúp Hằng.';return;}
-  window.location.href='https://breakout-zns-production.up.railway.app/thanh-toan.html?product=coaching-52w'
+  var tier=document.querySelector('input[name="tier"]:checked').value;
+  window.location.href='https://breakout-zns-production.up.railway.app/thanh-toan.html?product='+encodeURIComponent(tier)
     +'&email='+encodeURIComponent(email)
     +'&phone='+encodeURIComponent(phone)
     +'&name='+encodeURIComponent(name);
