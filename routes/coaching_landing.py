@@ -29,6 +29,22 @@ async def coaching_landing() -> HTMLResponse:
     return HTMLResponse(_LANDING_FILE.read_text(encoding="utf-8"))
 
 
+_BOF_FILE = Path(__file__).resolve().parent.parent / "static" / "bof-landing.html"
+
+
+@router.get("/bof", response_class=HTMLResponse, include_in_schema=False)
+@router.get("/nen-tang-van-hanh", response_class=HTMLResponse, include_in_schema=False)
+async def bof_landing() -> HTMLResponse:
+    """Business Operating Foundation, chuong trinh nen tang 7 tuan 24tr (2026-08-12).
+
+    Bac truoc Breakout Coaching 52 tuan: hoc phi 24tr duoc khau tru vao 150tr
+    neu hoc vien di tiep. Trang dang o trang thai noindex vi con placeholder
+    (payment URL, ngay khai giang, gio hoc). Bo noindex khi Anna dien xong.
+    Nguon noi dung: wiki/projects/breakout/landing-nen-tang-van-hanh-7-tuan-2026-08-12.md
+    """
+    return HTMLResponse(_BOF_FILE.read_text(encoding="utf-8"))
+
+
 @router.get("/thanh-toan-coaching", response_class=HTMLResponse, include_in_schema=False)
 async def coaching_payment_private() -> HTMLResponse:
     """Trang thanh toan kin, Anna gui rieng sau khi khach dong y (2026-08-06)."""

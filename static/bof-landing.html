@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Nền Tảng Vận Hành Doanh Nghiệp Một Người, 7 tuần | Đào Thị Hằng</title>
+<meta name="description" content="Bảy tuần để bạn biết mình nên bán gì, bán cho ai, và bán bằng con đường nào. Foundation chọn hướng, Customer Success thiết kế phễu sản phẩm, Growth System đưa ra thị trường. 14 buổi live với Đào Thị Hằng, thứ Ba và thứ Sáu.">
+<meta property="og:title" content="Bảy tuần để bạn biết mình nên bán gì, bán cho ai, và bán bằng con đường nào">
+<meta property="og:description" content="Chương trình nền tảng 7 tuần trước Breakout Coaching. Dành cho người muốn kinh doanh nhưng chưa biết bắt đầu từ đâu.">
+<meta property="og:url" content="https://os.breakout.live/bof">
+<style>
+:root{
+  --red:#E11D2A; --red-dark:#B3141F; --red-soft:rgba(225,29,42,.10);
+  --black:#000; --g1:#141414; --g2:#242424;
+  --white:#fff; --gray:#B0B0B0; --gray-light:#E6E6E6;
+  --fill:#F2A93B; --fill-soft:rgba(242,169,59,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Inter","Be Vietnam Pro","Segoe UI",sans-serif;
+  background:var(--black);color:var(--white);line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.container{max-width:1180px;margin:0 auto;padding:0 20px}
+.narrow{max-width:820px}
+
+.topbar{position:sticky;top:0;z-index:100;background:rgba(0,0,0,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--g2);padding:12px 0}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{font-weight:800;font-size:18px;letter-spacing:2px}
+.logo b{color:var(--red)}
+.topbar-mid{color:var(--gray);font-size:13px;flex:1;text-align:center}
+@media(max-width:760px){.topbar-mid{display:none}}
+
+.btn{display:inline-block;padding:14px 28px;border-radius:8px;font-weight:800;font-size:15px;
+  text-decoration:none;text-align:center;letter-spacing:.3px;border:none;cursor:pointer;
+  transition:background .2s,transform .2s,box-shadow .2s}
+.btn-primary{background:var(--red);color:var(--white)}
+.btn-primary:hover{background:var(--red-dark);transform:translateY(-1px);box-shadow:0 8px 26px rgba(225,29,42,.4)}
+.btn-sm{padding:10px 18px;font-size:14px}
+.btn-lg{padding:18px 36px;font-size:17px}
+.btn-block{display:block;width:100%}
+a:focus-visible,.btn:focus-visible,summary:focus-visible{outline:2px solid var(--fill);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.fill{display:inline-block;background:var(--fill-soft);color:var(--fill);border:1px dashed var(--fill);
+  border-radius:5px;padding:1px 8px;font-size:.86em;font-weight:700;white-space:nowrap}
+.fill-note{display:block;margin-top:8px;text-align:center;font-size:12px}
+
+.hero{padding:80px 0 92px;border-bottom:1px solid var(--g2)}
+.hero-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:52px;align-items:start}
+.tagline{font-size:13px;color:var(--red);font-weight:800;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-size:clamp(32px,4.4vw,50px);font-weight:800;line-height:1.13;letter-spacing:-.5px;text-wrap:balance;margin-bottom:20px}
+.hero h1 .accent{color:var(--red)}
+.hero .sub{font-size:20px;color:var(--gray-light);margin-bottom:28px;max-width:62ch}
+.hero-points{list-style:none;display:flex;flex-direction:column;gap:10px}
+.hero-points li{position:relative;padding-left:28px;font-size:16.5px;color:var(--gray-light)}
+.hero-points li::before{content:"\2713";position:absolute;left:0;color:var(--red);font-weight:900}
+.cta-box{background:var(--g1);border:1.5px solid var(--red);border-radius:16px;padding:30px;
+  box-shadow:0 24px 70px rgba(225,29,42,.22);position:sticky;top:76px}
+.cta-box .title{font-size:14px;color:var(--gray-light);font-weight:700;letter-spacing:.5px}
+.cta-box .price-main{color:var(--red);font-size:42px;font-weight:900;line-height:1;margin:10px 0 4px}
+.cta-box .price-caption{color:var(--gray);font-size:13px;margin-bottom:18px}
+.cta-box .incl{list-style:none;display:flex;flex-direction:column;gap:2px;margin-bottom:20px}
+.cta-box .incl li{font-size:14.5px;color:var(--gray-light);padding:6px 0 6px 24px;position:relative}
+.cta-box .incl li::before{content:"\2713";position:absolute;left:0;color:var(--red);font-weight:900}
+.cta-note{color:var(--gray);font-size:12.5px;margin-top:14px;text-align:center;line-height:1.5}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:36px}.cta-box{position:static}}
+
+section{padding:76px 0}
+section.alt{background:var(--g1)}
+section.line{border-top:1px solid var(--g2)}
+.eyebrow{color:var(--red);font-weight:800;font-size:12.5px;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+h2{font-size:clamp(26px,3.2vw,38px);font-weight:800;line-height:1.2;letter-spacing:-.4px;text-wrap:balance;margin-bottom:18px}
+h3{font-size:23px;font-weight:800;margin-bottom:12px;text-wrap:balance}
+h4{font-size:17px;font-weight:800;margin-bottom:10px}
+.lede{font-size:19px;color:var(--gray-light);max-width:66ch;margin-bottom:34px}
+p{max-width:66ch;margin-bottom:14px;color:var(--gray-light);font-size:17px}
+p strong{color:var(--white)}
+.stack{display:flex;flex-direction:column;gap:38px}
+.kicker{color:var(--red);font-weight:800}
+.solves{color:var(--white);font-weight:700;border-left:3px solid var(--red);padding-left:14px;margin-top:14px;font-size:16px}
+
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:34px}
+.layer{background:var(--black);border:1px solid var(--g2);border-top:3px solid var(--red);border-radius:14px;padding:26px}
+section.alt .layer{background:var(--g1)}
+.layer .n{color:var(--red);font-size:12px;font-weight:800;letter-spacing:2px;margin-bottom:10px}
+.layer p{font-size:16px;margin-bottom:10px}
+@media(max-width:860px){.layers{grid-template-columns:1fr}}
+
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:28px 0 8px}
+.role{background:var(--g1);border:1px solid var(--g2);border-radius:14px;padding:26px}
+section.alt .role{background:var(--black)}
+.role .day{display:inline-block;background:var(--red);color:var(--white);font-size:12px;font-weight:800;
+  letter-spacing:1.5px;padding:5px 12px;border-radius:6px;margin-bottom:14px}
+.role ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.role li{position:relative;padding-left:24px;color:var(--gray-light);font-size:16.5px}
+.role li::before{content:"\203A";position:absolute;left:0;color:var(--red);font-weight:900;font-size:19px;line-height:1.2}
+@media(max-width:760px){.roles{grid-template-columns:1fr}}
+
+.tiers{list-style:none;display:flex;flex-direction:column;gap:10px;margin:16px 0 18px;max-width:66ch}
+.tiers li{position:relative;padding:10px 0 10px 32px;color:var(--gray-light);font-size:16.5px;border-bottom:1px solid rgba(36,36,36,.8)}
+.tiers li:last-child{border-bottom:none}
+.tiers li::before{content:"\25B8";position:absolute;left:8px;color:var(--red);font-weight:900}
+.tiers b{color:var(--white)}
+.callout{background:var(--red-soft);border:1px solid var(--red);border-radius:14px;padding:26px;margin-bottom:24px}
+.callout p{margin-bottom:0;font-size:17.5px;color:var(--white);max-width:none}
+
+.wk{margin-bottom:30px}
+.wk-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--g2);padding-bottom:10px;margin-bottom:8px}
+.wk-head .w{color:var(--red);font-weight:800;font-size:12.5px;letter-spacing:2px;text-transform:uppercase}
+.wk-head .t{font-weight:700;font-size:20px}
+.prep{color:var(--gray);font-size:15px;font-style:italic;margin:12px 0 14px;max-width:none}
+.sess{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid rgba(36,36,36,.7)}
+.sess:last-child{border-bottom:none}
+.sess .num{flex:none;width:40px;height:40px;border-radius:10px;background:var(--red);color:var(--white);
+  font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.sess .when{color:var(--red);font-size:12.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+.sess .what{color:var(--gray-light);font-size:16.5px;margin-top:2px}
+
+.fit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.fit{border-radius:14px;padding:28px}
+.fit-yes{background:var(--red-soft);border:1px solid var(--red)}
+.fit-no{background:#171313;border:1px solid #322222}
+.fit h3{font-size:15px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.fit-yes h3{color:var(--red)}
+.fit-no h3{color:#9a6a6a}
+.fit h4{font-size:12.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin:20px 0 12px}
+.fit h4:first-of-type{margin-top:0}
+.fit ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.fit li{position:relative;padding-left:26px;color:var(--gray-light);font-size:16.5px}
+.fit-yes li::before{content:"\2713";position:absolute;left:0;color:var(--red);font-weight:900}
+.fit-no li::before{content:"\2715";position:absolute;left:0;color:#7a4a4a;font-weight:800}
+.fit-foot{color:var(--gray);font-size:15.5px;margin-top:18px;max-width:none}
+@media(max-width:860px){.fit-grid{grid-template-columns:1fr}}
+
+.assets{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:start}
+.asset-col{background:var(--g1);border:1px solid var(--g2);border-radius:14px;padding:26px}
+.asset-col h4{color:var(--red);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.asset-col .role-note{color:var(--gray);font-size:14px;font-style:italic;margin-bottom:16px}
+.asset-col ol{list-style:none;counter-reset:a;display:flex;flex-direction:column;gap:10px}
+.asset-col li{counter-increment:a;position:relative;padding-left:30px;color:var(--gray-light);font-size:16px}
+.asset-col li::before{content:counter(a);position:absolute;left:0;top:1px;color:var(--red);font-weight:800;
+  font-size:13px;font-variant-numeric:tabular-nums}
+.asset-col li b{color:var(--white)}
+@media(max-width:900px){.assets{grid-template-columns:1fr}}
+.no-promise{margin-top:34px;background:var(--black);border-left:3px solid var(--red);border-radius:0 12px 12px 0;padding:24px 26px}
+section.alt .no-promise{background:var(--g1)}
+.no-promise p{margin-bottom:10px}
+.no-promise p:last-child{margin-bottom:0}
+
+.quotes{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.q{background:var(--g1);border:1px solid var(--g2);border-left:3px solid var(--red);border-radius:0 12px 12px 0;padding:26px}
+section.alt .q{background:var(--black)}
+.q blockquote{font-size:17.5px;color:var(--white);line-height:1.6;margin-bottom:16px}
+.q .who{color:var(--red);font-weight:800;font-size:15px}
+.q .who span{display:block;color:var(--gray);font-weight:500;font-size:14.5px;margin-top:3px}
+.disclaim{color:var(--gray);font-size:14.5px;margin-top:26px;font-style:italic;max-width:none}
+@media(max-width:860px){.quotes{grid-template-columns:1fr}}
+
+.ladder{display:grid;grid-template-columns:1fr auto 1fr;gap:26px;margin-bottom:36px}
+.rung{border-radius:14px;padding:28px}
+.rung-now{background:var(--red-soft);border:1.5px solid var(--red)}
+.rung-next{background:var(--g1);border:1px solid var(--g2)}
+.rung .lbl{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.rung-now .lbl{color:var(--red)}
+.rung-next .lbl{color:var(--gray)}
+.rung h3{font-size:21px;margin-bottom:8px}
+.rung p{font-size:16px;margin-bottom:0}
+.rung .price{font-size:30px;font-weight:900;margin-top:14px;font-variant-numeric:tabular-nums}
+.rung-now .price{color:var(--red)}
+.rung-next .price{color:var(--white)}
+.rung .price small{display:block;font-size:14px;font-weight:600;color:var(--gray);margin-top:4px}
+.arrow{align-self:center;font-size:34px;color:var(--red);font-weight:300}
+@media(max-width:860px){.ladder{grid-template-columns:1fr}.arrow{transform:rotate(90deg);justify-self:center}}
+
+.table-wrap{overflow-x:auto;margin:24px 0 28px}
+table{border-collapse:collapse;width:100%;min-width:420px}
+th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--g2);font-size:16.5px}
+th{color:var(--gray);font-size:12.5px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800}
+td:last-child,th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+tr.sum td{color:var(--red);font-weight:900;font-size:18px;border-bottom:none}
+
+.faq{display:flex;flex-direction:column;gap:12px}
+details{background:var(--g1);border:1px solid var(--g2);border-radius:12px;overflow:hidden}
+section.alt details{background:var(--black)}
+details[open]{border-color:var(--red)}
+summary{cursor:pointer;padding:20px 24px;font-weight:700;font-size:17.5px;list-style:none;
+  display:flex;justify-content:space-between;gap:16px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--red);font-size:24px;font-weight:400;flex:none;line-height:1}
+details[open] summary::after{content:"\2013"}
+.faq-body{padding:0 24px 22px}
+.faq-body p{font-size:16.5px}
+.faq-body p:last-child{margin-bottom:0}
+
+.close{text-align:center;padding:88px 0}
+.close h2{margin-left:auto;margin-right:auto;max-width:22ch}
+.close p{margin-left:auto;margin-right:auto;text-align:center}
+.close .btn{margin-top:22px}
+footer{border-top:1px solid var(--g2);padding:30px 0;color:var(--gray);font-size:14px;text-align:center}
+.sig{color:var(--red);font-weight:800}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="logo">BREAK<b>OUT</b></div>
+    <div class="topbar-mid">7 tu&#7847;n &middot; 14 bu&#7893;i live &middot; Th&#7913; Ba v&agrave; th&#7913; S&aacute;u</div>
+    <a class="btn btn-primary btn-sm" href="#hoc-phi">&#272;&#259;ng k&yacute; h&#7885;c</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="tagline">Chương trình nền tảng trước Coaching</div>
+      <h1>Bảy tuần để bạn biết mình nên bán gì, bán cho ai, và <span class="accent">bán bằng con đường nào.</span></h1>
+      <p class="sub">Dành cho người muốn kinh doanh nhưng chưa biết nên bắt đầu từ đâu, và cho người đã có ý tưởng nhưng chưa biến được nó thành mô hình có khách. Bạn học video trước. Khi gặp Hằng, Hằng và bạn review lại, gỡ vướng, và áp thẳng vào bối cảnh thật của bạn. Hai buổi mỗi tuần, thứ Ba và thứ Sáu, trong 7 tuần.</p>
+      <ul class="hero-points">
+        <li>7 tuần, 14 buổi live với Hằng, cộng video tự học trọn bộ</li>
+        <li>Foundation chọn hướng, Customer Success thiết kế phễu sản phẩm, Growth System đưa ra thị trường</li>
+        <li>Học phí 24 triệu, được khấu trừ vào Coaching nếu bạn đi tiếp</li>
+      </ul>
+    </div>
+    <div class="cta-box">
+      <div class="title">Nền Tảng Vận Hành Doanh Nghiệp Một Người</div>
+      <div class="price-main">24.000.000đ</div>
+      <div class="price-caption">Một lần, cho trọn 7 tuần</div>
+      <ul class="incl">
+        <li>Trọn bộ video ba phần</li>
+        <li>14 buổi live với Hằng</li>
+        <li>Review bài làm, tư vấn cá nhân</li>
+        <li>Thư viện mẫu và câu lệnh AI</li>
+        <li>Nhóm học viên suốt 7 tuần</li>
+      </ul>
+      <a class="btn btn-primary btn-block btn-lg" href="#hoc-phi">Đăng ký học 7 tuần</a>
+      <span class="fill fill-note">PAYMENT_URL_CHỊ_ĐIỀN</span>
+      <div class="cta-note">Khai giảng <span class="fill">ngày khai giảng</span><br>Thanh toán xong bạn nhận quyền xem video ngay, học trước buổi đầu tiên.</div>
+    </div>
+  </div>
+</div>
+
+<section class="alt">
+  <div class="container narrow">
+    <div class="eyebrow">Bạn có đang ở đây không</div>
+    <h2>Bạn muốn kinh doanh. Nhưng câu hỏi đầu tiên bạn vẫn chưa trả lời được: bán gì?</h2>
+    <p>Bạn đã học nhiều rồi. Đã xem nhiều rồi. Điện thoại bạn lưu hàng chục ý tưởng. Có khi có cả vài khoá chưa xem hết.</p>
+    <p>Càng xem càng rối. Hôm nay thấy người ta bán mỹ phẩm được, bạn nghĩ hay là mình cũng bán. Tuần sau thấy người khác dạy online, bạn lại nghĩ hay là mình dạy. Rồi lại thôi, vì bạn không chắc mình có gì để bán.</p>
+    <p>Bạn có chuyên môn. Hoặc bạn có một quãng đời đã đi qua, có thứ bạn hiểu hơn người khác. Nhưng bạn không biết cách biến nó thành một sản phẩm ai đó chịu trả tiền.</p>
+    <p>Có thể bạn đã thử bán một món gì đó. Bán được vài đơn. Rồi hết. Khách mua xong là im, vì bạn cũng không biết bước tiếp theo cho họ là gì.</p>
+    <p>Bạn mở AI ra, gõ một câu, nó trả về một đoạn văn nghe hay mà không dùng được. Vì nó không biết bạn là ai, khách bạn là ai, bạn đang bán cái gì cho ai.</p>
+    <p>Và điều bạn muốn nhất, bạn chưa nói thành lời: bạn không muốn copy mô hình của người khác. Bạn muốn một lối kinh doanh là của bạn.</p>
+    <p>Đây không phải vấn đề chăm chỉ. Bạn đã chăm chỉ rồi.</p>
+    <p><strong>Đây là vấn đề nền.</strong></p>
+  </div>
+</section>
+
+<section class="line">
+  <div class="container">
+    <div class="eyebrow">Chẩn đoán</div>
+    <h2>Ba lớp nền thiếu theo đúng một thứ tự</h2>
+    <p class="lede">Ba lớp này phải xây theo thứ tự. Không nhảy cóc được.</p>
+    <div class="layers">
+      <div class="layer">
+        <div class="n">Lớp 1</div>
+        <h3>Chưa rõ mình nên bán gì</h3>
+        <p>Chưa trả lời xong: bạn là ai, bạn thật sự có gì trong tay, thứ đó đáng giá với ai, và bạn nên bắt đầu bằng sản phẩm hay dịch vụ nào.</p>
+        <p>Chưa rõ thì ý tưởng nào nghe cũng hay, và không ý tưởng nào đi được quá ba tháng.</p>
+        <p class="solves">Foundation giải quyết lớp này.</p>
+      </div>
+      <div class="layer">
+        <div class="n">Lớp 2</div>
+        <h3>Chưa rõ khách, chưa có hành trình sản phẩm</h3>
+        <p>Chân dung khách hàng đang là tưởng tượng. "Phụ nữ 28 đến 45, quan tâm phát triển bản thân". Đó không phải khách hàng. Đó là một dòng mô tả.</p>
+        <p>Và kể cả khi bán được, bạn bán một món rời rạc. Khách mua xong là hết. Không có bước tiếp theo cho họ đi.</p>
+        <p class="solves">Customer Success giải quyết lớp này.</p>
+      </div>
+      <div class="layer">
+        <div class="n">Lớp 3</div>
+        <h3>Chưa có cỗ máy tăng trưởng</h3>
+        <p>Chưa có trang bán. Chưa có nội dung kéo người. Chưa có chuỗi email chạy khi bạn ngủ. Chưa có số để biết cái gì đang chạy và cái gì đang đốt tiền.</p>
+        <p>Mỗi đồng doanh thu đều đổi bằng một giờ của bạn.</p>
+        <p class="solves">Growth System giải quyết lớp này.</p>
+      </div>
+    </div>
+    <div class="narrow">
+      <p>Không có Lớp 1 thì Lớp 2 đi sai hướng, vì bạn chọn nhầm nhóm khách.</p>
+      <p>Không có Lớp 2 thì Lớp 3 đem một món hàng rời rạc ra chợ, cho người không có lý do ở lại.</p>
+      <p><strong>Và không có cả ba, thì AI chỉ giúp bạn làm sai nhanh hơn.</strong></p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container narrow">
+    <div class="eyebrow">Câu hỏi Hằng hay nhận</div>
+    <h2>Vì sao không nên vào thẳng Coaching</h2>
+    <p>Nhiều người hỏi Hằng: bỏ qua phần nền, vào thẳng Coaching được không?</p>
+    <p>Hằng trả lời thật.</p>
+    <p>Coaching 52 tuần là chương trình đưa AI vào vận hành doanh nghiệp thật. Ở đó bạn xây đội AI agent chia vai, dựng automation chạy theo lịch, dựng hệ đo lường, SOP, dashboard, để cuối cùng bạn rút mình ra khỏi việc hằng ngày.</p>
+    <p><strong>Muốn tự động hoá một thứ, thứ đó phải đang chạy trước đã.</strong></p>
+    <p>Nếu bạn chưa rõ mình phục vụ ai, AI sẽ viết cho tất cả mọi người, tức là cho không ai cả.</p>
+    <p>Nếu bạn chưa có dữ liệu khách thật, AI sẽ bịa insight. Nó bịa rất trơn tru, nghe rất thuyết phục, sai rất đắt.</p>
+    <p>Nếu bạn chưa có phễu và trang bán đang chạy, thì không có gì để tự động hoá.</p>
+    <p>Nên Hằng tách phần nền ra. Bảy tuần. Làm cho xong. Rồi mới nói chuyện AI.</p>
+  </div>
+</section>
+
+<section class="line">
+  <div class="container">
+    <div class="eyebrow">Đọc kỹ phần này</div>
+    <h2>Chương trình này học như thế nào</h2>
+    <p class="lede">Nó khác với đa số khoá bạn từng học.</p>
+    <div class="narrow">
+      <p><strong>Bạn học video trước.</strong> Toàn bộ nội dung ba phần đã được quay sẵn thành video. Bạn xem theo nhịp của bạn, take note, và làm bài trên chính bối cảnh của bạn.</p>
+      <p><strong>Buổi live không phải giờ giảng bài.</strong> Hằng không dùng 14 buổi để đọc lại thứ đã có trong video. Buổi live dùng để review phần bạn đã học, soi bài bạn đã làm, gỡ chỗ bạn vướng, và chỉ cho bạn cách áp vào đúng hoàn cảnh của bạn.</p>
+    </div>
+    <div class="roles">
+      <div class="role">
+        <div class="day">Thứ Ba</div>
+        <ul>
+          <li>Review phần học chính trong tuần</li>
+          <li>Soi bài bạn đã làm</li>
+          <li>Chỉnh hướng triển khai</li>
+        </ul>
+      </div>
+      <div class="role">
+        <div class="day">Thứ Sáu</div>
+        <ul>
+          <li>Hỏi đáp</li>
+          <li>Tư vấn cá nhân</li>
+          <li>Gỡ vướng thực tế trong lúc bạn đang làm</li>
+        </ul>
+      </div>
+    </div>
+    <div class="narrow" style="margin-top:28px">
+      <p><strong>Vì sao Hằng làm như vậy.</strong> Vì kiến thức không phải thứ khan hiếm. Video ai cũng xem được. Thứ không thay thế được là có người nhìn vào bài của bạn, biết bạn đang định bán gì cho ai, và nói cho bạn biết chỗ nào sai trước khi bạn tốn ba tháng.</p>
+      <p>Đổi lại, chương trình này chỉ chạy được nếu bạn xem video và làm bài trước khi vào buổi. Bạn đến buổi live với trang giấy trắng thì buổi đó mất giá trị, và Hằng không giảng lại được.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <div class="eyebrow">Nội dung</div>
+    <h2>Ba phần của chương trình</h2>
+    <div class="stack" style="margin-top:34px">
+
+      <div>
+        <h3><span class="kicker">Phần 1.</span> Foundation, nền của người chủ</h3>
+        <p>Foundation giúp bạn hiểu bản thân và chọn hướng kinh doanh phù hợp với chính bạn. Bạn dựng ba thứ:</p>
+        <p><strong>Hồ sơ Sáng Lập.</strong> Một tài liệu in ra được, trả lời bốn câu: bạn là ai, bạn nên phục vụ ai, bạn nên bắt đầu bằng mô hình nào, bạn muốn xây loại doanh nghiệp nào. AI phỏng vấn bạn để moi ra những thứ bạn có mà bạn không nhớ là mình có.</p>
+        <p><strong>Bộ não số có dữ liệu.</strong> Kho tri thức cá nhân, với 10 đến 20 tài liệu đầu tiên của chính bạn đã được đổ vào, gắn thẻ, nối link. Cộng Skill Vault ghi lại chuyên môn 5 đến 10 năm của bạn.</p>
+        <p><strong>Trợ lý AI hiểu bạn.</strong> AI được nối vào Bộ não số, được huấn luyện giọng văn của bạn. Từ đây AI viết ra thứ nghe giống bạn, không phải thứ nghe giống AI.</p>
+        <p>Cộng thêm: bản đồ Solo Biz 12 tháng, sáu hệ thống vận hành cơ bản, và nhịp vận hành hằng ngày để hệ thống không chết sau hai tuần.</p>
+      </div>
+
+      <div>
+        <h3><span class="kicker">Phần 2.</span> Customer Success, nền của khách hàng và phễu sản phẩm</h3>
+        <div class="callout">
+          <p>Customer Success trong chương trình này không chỉ là chăm sóc khách sau khi mua. Trước hết, nó là cách bạn thiết kế một hành trình sản phẩm để khách hàng đi từ vấn đề ban đầu tới kết quả họ thật sự muốn. Bạn không còn bán một sản phẩm rời rạc. Bạn xây một phễu sản phẩm giúp khách giải quyết từng tầng vấn đề, và nhờ đó doanh nghiệp của bạn có lý do để bán tiếp, chăm tiếp, và tạo kết quả sâu hơn.</p>
+        </div>
+        <h4>Nửa đầu, hiểu khách và tìm ra vấn đề cốt lõi</h4>
+        <p>Bạn chọn nhóm khách hàng đầu tiên. Không phải nhóm to nhất, mà nhóm bạn hiểu nhất và tiếp cận được nhất.</p>
+        <p>Bạn tìm ra vấn đề cốt lõi của họ. Không phải điều họ nói ngoài miệng, mà điều thật sự làm họ khó chịu đủ để bỏ tiền ra thoát khỏi.</p>
+        <p>Bạn xác định họ đang ở đâu và muốn đi tới đâu. Bạn dựng hành trình khách hàng: họ ở đâu trước khi biết bạn, họ đi qua những bước nào, họ quyết định ở điểm nào, và sau khi mua thì họ cần gì tiếp.</p>
+        <p>Bạn chốt lời hứa sản phẩm: bạn hứa đưa họ từ đâu tới đâu, nói thành một câu. Cộng bản đồ nỗi đau và kho ngôn ngữ thật của khách, để mọi bài viết sau này dùng chữ của khách chứ không dùng chữ của bạn.</p>
+        <h4>Nửa sau, thiết kế phễu sản phẩm</h4>
+        <p>Đây là phần quan trọng nhất, và cũng là phần gần như không ai dạy cho người mới.</p>
+        <p>Vấn đề của khách hàng không nằm ở một tầng. Nó có nhiều tầng. Một sản phẩm không giải quyết hết được. Nên bạn không thiết kế một món hàng, bạn thiết kế một thang:</p>
+        <ul class="tiers">
+          <li><b>Sản phẩm đầu vào</b>, bước nhỏ khách dễ nói có, giải quyết tầng vấn đề đầu tiên</li>
+          <li><b>Sản phẩm lõi</b>, giải pháp chính đưa khách từ A tới B</li>
+          <li><b>Sản phẩm nâng cao</b>, dành cho khách đã có kết quả và muốn đi xa hơn</li>
+          <li><b>Bước đi tiếp</b>, nếu khách còn cần</li>
+        </ul>
+        <p>Mỗi tầng giải quyết một tầng vấn đề. Khách xong tầng này thì có lý do thật để đi tầng sau, không phải vì bạn ép mua.</p>
+        <h4>Rồi mới tới chăm sóc và giữ chân</h4>
+        <p>Khi đã có hành trình sản phẩm, việc chăm khách mới có chỗ đứng. Khách mua rồi thì ai chăm, chăm thế nào, làm sao để họ thật sự ra kết quả chứ không phải mua xong rồi bỏ đó, làm sao để họ đi tiếp thay vì im lặng.</p>
+        <p>Đây là lý do phần này tên là Customer Success. Hiểu khách mới là bước đầu. Thiết kế được con đường cho khách đi mới là phần làm ra doanh nghiệp.</p>
+      </div>
+
+      <div>
+        <h3><span class="kicker">Phần 3.</span> Growth System, nền của cỗ máy tăng trưởng</h3>
+        <p><strong>Growth System, tức phần Business System, giúp bạn biến nền tảng và customer success thành hệ thống tăng trưởng.</strong></p>
+        <p>Ranh giới giữa hai phần, nói cho rõ để bạn không lẫn:</p>
+        <ul class="tiers">
+          <li><b>Customer Success</b> thiết kế hành trình sản phẩm dựa trên vấn đề của khách. Phần bên trong.</li>
+          <li><b>Growth System</b> đưa hành trình đó ra thị trường bằng trang bán, nội dung, email, quảng cáo và đo lường. Phần bên ngoài.</li>
+        </ul>
+        <p><strong>Hệ thống tăng trưởng và trang bán.</strong> Lấy phễu sản phẩm bạn đã thiết kế ở Customer Success, rồi soi nó bằng con mắt thương mại. Bốn biến số quyết định lời lỗ: giá trị đơn hàng trung bình, giá trị vòng đời khách, tần suất mua lại, biên lợi nhuận thực. Bốn sai lầm khiến người bán hàng mãi không lời. Chỉnh giá và cấu trúc từng tầng cho phễu chạy được về mặt tiền. Rồi dựng trang bán theo cấu trúc 7 khối.</p>
+        <p><strong>Nội dung, quảng cáo, email, kênh kéo khách.</strong> Loại nội dung chạy quảng cáo được. Cách dựng chiến dịch và cách phòng chiến dịch chết giữa chừng. Năm chuỗi email tự động: chào mừng, nhắc giỏ bỏ quên, sau mua, bán chéo và bán thêm, kéo khách cũ quay lại.</p>
+        <p><strong>Hệ thống đo lường, theo dõi, tối ưu.</strong> Nhìn số nào, bỏ qua số nào. Biết cái gì đang chạy, cái gì đang đốt tiền. Ba chiến lược tăng trưởng: tăng số khách tiềm năng, tăng giá trị mỗi đơn, tăng số lần mua lại. Bạn chọn chiến lược nào chạy trước cho 90 ngày tới.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="line">
+  <div class="container">
+    <div class="eyebrow">Lịch học</div>
+    <h2>Bản đồ 14 buổi</h2>
+    <p class="lede">7 tuần. Mỗi tuần 2 buổi live với Hằng, thứ Ba và thứ Sáu. Giữa các buổi bạn tự học video và làm bài. Giờ học: <span class="fill">giờ học, giờ Việt Nam</span></p>
+
+    <div class="wk">
+      <div class="wk-head"><span class="w">Tuần 1</span><span class="t">Foundation</span></div>
+      <p class="prep">Trước buổi 1: bạn xem video Foundation, take note, làm bài nền tảng.</p>
+      <div class="sess"><div class="num">1</div><div><div class="when">Thứ Ba</div><div class="what">Review Foundation. Dựng lại nền móng kinh doanh một người theo đúng bối cảnh của từng học viên.</div></div></div>
+      <div class="sess"><div class="num">2</div><div><div class="when">Thứ Sáu</div><div class="what">Hỏi đáp, tư vấn cá nhân, gỡ vướng Foundation, soi bài làm.</div></div></div>
+    </div>
+
+    <div class="wk">
+      <div class="wk-head"><span class="w">Tuần 2 và 3</span><span class="t">Customer Success</span></div>
+      <p class="prep">Trước mỗi buổi: bạn xem video Customer Success, take note, làm bài.</p>
+      <div class="sess"><div class="num">3</div><div><div class="when">Thứ Ba</div><div class="what">Review Customer Success phần 1. Hiểu khách hàng, vấn đề cốt lõi, hành trình khách, lời hứa sản phẩm.</div></div></div>
+      <div class="sess"><div class="num">4</div><div><div class="when">Thứ Sáu</div><div class="what">Hỏi đáp, tư vấn cá nhân, soi chân dung khách hàng và lời hứa sản phẩm.</div></div></div>
+      <div class="sess"><div class="num">5</div><div><div class="when">Thứ Ba</div><div class="what">Review Customer Success phần 2. Thiết kế phễu sản phẩm và thang sản phẩm, để giúp khách giải quyết vấn đề theo từng tầng.</div></div></div>
+      <div class="sess"><div class="num">6</div><div><div class="when">Thứ Sáu</div><div class="what">Hỏi đáp, tư vấn cá nhân, gỡ case thực tế, chỉnh phễu sản phẩm theo bối cảnh học viên.</div></div></div>
+    </div>
+
+    <div class="wk">
+      <div class="wk-head"><span class="w">Tuần 4, 5 và 6</span><span class="t">Growth System</span></div>
+      <p class="prep">Trước mỗi buổi: bạn xem video Growth System, take note, làm bài.</p>
+      <div class="sess"><div class="num">7</div><div><div class="when">Thứ Ba</div><div class="what">Review Growth System phần 1. Hệ thống tăng trưởng và trang bán.</div></div></div>
+      <div class="sess"><div class="num">8</div><div><div class="when">Thứ Sáu</div><div class="what">Hỏi đáp, tư vấn cá nhân, sửa thông điệp và trang bán.</div></div></div>
+      <div class="sess"><div class="num">9</div><div><div class="when">Thứ Ba</div><div class="what">Review Growth System phần 2. Nội dung, quảng cáo, email, kênh kéo khách.</div></div></div>
+      <div class="sess"><div class="num">10</div><div><div class="when">Thứ Sáu</div><div class="what">Hỏi đáp, tư vấn cá nhân, gỡ vướng triển khai growth.</div></div></div>
+      <div class="sess"><div class="num">11</div><div><div class="when">Thứ Ba</div><div class="what">Review Growth System phần 3. Hệ thống đo lường, theo dõi, tối ưu.</div></div></div>
+      <div class="sess"><div class="num">12</div><div><div class="when">Thứ Sáu</div><div class="what">Hỏi đáp, tư vấn cá nhân, soi hệ thống từng người.</div></div></div>
+    </div>
+
+    <div class="wk">
+      <div class="wk-head"><span class="w">Tuần 7</span><span class="t">Tổng hợp và quyết định đi tiếp</span></div>
+      <p class="prep">Trước buổi 13: bạn tổng hợp lại Foundation, Customer Success và Growth System.</p>
+      <div class="sess"><div class="num">13</div><div><div class="when">Thứ Ba</div><div class="what">Tổng hợp 3 hệ thống. Nhìn lại mô hình vận hành và điểm nghẽn lớn nhất của bạn.</div></div></div>
+      <div class="sess"><div class="num">14</div><div><div class="when">Thứ Sáu</div><div class="what">Tư vấn cá nhân, chốt lộ trình tiếp theo. Ai phù hợp và muốn đi tiếp thì vào Coaching.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <div class="eyebrow">Trước khi bạn đóng tiền</div>
+    <h2>Chương trình này hợp với ai, và chưa hợp với ai</h2>
+    <p class="lede">Hằng viết phần bên phải thật, để bạn tự loại mình ra nếu chưa đúng lúc.</p>
+    <div class="fit-grid">
+      <div class="fit fit-yes">
+        <h3>Hợp với bạn nếu</h3>
+        <h4>Về xuất phát điểm</h4>
+        <ul>
+          <li>Bạn là phụ nữ đang muốn kinh doanh nhưng chưa biết nên bán gì</li>
+          <li>Bạn có chuyên môn hoặc một quãng trải nghiệm sống, nhưng chưa biết đóng gói thành sản phẩm hay dịch vụ</li>
+          <li>Bạn đã có ý tưởng nhưng chưa biết ai là khách hàng thật</li>
+          <li>Bạn từng thử bán, được vài đơn, nhưng sản phẩm rời rạc, chưa thành một hành trình</li>
+          <li>Bạn muốn tìm lối kinh doanh của riêng mình, không muốn copy mô hình người khác</li>
+          <li>Bạn đang tự làm hết mọi việc và biết cách này không đi xa được</li>
+        </ul>
+        <h4>Về cách bạn sẽ học</h4>
+        <ul>
+          <li>Bạn chịu tự học video và làm bài trước khi vào buổi live</li>
+          <li>Bạn dành được khoảng 5 đến 7 tiếng mỗi tuần</li>
+          <li>Bạn muốn xây doanh nghiệp một người vận hành được, không muốn tuyển một đội</li>
+          <li>Bạn đang tính đi Coaching nhưng chưa chắc mình đã sẵn sàng, và muốn có dữ liệu để tự quyết</li>
+        </ul>
+        <p class="fit-foot">Bạn đang đi làm, đang làm mẹ, hay đang xoay nhiều việc cùng lúc đều được. Điều kiện không nằm ở việc bạn rảnh, mà nằm ở việc bạn có rút ra được vài tiếng mỗi tuần và có làm bài hay không.</p>
+      </div>
+      <div class="fit fit-no">
+        <h3>Chưa hợp nếu</h3>
+        <ul>
+          <li>Bạn muốn được giảng bài từ đầu tới cuối trong buổi live. Chương trình này không vận hành như vậy</li>
+          <li>Bạn không có thời gian xem video và làm bài giữa các buổi</li>
+          <li>Bạn muốn có kết quả trong 2 tuần. Nền không cho kết quả nhanh, nền cho kết quả bền</li>
+          <li>Bạn muốn Hằng làm hộ. Hằng review, Hằng chữa, Hằng chỉ hướng. Bạn làm</li>
+          <li>Bạn tìm mẫu có sẵn để dán vào ngành nào cũng chạy</li>
+          <li>Bạn đang cần tiền gấp trong tháng này. Đi kiếm doanh thu trước, quay lại sau. Hằng nói thật</li>
+          <li>Bạn đã có hệ thống chạy ổn và chỉ cần lớp AI vận hành. Vậy bạn nên vào thẳng Coaching</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="line">
+  <div class="container">
+    <div class="eyebrow">Kết quả</div>
+    <h2>Sau 7 tuần bạn có gì trong tay</h2>
+    <p class="lede">Không phải cảm hứng. Không phải chứng chỉ. Là tài sản đếm được, dựng trên bối cảnh thật của bạn.</p>
+    <div class="assets">
+      <div class="asset-col">
+        <h4>Từ Foundation</h4>
+        <div class="role-note">Chọn hướng</div>
+        <ol>
+          <li>Hồ sơ Sáng Lập, in ra được</li>
+          <li>Bộ não số với 10 đến 20 tài liệu đầu tiên đã tổ chức</li>
+          <li>Trợ lý AI đã huấn luyện bằng dữ liệu và giọng văn của bạn</li>
+          <li>Bản đồ Solo Biz 12 tháng</li>
+          <li>Nhịp vận hành hằng ngày và hằng tuần</li>
+        </ol>
+      </div>
+      <div class="asset-col">
+        <h4>Từ Customer Success</h4>
+        <div class="role-note">Thiết kế hành trình sản phẩm dựa trên vấn đề của khách</div>
+        <ol>
+          <li>Nhóm khách hàng đầu tiên đã chọn rõ</li>
+          <li>Chân dung khách hàng rõ hơn, dựng từ dữ liệu thật</li>
+          <li>Vấn đề cốt lõi của khách hàng, viết thành câu</li>
+          <li>Hành trình khách hàng, từ trước khi họ biết bạn tới sau khi họ mua</li>
+          <li>Lời hứa sản phẩm</li>
+          <li>Bản đồ nỗi đau</li>
+          <li>Kho ngôn ngữ khách hàng</li>
+          <li><b>Phễu sản phẩm, hay thang sản phẩm đầu tiên của bạn</b></li>
+          <li>Sản phẩm đầu vào, sản phẩm lõi, sản phẩm nâng cao, mỗi tầng một tầng vấn đề</li>
+          <li>Logic chăm sóc khách sau mua</li>
+          <li>Cách giúp khách đi tiếp, thay vì mua xong rồi im</li>
+        </ol>
+      </div>
+      <div class="asset-col">
+        <h4>Từ Growth System</h4>
+        <div class="role-note">Đưa hành trình đó ra thị trường</div>
+        <ol>
+          <li>Trang bán bản đầu tiên</li>
+          <li>Nội dung và kênh kéo khách, chiến dịch đầu tiên đã dựng</li>
+          <li>Chuỗi email tự động đã dựng</li>
+          <li>Hệ thống đo lường: nhìn số nào, tối ưu cái gì</li>
+          <li>Ba chiến lược tăng trưởng đã chọn cho 90 ngày tới</li>
+        </ol>
+      </div>
+    </div>
+    <div class="no-promise">
+      <h4>Hằng không hứa gì</h4>
+      <p>Hằng không hứa doanh thu. Doanh thu phụ thuộc ngành, giá, thị trường, và số việc bạn thực sự làm.</p>
+      <p>Hằng không hứa khách sẽ mua. Mua hay không là quyết định của khách.</p>
+      <p>Hằng không hứa AI tìm khách thay bạn. AI không có chân để đi gặp khách.</p>
+      <p>Hằng cũng không hứa bạn sẽ tìm ra một sản phẩm chắc thắng. Không ai hứa được điều đó. Thị trường mới là bên quyết định. Thứ Hằng làm được là giúp bạn chọn một hướng có căn cứ từ chính con người và nguồn lực của bạn, thiết kế nó thành một phễu sản phẩm có logic, và đem ra thử với khách thật sớm nhất có thể, thay vì đoán trong đầu thêm ba năm nữa.</p>
+      <p><strong>Hằng cam kết đúng một điều:</strong> nếu bạn xem đủ video, làm đủ bài, và có mặt đủ buổi, bạn sẽ không bước ra khỏi 7 tuần này trong mơ hồ. Chỗ nào chưa rõ, Hằng review thêm cho tới khi rõ.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <div class="eyebrow">Học viên nói</div>
+    <h2>Phản hồi từ học viên đã học các chương trình nền tảng</h2>
+    <p class="lede">Và làm việc với Hằng trong hệ sinh thái Breakout.</p>
+    <div class="quotes">
+      <div class="q">
+        <blockquote>"Trước đây em cứ nghĩ bán online là đăng sản phẩm rồi chạy quảng cáo thôi, nhưng học xong em mới hiểu muốn làm lâu dài thì phải có tư duy và làm bài bản ngay từ đầu."</blockquote>
+        <div class="who">Chị Nguyễn Hồng Hoa<span>Đã bán online trước khi học</span></div>
+      </div>
+      <div class="q">
+        <blockquote>"Tôi hiểu khách hàng chính là tài sản, làm kinh doanh phải có hệ thống. Tôi cũng nhận ra mình hoàn toàn có thể tự vận hành một cửa hàng online, chứ không phức tạp như mình từng nghĩ."</blockquote>
+        <div class="who">Chị Lại Minh Hằng<span>Nhân viên nhà nước, 8 tiếng mỗi ngày</span></div>
+      </div>
+      <div class="q">
+        <blockquote>"Mình không còn cảm giác mình phải tự nhảy một mình nữa. Cô nói rất thật, rất đúng với nỗi đau của những người như mình: bận rộn, áp lực, muốn thay đổi nhưng chưa có lối đi rõ ràng."</blockquote>
+        <div class="who">Chị Trần Thị Hồng Điệp<span>Giáo viên, phụ trách trung tâm bóng đá trẻ của gia đình</span></div>
+      </div>
+      <div class="q">
+        <blockquote>"Kinh doanh online không phải là bán hàng, mà là xây hệ thống."</blockquote>
+        <div class="who">Chị Nguyễn Thị Chung<span>Từng nghĩ kinh doanh online chỉ là tìm một sản phẩm rồi bán</span></div>
+      </div>
+    </div>
+    <p class="disclaim">Đây là phản hồi về chương trình nền tảng học viên đã học, không phải về chương trình 7 tuần này. Kết quả của mỗi người khác nhau, phụ thuộc ngành nghề, thời gian và mức độ thực hành.</p>
+  </div>
+</section>
+
+<section class="line">
+  <div class="container">
+    <div class="eyebrow">Nối tiếp</div>
+    <h2>Chương trình này nối sang Coaching như thế nào</h2>
+    <div class="ladder">
+      <div class="rung rung-now">
+        <div class="lbl">Bạn đang xem</div>
+        <h3>Nền Tảng Vận Hành</h3>
+        <p>7 tuần. Foundation, Customer Success, Growth System. Dựng phần <strong>doanh nghiệp có hình</strong>.</p>
+        <div class="price">24 triệu</div>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="rung rung-next">
+        <div class="lbl">Nếu bạn đi tiếp</div>
+        <h3>Breakout Coaching</h3>
+        <p>52 tuần. Đưa AI vào vận hành doanh nghiệp. Dựng phần <strong>doanh nghiệp tự chạy</strong>.</p>
+        <div class="price">126 triệu<small>150 triệu, khấu trừ 24 triệu đã đóng</small></div>
+      </div>
+    </div>
+    <div class="narrow">
+      <p>Coaching 52 tuần dựng đội AI agent chia vai, automation theo lịch, hệ đo lường, SOP, dashboard, và cuối cùng là bạn rút mình ra khỏi việc hằng ngày. <strong>Cái thứ hai chỉ có nghĩa khi cái thứ nhất đã xong.</strong></p>
+      <h4 style="margin-top:26px">Bạn không bắt buộc nâng cấp</h4>
+      <p>Chương trình 7 tuần này là một bước nền tảng độc lập. Học xong bạn có thể về làm một năm rồi mới quay lại. Hoặc không quay lại. Cả hai đều được. Toàn bộ tài sản bạn dựng trong 7 tuần là của bạn, dùng được mãi.</p>
+      <p>Hằng thiết kế nó như vậy có chủ ý. Một chương trình chỉ có nghĩa khi bạn mua cái tiếp theo thì đó không phải chương trình, đó là cái bẫy.</p>
+      <p>Khoản khấu trừ 24 triệu: <span class="fill">thời hạn khấu trừ</span></p>
+      <h4 style="margin-top:26px">Vì sao Hằng làm bước lọc này</h4>
+      <p>Nói thẳng: Hằng không muốn nhận vào Coaching 52 tuần một người chưa sẵn sàng. Bảy tuần cho cả hai bên đủ dữ liệu. Bạn biết bạn có thực sự làm được không. Hằng biết bạn có nên đi tiếp không.</p>
+      <p>Ở buổi 14, nếu Hằng thấy bạn chưa nên vào Coaching, Hằng sẽ nói. Kể cả khi bạn muốn đóng tiền.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container narrow">
+    <div class="eyebrow">Về Hằng</div>
+    <h2>Bảy tuần này là phần nền Hằng ước có 15 năm trước</h2>
+    <p>Hằng là Đào Thị Hằng. Sinh ra bên sông Thạch Hãn, Quảng Trị, trong một làng chài nghèo. Học bổng toàn phần thạc sĩ chính phủ Úc. Xây thương hiệu đầu tiên từ con số 0.</p>
+    <p>Có một thời Hằng đứng đầu một công ty hơn 70 nhân sự. Tuyển CEO, tuyển kế toán, thuê agency. Mặt ngoài là một triệu đô. Bên trong, mỗi tháng Hằng bán dần từng miếng đất, rồi bán cả nhà, để trả lương cho 70 người đó.</p>
+    <p>Hằng tưởng đó là kinh doanh. Hoá ra đó là cái lồng Hằng tự dựng rồi tự nhốt mình vào.</p>
+    <p>Hằng đóng cửa công ty. Lùi lại ba năm. Ba năm đó Hằng không đi học thêm chiến lược nào. Hằng quay về trả lời cho rõ những câu hỏi lẽ ra phải trả lời 15 năm trước.</p>
+    <p>Bây giờ Hằng vận hành nhiều doanh nghiệp cùng lúc, một mình, cộng AI. Đào tạo tiếng Anh với hơn 33.000 người đã đi qua các chương trình. Đào tạo kinh doanh online. Đào tạo AI. Và một thương hiệu ẩm thực ở Úc.</p>
+  </div>
+</section>
+
+<section class="line" id="hoc-phi">
+  <div class="container">
+    <div class="eyebrow">Học phí</div>
+    <h2>24.000.000 đồng cho 7 tuần</h2>
+    <div class="narrow">
+      <p>Con số này không phải Hằng bốc ra. Ba phần trong chương trình, nếu mua rời theo bảng giá đang chạy:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Phần</th><th>Giá lẻ</th></tr></thead>
+          <tbody>
+            <tr><td>Foundation System</td><td>3.000.000đ</td></tr>
+            <tr><td>Customer System</td><td>6.000.000đ</td></tr>
+            <tr><td>Growth System</td><td>15.000.000đ</td></tr>
+            <tr class="sum"><td>Cộng</td><td>24.000.000đ</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Đúng bằng học phí chương trình. Hằng không cộng thêm một đồng nào cho 14 buổi live.</strong></p>
+      <p>Vì sao gộp lại? Vì học rời ba khoá cách nhau vài tháng thì mất đà. Học liền 7 tuần theo đúng thứ tự thì phần trước nuôi phần sau: Hồ sơ Sáng Lập dùng để chọn khách, hiểu khách dùng để thiết kế phễu, phễu dùng để viết trang bán.</p>
+
+      <h4 style="margin-top:30px">Bạn nhận được</h4>
+      <ul class="hero-points" style="margin-bottom:26px">
+        <li>Trọn bộ video ba phần: Foundation, Customer Success, Growth System</li>
+        <li>14 buổi live với Hằng, thứ Ba và thứ Sáu</li>
+        <li>Review bài làm và tư vấn cá nhân trong các buổi live</li>
+        <li>Thư viện mẫu và bộ câu lệnh AI</li>
+        <li>Hỗ trợ trong nhóm học viên suốt 7 tuần</li>
+        <li>Xem lại buổi live <span class="fill">thời hạn xem lại</span></li>
+        <li>24 triệu được khấu trừ vào học phí Coaching nếu bạn đi tiếp</li>
+      </ul>
+
+      <h4>Điều kiện học phí</h4>
+      <p><strong>Học phí không hoàn lại.</strong></p>
+      <p>Hằng viết rõ ngay từ đầu để bạn cân nhắc kỹ trước khi đóng, chứ không cân nhắc sau. Toàn bộ video được mở ngay sau khi thanh toán, nên bạn nhận giá trị từ ngày đầu tiên.</p>
+      <p>Bù lại, nếu bạn đi tiếp Coaching, 24 triệu này được khấu trừ nguyên vẹn vào học phí 150 triệu.</p>
+      <p style="margin-top:24px"><a class="btn btn-primary btn-lg" href="#hoc-phi">Đăng ký học 7 tuần, 24.000.000đ</a> <span class="fill">PAYMENT_URL_CHỊ_ĐIỀN</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container narrow">
+    <div class="eyebrow">Câu hỏi thường gặp</div>
+    <h2>Những điều người ta hay hỏi Hằng</h2>
+    <div class="faq">
+      <details>
+        <summary>Tôi còn chưa biết mình nên bán gì, học có sớm quá không</summary>
+        <div class="faq-body">
+          <p>Ngược lại. Đó chính là lý do chương trình này tồn tại.</p>
+          <p>Chương trình không thiết kế cho người đã có doanh nghiệp chạy ổn. Nó thiết kế cho người đang đứng ở vạch xuất phát và chưa biết đi hướng nào.</p>
+          <p>Tuần 1 là để trả lời bốn câu: bạn là ai, bạn thật sự có gì trong tay, thứ đó đáng giá với ai, và bạn nên bắt đầu bằng sản phẩm hay dịch vụ nào. Tuần 2 và 3 là để bạn tìm ra vấn đề cốt lõi của nhóm khách đó, rồi thiết kế phễu sản phẩm. Ba tuần sau mới tới chuyện đem ra thị trường.</p>
+          <p>Chỉ có một trường hợp không nên vào: bạn chưa có ý định kinh doanh, chỉ đang tò mò. Vậy thì chờ đã.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Tôi không muốn copy mô hình của người khác</summary>
+        <div class="faq-body">
+          <p>Tốt. Chương trình này cũng không đưa bạn một mô hình có sẵn để dán vào.</p>
+          <p>Foundation bắt đầu từ chính bạn: chuyên môn bạn có, quãng đời bạn đã đi qua, nguồn lực bạn đang cầm, và hoàn cảnh thật của bạn. Hướng kinh doanh mọc ra từ đó, nên nó là của bạn.</p>
+          <p>Đó cũng là lý do Hằng không phát cho cả lớp một danh sách sản phẩm hot rồi bảo chọn một cái. Cái hợp với người khác chưa chắc hợp với bạn, và bạn sẽ bỏ nó sau ba tháng như đã bỏ những cái trước.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Hai buổi một tuần, tôi không có thời gian</summary>
+        <div class="faq-body">
+          <p>Câu hỏi thật không phải bạn có thời gian không. Là bạn đang dùng thời gian vào đâu.</p>
+          <p>Chương trình cần khoảng 5 đến 7 tiếng mỗi tuần: xem video, làm bài, và hai buổi live. Bảy tiếng một tuần, trong 7 tuần, là 49 tiếng. Đổi lấy việc không phải mò thêm 3 năm nữa.</p>
+          <p>Còn nếu tuần nào bạn cũng không rút ra được 7 tiếng, thì vấn đề của bạn chưa phải là thiếu hệ thống. Vấn đề là bạn đang gánh quá nhiều thứ không phải việc của bạn. Cái đó chính là thứ tuần 1 xử lý.</p>
+          <p>Bận một buổi live thì có bản xem lại. Nhưng phần bạn tự làm bài thì không ai làm thay được.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Tôi sợ học xong không làm được</summary>
+        <div class="faq-body">
+          <p>Nỗi sợ này đúng. Vì đa số khoá học đúng là như vậy: học xong, hào hứng ba ngày, rồi về nếp cũ.</p>
+          <p>Chương trình này chống lại điều đó bằng hai cách. Một, bạn không làm bài tập giả định. Mọi bài đều làm trên bối cảnh thật của bạn. Hai, mỗi tuần có hai buổi Hằng nhìn vào bài của bạn. Buổi thứ Ba review và chỉnh hướng, buổi thứ Sáu gỡ đúng chỗ bạn đang tắc.</p>
+          <p>Nhưng Hằng nói thẳng: nếu bạn không xem video và không làm bài, không ai cứu được. Hằng review và chỉ hướng. Đi là bạn đi.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Tôi sợ mình chưa đủ giỏi, chưa đủ trình để vào</summary>
+        <div class="faq-body">
+          <p>Chương trình này thiết kế cho người <strong>chưa</strong> có hệ thống. Nếu bạn đã đủ giỏi thì bạn đã không cần.</p>
+          <p>Bạn không cần biết công nghệ. Không cần biết code. Không cần giỏi AI. Không cần có sẵn khách. Bạn cần ba thứ: xem video, làm bài, và trung thực với chính mình khi trả lời những câu hỏi khó.</p>
+          <p>Nếu bạn vẫn thấy lo, hãy nhìn lại phần phản hồi phía trên. Có người là nhân viên nhà nước. Có người là giáo viên vừa dạy vừa lo trung tâm bóng đá của gia đình. Không ai trong số đó xuất phát từ vị trí giỏi hơn bạn.</p>
+        </div>
+      </details>
+      <details>
+        <summary>24 triệu có đáng không</summary>
+        <div class="faq-body">
+          <p>Hằng không trả lời hộ bạn câu này. Hằng đưa bạn dữ liệu để tự trả lời.</p>
+          <p>Một, 24 triệu đúng bằng tổng giá lẻ ba phần đang bán. Bạn không trả thêm đồng nào cho 14 buổi live.</p>
+          <p>Hai, nếu bạn đi tiếp Coaching, 24 triệu này được khấu trừ. Coi như bạn đã trả trước một phần.</p>
+          <p>Ba, thử tính theo hướng khác: bạn đã mất bao nhiêu tháng để loay hoay chưa rõ mình bán gì cho ai? Mỗi tháng đó đáng bao nhiêu?</p>
+          <p>Và câu cuối, câu này quan trọng hơn cả: nếu 24 triệu là số tiền làm bạn căng thẳng ngay lúc này, thì đừng đóng. Hằng nói thật. Đi kiếm doanh thu trước, quay lại sau. Chương trình vẫn ở đây.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Học xong có bắt buộc lên Coaching không</summary>
+        <div class="faq-body">
+          <p>Không. Không hề.</p>
+          <p>Chương trình 7 tuần này là một bước nền tảng độc lập. Toàn bộ tài sản bạn dựng là của bạn, dùng được mãi. Bạn có thể học xong, về làm một năm, rồi mới quay lại. Hoặc không quay lại. Cả hai đều được.</p>
+          <p>Hằng cũng không cam kết chiều ngược lại: học xong 7 tuần không có nghĩa là bạn chắc chắn được nhận vào Coaching. Ở buổi 14 Hằng sẽ nói thật bạn đã sẵn sàng chưa.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Buổi live có dạy bài mới không</summary>
+        <div class="faq-body">
+          <p>Không. Bài mới nằm trong video, bạn xem trước.</p>
+          <p>Buổi live dùng để review phần bạn đã học, soi bài bạn đã làm, trả lời thắc mắc, và chỉ cho bạn cách áp vào đúng hoàn cảnh của bạn.</p>
+          <p>Hằng làm vậy có lý do. Nếu 14 buổi dùng để giảng lại thứ đã có sẵn trong video, bạn mất 14 buổi và không ai nhìn vào bài của bạn lần nào.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Chương trình này khác gì Coaching 52 tuần</summary>
+        <div class="faq-body">
+          <p>Bảy tuần này dựng <strong>nền</strong>: bạn là ai, khách là ai, bán gì, phễu sản phẩm ra sao, đem ra thị trường thế nào.</p>
+          <p>Coaching 52 tuần dựng <strong>hệ điều hành</strong>: đưa AI vào vận hành, đội AI agent chia vai, automation theo lịch, SOP, dashboard, để bạn rút mình ra khỏi việc hằng ngày.</p>
+          <p>Nói ngắn: 7 tuần để doanh nghiệp <strong>có hình</strong>. 52 tuần để doanh nghiệp <strong>tự chạy</strong>.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<div class="close container">
+  <h2>Bạn không cần thêm một ý tưởng nữa. Bạn đã lưu đủ ý tưởng rồi.</h2>
+  <p>Bạn cần biết mình nên bán gì, bán cho ai, và bán bằng con đường nào.</p>
+  <p>Bảy tuần. Mười bốn buổi có người nhìn vào bài của bạn. Ba lớp nền, đúng thứ tự: chọn hướng, thiết kế phễu sản phẩm, đem ra thị trường.</p>
+  <p><strong>Xong phần đó rồi, chuyện đưa AI vào vận hành mới có nghĩa.</strong></p>
+  <a class="btn btn-primary btn-lg" href="#hoc-phi">Đăng ký học 7 tuần, 24.000.000đ</a>
+  <p style="margin-top:20px;color:var(--gray);font-size:15px">Khai giảng <span class="fill">ngày khai giảng</span> <span class="fill">số lượng nếu có giới hạn thật</span></p>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="sig">Đào Thị Hằng</div>
+    <div style="margin-top:4px">Vì sự tự do của bạn</div>
+  </div>
+</footer>
+
+</body>
+</html>
