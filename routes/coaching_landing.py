@@ -53,6 +53,24 @@ async def fob_landing_aliases():
     return RedirectResponse(url="/fob", status_code=301)
 
 
+_CS_FILE = Path(__file__).resolve().parent.parent / "static" / "customer-success-landing.html"
+
+
+@router.get("/customer-success", response_class=HTMLResponse, include_in_schema=False)
+async def customer_success_landing() -> HTMLResponse:
+    """Khoa Customer Success, tang 2 thang san pham Breakout, 6tr (Anna chot 2026-08-12).
+
+    Dinh vi moi (theo quyet dinh FOB 12/08): khong phai cham soc khach sau ban, ma la
+    hieu khach -> tim van de cot loi -> thiet ke phieu san pham -> roi moi cham soc.
+    Giao trinh: 7 module CIS (wiki/projects/breakout/giao-trinh/customer-insight-system-outline.md).
+    Thanh toan dung san pham `customer` da chay san (6tr, tag breakout-da-mua-customer-system).
+
+    LUU Y: trang cu app.breakout.live/customer-system van song, dinh vi hep hon (san pham
+    so) va con hua hoan phi 14 ngay. Can Anna chot gop lam mot, xem file vault.
+    """
+    return HTMLResponse(_CS_FILE.read_text(encoding="utf-8"))
+
+
 @router.get("/thanh-toan-coaching", response_class=HTMLResponse, include_in_schema=False)
 async def coaching_payment_private() -> HTMLResponse:
     """Trang thanh toan kin, Anna gui rieng sau khi khach dong y (2026-08-06)."""
@@ -66,7 +84,7 @@ GSC_VERIFICATION_TOKENS = {"c66fa30bfc653b0e"}  # token file GSC cua Anna
 @router.get("/sitemap.xml", include_in_schema=False)
 async def sitemap_xml():
     """Sitemap os.breakout.live: chi trang marketing public (GSC 2026-08-06)."""
-    urls = "".join(f"<url><loc>https://os.breakout.live{p}</loc></url>" for p in ["/coaching", "/foundation-system", "/fob"])
+    urls = "".join(f"<url><loc>https://os.breakout.live{p}</loc></url>" for p in ["/coaching", "/foundation-system", "/fob", "/customer-success"])
     xml = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>'
     from fastapi.responses import Response
     return Response(content=xml, media_type="application/xml")
