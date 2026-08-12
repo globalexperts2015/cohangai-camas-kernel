@@ -58,7 +58,7 @@ GSC_VERIFICATION_TOKENS = {"c66fa30bfc653b0e"}  # token file GSC cua Anna
 @router.get("/sitemap.xml", include_in_schema=False)
 async def sitemap_xml():
     """Sitemap os.breakout.live: chi trang marketing public (GSC 2026-08-06)."""
-    urls = "".join(f"<url><loc>https://os.breakout.live{p}</loc></url>" for p in ["/coaching", "/foundation-system"])
+    urls = "".join(f"<url><loc>https://os.breakout.live{p}</loc></url>" for p in ["/coaching", "/foundation-system", "/bof"])
     xml = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>'
     from fastapi.responses import Response
     return Response(content=xml, media_type="application/xml")
