@@ -29,20 +29,28 @@ async def coaching_landing() -> HTMLResponse:
     return HTMLResponse(_LANDING_FILE.read_text(encoding="utf-8"))
 
 
-_BOF_FILE = Path(__file__).resolve().parent.parent / "static" / "bof-landing.html"
+_FOB_FILE = Path(__file__).resolve().parent.parent / "static" / "bof-landing.html"
 
 
-@router.get("/bof", response_class=HTMLResponse, include_in_schema=False)
-@router.get("/nen-tang-van-hanh", response_class=HTMLResponse, include_in_schema=False)
-async def bof_landing() -> HTMLResponse:
-    """Business Operating Foundation, chuong trinh nen tang 7 tuan 24tr (2026-08-12).
+@router.get("/fob", response_class=HTMLResponse, include_in_schema=False)
+async def fob_landing() -> HTMLResponse:
+    """Chuong trinh nen tang 7 tuan, 24tr (Anna chot 2026-08-12).
 
-    Bac truoc Breakout Coaching 52 tuan: hoc phi 24tr duoc khau tru vao 150tr
-    neu hoc vien di tiep. Trang dang o trang thai noindex vi con placeholder
-    (payment URL, ngay khai giang, gio hoc). Bo noindex khi Anna dien xong.
+    URL chinh: /fob (Anna chot 2026-08-12). /bof va /nen-tang-van-hanh 301 ve day
+    de link da gui khong chet va Google chi thay MOT URL.
+
+    Bac truoc Breakout Coaching 52 tuan: hoc phi 24tr duoc khau tru vao 150tr neu
+    hoc vien di tiep trong 3 thang sau khi ket thuc khoa.
     Nguon noi dung: wiki/projects/breakout/landing-nen-tang-van-hanh-7-tuan-2026-08-12.md
     """
-    return HTMLResponse(_BOF_FILE.read_text(encoding="utf-8"))
+    return HTMLResponse(_FOB_FILE.read_text(encoding="utf-8"))
+
+
+@router.get("/bof", include_in_schema=False)
+@router.get("/nen-tang-van-hanh", include_in_schema=False)
+async def fob_landing_aliases():
+    """Alias cu -> /fob. 301 de khong chia SEO va khong duplicate content."""
+    return RedirectResponse(url="/fob", status_code=301)
 
 
 @router.get("/thanh-toan-coaching", response_class=HTMLResponse, include_in_schema=False)
@@ -58,7 +66,7 @@ GSC_VERIFICATION_TOKENS = {"c66fa30bfc653b0e"}  # token file GSC cua Anna
 @router.get("/sitemap.xml", include_in_schema=False)
 async def sitemap_xml():
     """Sitemap os.breakout.live: chi trang marketing public (GSC 2026-08-06)."""
-    urls = "".join(f"<url><loc>https://os.breakout.live{p}</loc></url>" for p in ["/coaching", "/foundation-system", "/bof"])
+    urls = "".join(f"<url><loc>https://os.breakout.live{p}</loc></url>" for p in ["/coaching", "/foundation-system", "/fob"])
     xml = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>'
     from fastapi.responses import Response
     return Response(content=xml, media_type="application/xml")
