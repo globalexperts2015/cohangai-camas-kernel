@@ -49,10 +49,12 @@ class LLMLayer:
     """Thin async wrapper over Anthropic Messages API."""
 
     def __init__(self, api_key: Optional[str] = None) -> None:
+        from .llm_provider import build_async_client, ready as _provider_ready
+
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         self._client: Optional[Any] = None
-        if AsyncAnthropic is not None and self.api_key:
-            self._client = AsyncAnthropic(api_key=self.api_key)
+        if AsyncAnthropic is not None and (self.api_key or _provider_ready()):
+            self._client = build_async_client(self.api_key)
 
     @property
     def ready(self) -> bool:

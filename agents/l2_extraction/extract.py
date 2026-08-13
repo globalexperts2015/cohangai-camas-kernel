@@ -13,16 +13,15 @@ from .prompts import L2_EXTRACTION_REGISTRY
 
 
 log = logging.getLogger("camas.l2_extract")
-_CLIENT: anthropic.AsyncAnthropic | None = None
+_CLIENT: Any = None
 
 
-def _client() -> anthropic.AsyncAnthropic:
+def _client() -> Any:
     global _CLIENT
     if _CLIENT is None:
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
-        if not api_key:
-            raise RuntimeError("ANTHROPIC_API_KEY not set")
-        _CLIENT = anthropic.AsyncAnthropic(api_key=api_key)
+        from kernel.llm_provider import build_async_client
+
+        _CLIENT = build_async_client()
     return _CLIENT
 
 

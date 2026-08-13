@@ -61,13 +61,12 @@ _TRENDS_COST_PER_CALL = 0.0  # pytrends free
 _CLIENT: anthropic.AsyncAnthropic | None = None
 
 
-def _client() -> anthropic.AsyncAnthropic:
+def _client():
     global _CLIENT
     if _CLIENT is None:
-        api_key = os.getenv("ANTHROPIC_API_KEY", "")
-        if not api_key:
-            raise RuntimeError("ANTHROPIC_API_KEY not configured")
-        _CLIENT = anthropic.AsyncAnthropic(api_key=api_key)
+        from kernel.llm_provider import build_async_client
+
+        _CLIENT = build_async_client()
     return _CLIENT
 
 

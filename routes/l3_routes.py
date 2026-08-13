@@ -157,9 +157,8 @@ async def _generate_l3_tier_b(
 ) -> None:
     """Tier B Hormozi Value Equation + Guarantee + Offer Stack + Financial Model.
     Uses Anthropic Opus for offer reasoning quality."""
-    import os
-    import anthropic
-    client = anthropic.AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    from kernel.llm_provider import build_async_client
+    client = build_async_client()
 
     prompt = f"""Bạn là Hormozi Offer Architect. Sinh 4 file JSON cho offer của founder.
 

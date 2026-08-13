@@ -536,9 +536,8 @@ async def _generate_ai_context(pool: asyncpg.Pool, student_id: UUID) -> None:
     """P0.4 (Anna 2026-06-12): Generate 3 AI Context files post Gate 1.
     Files: founder-dna.md, brand-voice.md, ai-instructions.md
     """
-    import os as _os
-    import anthropic as _anthropic
-    client = _anthropic.AsyncAnthropic(api_key=_os.environ.get("ANTHROPIC_API_KEY"))
+    from kernel.llm_provider import build_async_client
+    client = build_async_client()
 
     async with pool.acquire() as conn:
         fp = await conn.fetchrow(

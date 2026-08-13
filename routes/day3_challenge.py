@@ -31,10 +31,12 @@ log = logging.getLogger("camas.day3")
 _CLIENT: anthropic.AsyncAnthropic | None = None
 
 
-def _client() -> anthropic.AsyncAnthropic:
+def _client():
     global _CLIENT
     if _CLIENT is None:
-        _CLIENT = anthropic.AsyncAnthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        from kernel.llm_provider import build_async_client
+
+        _CLIENT = build_async_client()
     return _CLIENT
 
 

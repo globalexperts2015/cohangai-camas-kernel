@@ -106,8 +106,8 @@ LAYER_IMPACT = {
 async def _generate_freedom_report(pool: asyncpg.Pool, score_id, student_id: UUID,
                                    scores: dict, total: int, classification: str) -> None:
     """Generate Founder Freedom Report (7 sections) via Claude Haiku."""
-    import anthropic
-    client = anthropic.AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+    from kernel.llm_provider import build_async_client
+    client = build_async_client()
 
     scores_text = "\n".join(
         f"- {QUESTION_LABELS[k]}: {scores[k]}/10"
