@@ -102,6 +102,38 @@ async def get_student_level_cap(pool: asyncpg.Pool, student_id: UUID) -> tuple[s
     return program_id, level_cap_for_program(program_id)
 
 
+async def require_student_active(pool: asyncpg.Pool, student_id: UUID) -> None:
+    """Chặn học viên đang bị tạm khoá (ví dụ trả góp quá hạn, Anna chốt 2026-08-13).
+
+    FAIL-OPEN có chủ đích: chỉ chặn khi status là 'suspended' rõ ràng. Không đọc
+    được DB, không có bản ghi, hay status lạ đều cho qua. Lý do: khoá nhầm một
+    học viên đã trả đủ tiền tốn kém hơn nhiều so với việc một người nợ còn vào
+    được thêm vài ngày, và Anna gỡ tay được.
+    """
+    try:
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow(
+                "SELECT status FROM breakoutos.students WHERE id=$1", student_id
+            )
+    except Exception:
+        return
+    if not row:
+        return
+    if (row["status"] or "").strip().lower() != "suspended":
+        return
+    raise HTTPException(
+        403,
+        {
+            "error": "student_suspended",
+            "message": (
+                "Quyền truy cập của bạn đang tạm khoá vì học phí trả góp chưa "
+                "hoàn tất. Bạn hoàn tất kỳ còn lại hoặc nhắn Hằng qua Zalo để "
+                "được mở lại."
+            ),
+        },
+    )
+
+
 async def require_level_access(
     pool: asyncpg.Pool, student_id: UUID, required_level: int,
     feature: str = "level",
@@ -216,6 +248,38 @@ async def get_student_by_email(
         if not row:
             raise HTTPException(404, f"No student for email={email} program={program_id} cohort={cohort_id}")
         return dict(row)
+
+
+@router.post("/internal/student-status", dependencies=[Depends(require_service_key)])
+async def set_student_status(body: dict, pool: asyncpg.Pool = Depends(get_pool)) -> dict:
+    """Tạm khoá hoặc mở lại quyền của học viên theo email.
+
+    Gọi từ breakout-app khi trả góp quá hạn (status='suspended') hoặc khi Anna mở
+    lại (status='active'). Đổi TẤT CẢ bản ghi khớp email, vì một người có thể có
+    nhiều bản ghi theo program hoặc cohort và khoá sót thì coi như không khoá.
+
+    Chỉ nhận đúng hai giá trị. Không mở cho status tuỳ ý để tránh gõ nhầm làm
+    hỏng bộ lọc ở nơi khác.
+    """
+    email = (body.get("email") or "").strip().lower()
+    status = (body.get("status") or "").strip().lower()
+    if not email:
+        raise HTTPException(400, "Thiếu email")
+    if status not in ("active", "suspended"):
+        raise HTTPException(400, "status chỉ nhận 'active' hoặc 'suspended'")
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            UPDATE breakoutos.students
+               SET status = $2, updated_at = now()
+             WHERE lower(email) = $1
+            RETURNING id, email, program_id, cohort_id, status
+            """,
+            email, status,
+        )
+    log.info("student-status email=%s status=%s so_ban_ghi=%d", email, status, len(rows))
+    return {"ok": True, "email": email, "status": status,
+            "so_ban_ghi_da_doi": len(rows), "ban_ghi": [dict(r) for r in rows]}
 
 
 @router.post("/webhooks/payment-completed", status_code=201)

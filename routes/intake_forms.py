@@ -14,7 +14,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from routes._auth import _verify_hmac
 from routes.freedom_score_routes import has_baseline
-from routes.sdl_routes import check_gate_passed, get_pool, require_level_access
+from routes.sdl_routes import (
+    check_gate_passed,
+    get_pool,
+    require_level_access,
+    require_student_active,
+)
 
 
 router = APIRouter(tags=["intake-forms"])
@@ -29,6 +34,20 @@ def _error_page(message: str) -> str:
 <body><div class="container"><div class="card">
 <h1>Không thể mở trang</h1><p class="sub">{message}</p>
 </div></div></body></html>"""
+
+
+async def _suspended_page(pool, student_uuid: UUID) -> HTMLResponse | None:
+    """Trả trang báo tạm khoá nếu học viên đang suspended, None nếu được vào.
+
+    Dùng cho các form Foundation, vì chúng trả trang HTML chứ không trả JSON.
+    Bản thân require_student_active đã fail-open, nên lỗi hạ tầng không khoá nhầm.
+    """
+    try:
+        await require_student_active(pool, student_uuid)
+    except HTTPException as exc:
+        msg = exc.detail.get("message") if isinstance(exc.detail, dict) else str(exc.detail)
+        return HTMLResponse(_error_page(msg), status_code=403)
+    return None
 
 
 def _validated_student(student: str, sig: str) -> UUID | None:
@@ -87,6 +106,9 @@ async def l1_form(
             _error_page("Đường link không hợp lệ. Liên hệ Hằng qua Zalo."),
             status_code=403,
         )
+    suspended = await _suspended_page(pool, student_uuid)
+    if suspended is not None:
+        return suspended
     if not await has_baseline(pool, student_uuid):
         return RedirectResponse(
             f"/foundation/baseline?student={student}&sig={sig}",
@@ -248,6 +270,9 @@ async def l2_form(
             _error_page("Đường link không hợp lệ. Liên hệ Hằng qua Zalo."),
             status_code=403,
         )
+    suspended = await _suspended_page(pool, student_uuid)
+    if suspended is not None:
+        return suspended
     try:
         await require_level_access(pool, student_uuid, 2, "L2 Customer Intelligence OS")
     except HTTPException as exc:
@@ -473,6 +498,9 @@ async def l3_form(
             _error_page("Đường link không hợp lệ. Liên hệ Hằng qua Zalo."),
             status_code=403,
         )
+    suspended = await _suspended_page(pool, student_uuid)
+    if suspended is not None:
+        return suspended
     try:
         await require_level_access(pool, student_uuid, 3, "L3 Value Proposition OS")
     except HTTPException as exc:

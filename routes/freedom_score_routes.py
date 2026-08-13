@@ -33,7 +33,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from routes._auth import request_signature, require_student_signature, sign_student
-from routes.sdl_routes import get_pool
+from routes.sdl_routes import get_pool, require_student_active
 
 
 log = logging.getLogger("camas.freedom_score")
@@ -615,6 +615,15 @@ async def baseline_form(
             "<p>Đường link không hợp lệ. Liên hệ Hằng qua Zalo.</p>",
             status_code=403,
         )
+
+    # Học viên đang tạm khoá (trả góp quá hạn) thì chặn ngay từ form đầu tiên.
+    # require_student_active fail-open nên lỗi hạ tầng không khoá nhầm người đã trả đủ.
+    try:
+        await require_student_active(pool, UUID(student_id))
+    except HTTPException as exc:
+        msg = exc.detail.get("message") if isinstance(exc.detail, dict) else str(exc.detail)
+        return HTMLResponse(f"<h1>Quyền truy cập đang tạm khoá</h1><p>{msg}</p>",
+                            status_code=403)
 
     if student_id and not retake:
         try:
