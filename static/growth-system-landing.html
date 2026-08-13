@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<link rel="canonical" href="https://os.breakout.live/growth-system">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growth System - Khoá 3 Breakout | Đào Thị Hằng</title>
+<meta name="description" content="Scale doanh thu store online với phễu 6 tầng + Landing chuyển đổi + FB Ads + Email automation. Khoá 3 Breakout, 15 triệu.">
+<meta property="og:title" content="Growth System - Khoá 3 Breakout">
+<meta property="og:description" content="Scale doanh thu với phễu 6 tầng + Landing 7 block + FB Ads + 5 chuỗi email automation Klaviyo.">
+<meta property="og:url" content="https://os.breakout.live/growth-system">
+<style>
+:root { --red:#E63946; --red-dark:#C42836; --black:#0A0A0A; --gray-1:#1A1A1A; --gray-2:#2A2A2A; --white:#FFFFFF; --gray:#B5B5B5; --gray-light:#E8E8E8; --green:#06A77D; --green-dark:#058560; --yellow:#FFB703; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Inter", "Be Vietnam Pro", "Plus Jakarta Sans", "Segoe UI", sans-serif; background: var(--black); color: var(--white); line-height: 1.6; }
+.container { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+.topbar { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--gray-2); padding: 12px 0; }
+.topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.logo { color: var(--red); font-weight: 800; font-size: 18px; letter-spacing: 2px; }
+.topbar-mid { color: var(--gray); font-size: 13px; flex: 1; text-align: center; }
+.btn { display: inline-block; padding: 14px 28px; border-radius: 8px; font-weight: 700; text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer; font-size: 15px; text-align: center; }
+.btn-primary { background: var(--green); color: var(--white); }
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(6,167,125,0.35); }
+.btn-red { background: var(--red); color: var(--white); }
+.btn-red:hover { background: var(--red-dark); transform: translateY(-1px); }
+.btn-sm { padding: 10px 18px; font-size: 14px; }
+.btn-lg { padding: 18px 36px; font-size: 17px; }
+.btn-block { display: block; width: 100%; }
+.hero { padding: 80px 0 100px; background: radial-gradient(ellipse at top, rgba(230,57,70,0.18), transparent 60%), var(--black); }
+.hero-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; align-items: center; }
+.hero h1 { font-size: 50px; font-weight: 800; line-height: 1.15; margin-bottom: 20px; }
+.hero h1 .accent { color: var(--red); }
+.hero .sub { font-size: 19px; color: var(--gray-light); margin-bottom: 24px; }
+.hero .founder { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--gray-1); border-radius: 10px; border: 1px solid var(--gray-2); }
+.hero .founder-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--red), var(--yellow)); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--white); }
+.hero .founder-text { font-size: 13px; color: var(--gray-light); }
+.hero .founder-text b { color: var(--white); font-size: 14px; display: block; margin-bottom: 2px; }
+.cta-box { background: var(--white); color: var(--black); border-radius: 16px; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+.cta-box .title { font-size: 16px; color: var(--gray-2); margin-bottom: 8px; font-weight: 700; }
+.cta-box .subtitle { font-size: 13px; color: #555; margin-bottom: 20px; }
+.cta-box .price-main { color: var(--red); font-size: 44px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.cta-box .price-caption { color: #666; font-size: 13px; font-style: italic; margin-bottom: 24px; }
+.cta-box .trust { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; font-size: 12px; color: #444; }
+.cta-box .trust div::before { content: "✓ "; color: var(--green); font-weight: 700; }
+section { padding: 80px 0; }
+section.alt { background: var(--gray-1); }
+section.dark-alt { background: var(--black); border-top: 1px solid var(--gray-2); }
+section.white { background: var(--white); color: var(--black); }
+section.white h2 { color: var(--black); }
+section.white p { color: #333; }
+.section-headline { font-size: 38px; font-weight: 800; margin-bottom: 20px; line-height: 1.2; }
+.section-sub { font-size: 18px; color: var(--gray-light); margin-bottom: 40px; max-width: 720px; }
+section.white .section-sub { color: #555; }
+.pain-list { display: grid; grid-template-columns: 1fr; gap: 14px; max-width: 800px; }
+.pain-item { display: flex; align-items: start; gap: 14px; padding: 14px 0; }
+.pain-item::before { content: "✓"; flex-shrink: 0; width: 28px; height: 28px; background: var(--red); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+.module-list { max-width: 900px; }
+.module { background: var(--white); border: 1px solid #E0E0E0; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+.module-head { padding: 18px 24px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; color: var(--black); user-select: none; }
+.module-head:hover { background: #FAFAFA; }
+.module-head .toggle { color: var(--red); font-size: 22px; font-weight: 800; transition: transform 0.2s; }
+.module-body { padding: 0 24px 20px; font-size: 14px; color: #444; line-height: 1.7; display: none; }
+.module.open .module-body { display: block; }
+.module.open .toggle { transform: rotate(45deg); }
+.outcome-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.outcome-item { display: flex; align-items: start; gap: 14px; }
+.outcome-item::before { content: "✓"; flex-shrink: 0; width: 32px; height: 32px; background: var(--green); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+.funnel-tier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; max-width: 1100px; }
+.funnel-tier { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: 10px; padding: 18px; text-align: center; }
+.funnel-tier .t { color: var(--yellow); font-weight: 800; font-size: 13px; letter-spacing: 2px; margin-bottom: 6px; }
+.funnel-tier h4 { font-size: 15px; margin-bottom: 6px; }
+.funnel-tier .p { color: var(--gray); font-size: 12px; line-height: 1.5; }
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; max-width: 1000px; }
+.tool-card { background: var(--white); border: 1px solid #E0E0E0; border-radius: 10px; padding: 18px; text-align: center; }
+.tool-card .tname { color: var(--red); font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+.tool-card .tdesc { color: #555; font-size: 13px; }
+.email-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.email-card { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: 10px; padding: 20px; }
+.email-card .num { color: var(--red); font-weight: 800; font-size: 12px; letter-spacing: 2px; margin-bottom: 6px; }
+.email-card h4 { font-size: 17px; margin-bottom: 8px; }
+.email-card .p { color: var(--gray); font-size: 13px; line-height: 1.5; }
+.proof-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 30px; }
+.proof-item { display: flex; align-items: start; gap: 12px; }
+.proof-item::before { content: "★"; color: var(--yellow); font-size: 18px; flex-shrink: 0; }
+.quote { background: var(--white); border-left: 4px solid var(--red); padding: 20px 24px; border-radius: 8px; font-style: italic; color: #333; font-size: 16px; }
+.pricing-block { text-align: center; max-width: 600px; margin: 0 auto; }
+.pricing-block .main { color: var(--red); font-size: 72px; font-weight: 900; line-height: 1; margin-bottom: 8px; }
+.pricing-block .cap { color: var(--yellow); font-size: 15px; font-style: italic; margin-bottom: 20px; }
+.risk-callout { background: var(--white); color: var(--black); border-left: 4px solid var(--green); padding: 20px 24px; border-radius: 8px; margin: 30px auto; max-width: 700px; text-align: left; }
+.risk-callout .t { color: var(--green-dark); font-weight: 800; font-size: 17px; margin-bottom: 8px; }
+.risk-callout a { color: var(--red); font-weight: 700; text-decoration: none; }
+.faq-list { max-width: 900px; }
+.faq { border-bottom: 1px solid #E0E0E0; padding: 18px 0; }
+.faq-q { font-weight: 700; color: var(--black); cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; font-size: 16px; }
+.faq-q .tog { color: var(--red); font-size: 22px; font-weight: 800; transition: transform 0.2s; }
+.faq.open .faq-a { display: block; }
+.faq.open .tog { transform: rotate(45deg); }
+.faq-a { display: none; padding-top: 12px; color: #555; line-height: 1.7; font-size: 15px; }
+.final-cta { text-align: center; padding: 80px 0; background: linear-gradient(180deg, var(--gray-1), var(--black)); }
+.final-cta h2 { font-size: 36px; font-weight: 800; margin-bottom: 20px; }
+.final-cta .line { color: var(--gray-light); font-style: italic; margin-bottom: 8px; }
+.final-cta .closing { color: var(--gray); font-size: 14px; margin-top: 24px; }
+.footer { background: var(--black); padding: 40px 0; border-top: 1px solid var(--gray-2); text-align: center; color: var(--gray); font-size: 13px; }
+.footer a { color: var(--red); text-decoration: none; }
+.footer .row { margin-bottom: 8px; }
+@media (max-width: 880px) {
+  .hero { padding: 50px 0 60px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero h1 { font-size: 34px; }
+  .section-headline { font-size: 28px; }
+  .topbar-mid { display: none; }
+  section { padding: 50px 0; }
+  .final-cta h2 { font-size: 26px; }
+}
+</style>
+</head>
+<body data-bk-event="ViewContent" data-bk-event-data='{"content_name":"Growth System","content_ids":["growth"],"content_type":"product","currency":"VND","value":15000000}'>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="logo">BREAKOUT</div>
+    <div class="topbar-mid">Growth System (Khoá 3), khoá lớn nhất Breakout</div>
+    <a href="https://app.breakout.live/thanh-toan.html?product=growth" class="btn btn-red btn-sm">Đăng ký 15 triệu →</a>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Scale doanh thu store của bạn lên gấp 2-5 lần, với <span class="accent">phễu 6 tầng + Landing chuyển đổi + FB Ads + Email automation</span></h1>
+      <p class="sub">Bạn có store, có khách lác đác, nhưng không biết cách scale. Tăng traffic là tăng chi phí, không tăng lợi nhuận. Growth System Khoá 3 dạy bạn 5 module + Email Marketing để biến store thành cỗ máy doanh thu chạy bằng AI, có thể vận hành một mình.</p>
+      <div class="founder">
+        <div class="founder-avatar">ĐTH</div>
+        <div class="founder-text">
+          <b>Đào Thị Hằng</b>
+          Khoá lớn nhất Breakout, công cụ thật Anna dùng: Notion + AI + Gempages + Klaviyo + Genspark
+        </div>
+      </div>
+    </div>
+    <div class="cta-box">
+      <div class="title">Growth System (Khoá 3)</div>
+      <div class="subtitle">Nấc 3 Breakout, khoá lớn nhất</div>
+      <div class="price-main">15.000.000 VND</div>
+      <div class="price-caption">5 module + Email Marketing + Course Completion Credential</div>
+      <a href="https://app.breakout.live/thanh-toan.html?product=growth" class="btn btn-primary btn-lg btn-block">ĐĂNG KÝ NGAY</a>
+      <div class="trust">
+        <div>Vào học ngay sau thanh toán</div>
+        <div>Phễu 6 tầng + Landing + Ads + Email</div>
+        <div>Học phí khấu trừ khi nâng cấp</div>
+        <div>Tool thật: Notion, Gempages, Klaviyo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="white">
+  <div class="container">
+    <h2 class="section-headline">Có phải bạn đang ở đây?</h2>
+    <p class="section-sub">Bạn đã có store. Bạn đã có vài khách đầu tiên. Nhưng đến lúc scale lên, bạn kẹt:</p>
+    <div class="pain-list">
+      <div class="pain-item"><p>Chỉ có 1-2 SKU, không có sản phẩm entry, không có bundle, không có sản phẩm lợi nhuận cao. Khách mua 1 lần rồi biến.</p></div>
+      <div class="pain-item"><p>AOV (giá trị đơn trung bình) thấp. LTV (giá trị vòng đời khách) thấp. Tăng traffic = tăng chi phí, không tăng lợi nhuận.</p></div>
+      <div class="pain-item"><p>Landing page convert dưới 1%. Chạy ads burn tiền. Khách click vào nhưng không mua.</p></div>
+      <div class="pain-item"><p>FB Ads chạy được vài ngày là chết camp, bị ngưng, hoặc CPM tăng vọt.</p></div>
+      <div class="pain-item"><p>Khách bỏ giỏ 70%, mua xong không quay lại. Không có email nhắc, không có winback. Tiền đầu tư cho 1 khách bốc hơi.</p></div>
+    </div>
+    <p style="margin-top: 30px; color: #444;">Growth System là khoá lớn nhất Breakout. Bạn không học "1 mẹo" hay "1 hack". Bạn học cả hệ thống: phễu 6 tầng + landing 7 block + chiến lược ads + 5 chuỗi email automation. Hết khoá, bạn có cỗ máy scale chạy bằng AI một mình.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2 class="section-headline">5 Module + Email Marketing trong Growth System</h2>
+    <p class="section-sub">Mỗi module có lý thuyết + demo tool thật + bài tập thực hành + worksheet. Hằng dạy bằng chính cách Anna scale 5 ventures.</p>
+    <div class="module-list">
+      <div class="module"><div class="module-head" onclick="this.parentElement.classList.toggle('open')">Giới thiệu Growth System <span class="toggle">+</span></div><div class="module-body">The What của khoá. Giới thiệu công cụ AI-Notion. Lối tư duy khiến bạn mắc kẹt khi scale. Điều quyết định thành bại mọi việc. Sự thật về kinh doanh online ít người nói bạn biết.</div></div>
+      <div class="module"><div class="module-head" onclick="this.parentElement.classList.toggle('open')">Module 1: Thiết kế phễu sản phẩm <span class="toggle">+</span></div><div class="module-body"><b>Nền tảng phễu ecommerce</b>: 4 biến số sống còn (AOV, LTV, Repeat Purchase Rate, Net Profit Margin). <b>4 sai lầm phổ biến</b>: chỉ 1-2 SKU, không có sản phẩm entry, không có bundle, không có sản phẩm lợi nhuận cao. <b>Phễu 6 tầng cho sản phẩm vật lý</b>: Traffic Hook + 3 cách tạo, Core Product (2 lớp giá trị), Bundle (3 dạng + 3 nguyên tắc), Premium (2 trụ cột + 3 vũ khí, tâm lý đằng sau). <b>Ứng dụng AI thiết kế phễu</b>: hướng dẫn từng bước.</div></div>
+      <div class="module"><div class="module-head" onclick="this.parentElement.classList.toggle('open')">Module 2: Thiết kế Landing chuyển đổi cao <span class="toggle">+</span></div><div class="module-body">Vai trò Landing trong kinh doanh. Khác biệt Landing sản phẩm số vs vật lý. <b>7 Block bắt buộc</b>: Hero, Vấn đề khách, Tính năng + Lợi ích, Bằng chứng xã hội (review), Xử lý từ chối, Offer, CTA. <b>Demo A-Z Gempages</b>: cài app, thiết kế landing từ con số 0 đến publish.</div></div>
+      <div class="module"><div class="module-head" onclick="this.parentElement.classList.toggle('open')">Module 3: Quảng cáo Facebook A-Z <span class="toggle">+</span></div><div class="module-body">Loại content chạy ads hiệu quả. Chiến lược phòng ngừa camp bị ngưng, ads chết giữa chừng. Chiến lược chạy ads hiệu quả. <b>Quan trọng nhất, 40 phút</b>: Cách lên một chiến dịch FB Ads hiệu quả từ A-Z (targeting, creative, budget split, scaling).</div></div>
+      <div class="module"><div class="module-head" onclick="this.parentElement.classList.toggle('open')">Module 4: Chiến lược kinh doanh scale <span class="toggle">+</span></div><div class="module-body">3 trục tăng doanh thu: <b>Tăng số lượng khách hàng tiềm năng</b> (organic + paid + KOL + partnership). <b>Tăng giá trị đơn hàng</b> (upsell, bundle, free shipping threshold, premium tier). <b>Tăng số lần mua lại</b> (winback, loyalty program, post-purchase sequence, subscription model).</div></div>
+      <div class="module"><div class="module-head" onclick="this.parentElement.classList.toggle('open')">Module Email Marketing (bonus trong SSS) <span class="toggle">+</span></div><div class="module-body">Nền tảng email marketing. <b>5 chuỗi automation</b>: Welcome (chào khách mới), Abandonment (bỏ giỏ hàng), Post-purchase (sau mua), Cross-sell + Up-sell (bán kèm + nâng cấp), Winback (đánh thức khách nguội). <b>Setup Klaviyo</b> end-to-end + <b>Genspark</b> hỗ trợ viết email bằng AI.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="white">
+  <div class="container">
+    <h2 class="section-headline">Phễu 6 tầng cho sản phẩm vật lý (Module 1)</h2>
+    <p class="section-sub">Khác phễu sản phẩm số 5 nấc (xem Khoá 2). Phễu vật lý có 6 tầng vì cần manage tồn kho + AOV.</p>
+    <div class="funnel-tier-grid">
+      <div class="funnel-tier"><div class="t">TẦNG 1</div><h4>Traffic Hook</h4><div class="p">3 đặc điểm cốt lõi. 3 cách tạo.</div></div>
+      <div class="funnel-tier"><div class="t">TẦNG 2</div><h4>Core Product</h4><div class="p">Trái tim phễu. 2 lớp giá trị: thiết yếu + kỳ vọng.</div></div>
+      <div class="funnel-tier"><div class="t">TẦNG 3</div><h4>Bundle</h4><div class="p">3 dạng phổ biến. 3 nguyên tắc thiết kế.</div></div>
+      <div class="funnel-tier"><div class="t">TẦNG 4</div><h4>Premium</h4><div class="p">2 trụ cột + 3 vũ khí. Tâm lý đằng sau.</div></div>
+      <div class="funnel-tier"><div class="t">TẦNG 5</div><h4>Best Seller giảm nhẹ</h4><div class="p">Tạo cú hích tâm lý mua lại.</div></div>
+      <div class="funnel-tier"><div class="t">TẦNG 6</div><h4>Repeat + Subscribe</h4><div class="p">Recurring revenue, tăng LTV.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <h2 class="section-headline">5 chuỗi email automation trong Klaviyo (Module Email)</h2>
+    <p class="section-sub">Hằng dạy setup từng chuỗi end-to-end, có template + flow + trigger sẵn copy paste.</p>
+    <div class="email-grid">
+      <div class="email-card"><div class="num">CHUỖI 1</div><h4>Welcome Sequence</h4><div class="p">Chào khách mới, build trust, soft pitch sản phẩm phù hợp. 5-7 email.</div></div>
+      <div class="email-card"><div class="num">CHUỖI 2</div><h4>Abandonment</h4><div class="p">Khách bỏ giỏ hàng, nhắc lại trong 1h + 24h + 72h. Recover 15-30% đơn hỏng.</div></div>
+      <div class="email-card"><div class="num">CHUỖI 3</div><h4>Post-purchase</h4><div class="p">Sau khi mua: thank you, shipping update, review request, cross-sell mềm.</div></div>
+      <div class="email-card"><div class="num">CHUỖI 4</div><h4>Cross-sell + Up-sell</h4><div class="p">Bán kèm sản phẩm liên quan + nâng cấp lên Premium/Bundle/Subscription.</div></div>
+      <div class="email-card"><div class="num">CHUỖI 5</div><h4>Winback</h4><div class="p">Đánh thức khách 60-90 ngày không mua. Câu chuyện mới, lý do mới, không spam.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="white">
+  <div class="container">
+    <h2 class="section-headline">Công cụ thật Hằng dạy trong Growth System</h2>
+    <p class="section-sub">Đây là chính các tool Anna đang dùng để vận hành 5 ventures. Không phải dạy tool lý thuyết.</p>
+    <div class="tool-grid">
+      <div class="tool-card"><div class="tname">Notion + AI</div><div class="tdesc">Tổ chức funnel, content, customer data</div></div>
+      <div class="tool-card"><div class="tname">AI (Claude/ChatGPT)</div><div class="tdesc">Thiết kế phễu, viết content, tối ưu ads</div></div>
+      <div class="tool-card"><div class="tname">Gempages</div><div class="tdesc">Build landing page chuyển đổi cao trên Shopify</div></div>
+      <div class="tool-card"><div class="tname">Klaviyo</div><div class="tdesc">Email automation chuyên nghiệp cho ecommerce</div></div>
+      <div class="tool-card"><div class="tname">Genspark</div><div class="tdesc">AI hỗ trợ viết email + nội dung marketing</div></div>
+      <div class="tool-card"><div class="tname">FB Ads Manager</div><div class="tdesc">Chạy + scale ads thật, không lý thuyết</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="dark-alt">
+  <div class="container">
+    <h2 class="section-headline">Sau Khoá 3 Growth, bạn có gì trong tay?</h2>
+    <div class="outcome-grid">
+      <div class="outcome-item"><p>Một phễu sản phẩm 6 tầng đầy đủ cho store của bạn (Traffic Hook đến Premium).</p></div>
+      <div class="outcome-item"><p>Landing page chuyển đổi 3-5% (vs benchmark thị trường 1-2%).</p></div>
+      <div class="outcome-item"><p>Chiến dịch FB Ads chạy ổn định, không bị ngưng giữa chừng.</p></div>
+      <div class="outcome-item"><p>5 chuỗi email automation Klaviyo chạy 24/7 thay bạn.</p></div>
+      <div class="outcome-item"><p>AOV tăng 30-50% nhờ bundle + upsell + cross-sell đúng cách.</p></div>
+      <div class="outcome-item"><p>Tỷ lệ mua lại tăng 20-40% nhờ winback + post-purchase sequence.</p></div>
+      <div class="outcome-item"><p>Course Completion Credential (chứng chỉ hoàn thành Growth System).</p></div>
+      <div class="outcome-item"><p>Hệ thống có thể vận hành một mình + AI, không cần tuyển team marketing.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="white">
+  <div class="container">
+    <h2 class="section-headline">Hằng là ai mà dạy Khoá 3 này?</h2>
+    <div class="proof-grid">
+      <div class="proof-item"><p>Hằng tự scale Speakout từ 0 lên 33.000+ học viên + ~5.000 paid customer, không có team marketing đông.</p></div>
+      <div class="proof-item"><p>BMCorner (Gold Coast): 50-60K AUD/tháng, Anna phụ trách toàn bộ marketing solo + AI.</p></div>
+      <div class="proof-item"><p>Mắm Thuyền Nan: xây phễu 6 tầng đưa sản phẩm Việt ra global.</p></div>
+      <div class="proof-item"><p>Vận hành 5 ventures cùng lúc một mình bằng cùng bộ công cụ Hằng dạy trong Growth System.</p></div>
+    </div>
+    <div class="quote">Khoá 3 không dạy bạn "cách scale của Hằng". Hằng dạy bạn một bộ công cụ + framework để bạn TỰ scale store của bạn, dù bạn bán sản phẩm gì, ở ngách nào.</div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container pricing-block">
+    <h2 class="section-headline" style="text-align: center;">Growth System (Khoá 3)</h2>
+    <div class="main">15.000.000<span style="font-size:24px;"> VND</span></div>
+    <div class="cap">Khoá lớn nhất Breakout, có Course Completion Credential</div>
+    <div class="risk-callout">
+      <div class="t">Học phí không mất đi</div>
+      <p>Học phí bạn thanh toán thật cho tầng nền được khấu trừ nguyên vẹn khi bạn nâng cấp lên chương trình cao hơn. Bạn không trả tiền hai lần cho cùng một nền tảng. Chính sách hoàn phí 14 ngày áp dụng riêng cho Breakout Coaching 52 tuần.</p>
+      <p style="margin-top: 10px;"><a href="https://app.breakout.live/chinh-sach-hoan-phi">Xem chính sách hoàn phí đầy đủ →</a></p>
+    </div>
+    <a href="https://app.breakout.live/thanh-toan.html?product=growth" class="btn btn-primary btn-lg">ĐĂNG KÝ GROWTH SYSTEM 15.000.000 VND</a>
+    <p style="color: var(--gray); font-size: 13px; font-style: italic; margin-top: 14px;">Thanh toán Sepay tự động. Vào portal học ngay sau khi thanh toán.</p>
+  </div>
+</section>
+
+<section class="white">
+  <div class="container">
+    <h2 class="section-headline">Câu hỏi thường gặp</h2>
+    <div class="faq-list">
+      <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Khoá 3 khác Khoá 1 + Khoá 2 thế nào? <span class="tog">+</span></div><div class="faq-a">Khoá 1 Foundation: dựng store Shopify. Khoá 2 Customer System: hiểu khách + phễu sản phẩm số. Khoá 3 Growth System: scale doanh thu store với phễu 6 tầng + landing + ads + email automation. Khoá 3 là khoá lớn nhất, áp dụng cho store đã có khách đầu tiên.</div></div>
+      <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Tôi chưa có store, có học Khoá 3 được không? <span class="tog">+</span></div><div class="faq-a">Không nên. Khoá 3 giả định bạn đã có store + 5-10 khách đầu tiên. Nếu chưa có store, học Khoá 1 Foundation trước. Nếu có store nhưng chưa hiểu khách, nên học Khoá 2 Customer System song song hoặc trước Khoá 3.</div></div>
+      <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Tôi bán sản phẩm số (course, ebook), có cần Khoá 3 không? <span class="tog">+</span></div><div class="faq-a">Có. Module 2 Landing + Module 3 FB Ads + Module Email Marketing áp dụng được cho cả digital. Phễu 6 tầng vật lý có thể chuyển ngữ sang digital (lead magnet thay traffic hook, tripwire thay core, etc.). Nếu chuyên digital, ưu tiên Khoá 2 + Module 2/3 của Khoá 3.</div></div>
+      <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Tool Klaviyo + Gempages có cần đăng ký riêng không? <span class="tog">+</span></div><div class="faq-a">Có. Klaviyo free đến 250 contact. Gempages free trial 14 ngày, sau đó từ $29/tháng. Notion free cho personal. Genspark free tier. Tổng chi phí tool ~$50-100/tháng nếu chạy nghiêm túc. Hằng có discount code cho học viên với một số tool.</div></div>
+      <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Khoá có Q&A trực tiếp với Hằng không? <span class="tog">+</span></div><div class="faq-a">Có. 2 buổi Q&A live mỗi tháng (Zoom 90 phút) trong 12 tuần đầu, sau đó 1 buổi/tháng. Có recording trong portal. Muốn được cầm tay chỉ việc dài hơi, có Breakout Coaching 52 tuần (150 triệu).</div></div>
+      <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Tôi đăng ký rồi đổi ý có hoàn phí không? <span class="tog">+</span></div><div class="faq-a">Có. Hoàn 100% tiền trong 14 ngày nếu đủ 3 điều kiện: hoàn thành Module 1, nộp worksheet, chứng minh đã thử áp dụng. Xem <a href="https://app.breakout.live/chinh-sach-hoan-phi" style="color:var(--red);">chính sách hoàn phí đầy đủ</a>.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="final-cta">
+  <div class="container">
+    <h2>Growth System dành cho ai?</h2>
+    <p class="line">Chủ store đã có khách đầu tiên, muốn scale doanh thu gấp 2-5 lần.</p>
+    <p class="line">Người đã chạy ads burn tiền, muốn học chiến lược đúng.</p>
+    <p class="line">Solo founder muốn xây cỗ máy doanh thu chạy 24/7 bằng AI.</p>
+    <p style="margin: 24px 0 16px; color: var(--white);">Nếu đó là bạn:</p>
+    <a href="https://app.breakout.live/thanh-toan.html?product=growth" class="btn btn-primary btn-lg">ĐĂNG KÝ GROWTH SYSTEM 15.000.000 VND</a>
+    <p class="closing">Phân vân? Nhắn Zalo Hằng <b style="color:var(--white);">0932 093 593</b>, kể Hằng nghe store của bạn đang ở đâu.</p>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="container">
+    <div class="row">Đào Thị Hằng, Vì sự tự do của bạn</div>
+    <div class="row">Email: <a href="mailto:support@daothihang.com">support@daothihang.com</a> · WhatsApp: +61 484 514 733 &middot; Messenger: m.me/daothihang &middot; Zalo: 0932 093 593</div>
+    <div class="row"><a href="https://app.breakout.live/">Trang chủ Breakout</a> · <a href="/foundation">Foundation</a> · <a href="/customer-system">Customer</a> · <a href="/coaching">Coaching</a> · <a href="https://app.breakout.live/chinh-sach-hoan-phi">Hoàn phí</a></div>
+    <div class="row" style="margin-top:16px; color:#666;">© 2026 Đào Thị Hằng. All rights reserved.</div>
+  </div>
+</div>
+
+</body>
+</html>

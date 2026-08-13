@@ -630,7 +630,7 @@ async def root(request: Request):
     host = request.headers.get("host", "").lower()
     if host.startswith("os.breakout.live"):
         from fastapi.responses import RedirectResponse
-        return RedirectResponse(url="/foundation-system", status_code=302)
+        return RedirectResponse(url="/foundation", status_code=302)
     return JSONResponse(
         {
             "service": "camas-kernel",
@@ -641,7 +641,6 @@ async def root(request: Request):
     )
 
 
-@app.get("/foundation-system")
 @app.get("/foundation")
 async def foundation_landing(request: Request):
     """Landing khoá Foundation với Digital Assets Foundation angle.
@@ -652,6 +651,13 @@ async def foundation_landing(request: Request):
     """
     from fastapi.responses import HTMLResponse
     return HTMLResponse(_render_landing_foundation())
+
+
+@app.get("/foundation-system")
+async def foundation_landing_alias():
+    """URL cu -> /foundation canonical (Anna chot cau truc URL 2026-08-12)."""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/foundation", status_code=301)
 
 
 @app.get("/foundation-assets/vault-structure.png")
