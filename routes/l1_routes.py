@@ -262,6 +262,27 @@ async def _persist_tier_b(
             file_key,
             structured["error"],
         )
+        # BÁO NGAY cho Anna. Trước 2026-08-13 chỗ này chỉ ghi log, mà việc sinh
+        # Tier B chạy nền nên không ai đọc log. Học viên trả 3 triệu ngày 03/08 bị
+        # kẹt ở Gate 1 suốt 10 ngày vì tài khoản Anthropic hết credit, không một
+        # dấu hiệu nào nổi lên. Một học viên kẹt phải là chuyện nhìn thấy được.
+        try:
+            from routes.telegram_alert import send_telegram_sync
+            async with pool.acquire() as conn:
+                srow = await conn.fetchrow(
+                    "SELECT email, full_name FROM breakoutos.students WHERE id=$1", student_id
+                )
+            email = (srow["email"] if srow else "") or "khong ro email"
+            send_telegram_sync(
+                "BREAKOUTOS, AI SINH FILE THAT BAI\n"
+                f"Hoc vien: {email}\n"
+                f"File: {file_key}\n"
+                f"Loi: {str(structured.get('error'))[:120]}\n"
+                f"Student: {student_id}\n"
+                "Hoc vien nay DANG KET, chua qua Gate 1 duoc cho toi khi sinh lai."
+            )
+        except Exception:
+            log.exception("khong bao duoc Telegram khi Tier B that bai")
         return
 
     md = render_markdown(file_key, structured, student_id)
