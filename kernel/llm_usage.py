@@ -156,12 +156,14 @@ def set_pool(pool: Any) -> None:
     _POOL = pool
 
 
+SOURCE = "camas-kernel"
+
 _INSERT = """
 INSERT INTO breakoutos.llm_usage_log
-  (occurred_at, provider, model, model_raw, input_tokens, output_tokens,
+  (occurred_at, source, provider, model, model_raw, input_tokens, output_tokens,
    cache_read_tokens, cache_write_tokens, estimated_cost_usd, caller, call_group,
    student_id, request_id, success, error_type, duration_ms)
-VALUES (now(), $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+VALUES (now(), $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
 """
 
 
@@ -214,7 +216,7 @@ async def record(
             return
         async with _POOL.acquire() as conn:
             await conn.execute(
-                _INSERT, provider, model, model_raw, input_tokens, output_tokens,
+                _INSERT, SOURCE, provider, model, model_raw, input_tokens, output_tokens,
                 cache_read_tokens, cache_write_tokens, cost, caller, group,
                 student_id, request_id, success, error_type, duration_ms,
             )

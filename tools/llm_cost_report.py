@@ -86,6 +86,7 @@ async def main(days: int) -> None:
                       "so lieu se day len khi co lenh goi that.")
 
         if has_usage and total:
+            await _section_by_source(conn, days)
             await _section_by_day_model(conn, days)
             await _section_by_group(conn, days)
             await _section_top_callers(conn, days)
@@ -97,6 +98,29 @@ async def main(days: int) -> None:
         await _section_legacy_k3(conn, days)
     finally:
         await conn.close()
+
+
+async def _section_by_source(conn, days: int) -> None:
+    """Tach ro dich vu nao ton tien. camas-kernel sinh ho so hoc vien,
+    breakout-app chay chat lop va Gap Report."""
+    print("\n" + "-" * 74)
+    print("0. TACH THEO DICH VU")
+    print("-" * 74)
+    rows = await conn.fetch("""
+        SELECT source, count(*) AS so_lan, sum(input_tokens) AS tok_vao,
+               sum(output_tokens) AS tok_ra, sum(estimated_cost_usd) AS tien
+        FROM breakoutos.llm_usage_log
+        WHERE occurred_at > now() - ($1||' days')::interval
+        GROUP BY 1 ORDER BY tien DESC NULLS LAST
+    """, str(days))
+    print(f"  {'Dich vu':<18}{'Lan':>7}{'Tok vao':>12}{'Tok ra':>11}{'Tien':>11}")
+    for r in rows:
+        print(f"  {(r['source'] or '?')[:17]:<18}{r['so_lan']:>7}"
+              f"{r['tok_vao']:>12,}{r['tok_ra']:>11,}{_fmt_usd(r['tien']):>11}")
+    thieu = [r["source"] for r in rows]
+    for s in ("camas-kernel", "breakout-app"):
+        if s not in thieu:
+            print(f"  [!] Chua thay ban ghi nao tu {s} trong khoang nay.")
 
 
 async def _section_by_day_model(conn, days: int) -> None:
@@ -156,17 +180,17 @@ async def _section_top_callers(conn, days: int) -> None:
     print("3. TOP 10 NOI TON TIEN NHAT")
     print("-" * 74)
     rows = await conn.fetch("""
-        SELECT caller, model, count(*) AS so_lan,
+        SELECT source, caller, model, count(*) AS so_lan,
                sum(estimated_cost_usd) AS tien,
                avg(duration_ms)::int AS ms_tb
         FROM breakoutos.llm_usage_log
         WHERE occurred_at > now() - ($1||' days')::interval
-        GROUP BY 1,2 ORDER BY tien DESC NULLS LAST LIMIT 10
+        GROUP BY 1,2,3 ORDER BY tien DESC NULLS LAST LIMIT 10
     """, str(days))
-    print(f"  {'Noi goi':<38}{'Model':<20}{'Lan':>5}{'Tien':>11}")
+    print(f"  {'Dich vu':<14}{'Noi goi':<34}{'Model':<18}{'Lan':>5}{'Tien':>11}")
     for r in rows:
-        print(f"  {(r['caller'] or '?')[:37]:<38}{(r['model'] or '?')[:19]:<20}"
-              f"{r['so_lan']:>5}{_fmt_usd(r['tien']):>11}")
+        print(f"  {(r['source'] or '?')[:13]:<14}{(r['caller'] or '?')[:33]:<34}"
+              f"{(r['model'] or '?')[:17]:<18}{r['so_lan']:>5}{_fmt_usd(r['tien']):>11}")
 
 
 async def _section_anomalies(conn, days: int) -> None:
