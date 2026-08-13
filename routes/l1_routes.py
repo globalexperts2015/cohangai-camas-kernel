@@ -185,6 +185,15 @@ async def _trigger_ai_extraction(
     pool: asyncpg.Pool, student_id: UUID, payload: L1IntakePayload,
 ) -> None:
     """Background task: run 3 Tier B extractions sequentially."""
+    # Gan hoc vien vao ngu canh de bao cao chi phi biet lenh goi phuc vu ai.
+    # Chi ghi id, khong ghi ten hay email. Hong cung khong lam gay viec that.
+    try:
+        from kernel.llm_usage import set_student
+
+        set_student(student_id)
+    except Exception:  # noqa: BLE001
+        pass
+
     inputs = {
         "identity": payload.founder_identity,
         "decision_principles": "\n".join(payload.decision_principles),
@@ -346,6 +355,13 @@ async def rerun_tier_b_extraction(
     require_student_signature(str(student_id), request_signature(request, sig))
     if file_key not in EXTRACTION_REGISTRY:
         raise HTTPException(404, f"Unknown Tier B file: {file_key}")
+
+    try:
+        from kernel.llm_usage import set_student
+
+        set_student(student_id)
+    except Exception:  # noqa: BLE001
+        pass
 
     async with pool.acquire() as conn:
         profile = await conn.fetchrow(

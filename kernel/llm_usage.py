@@ -18,6 +18,7 @@ Rieng tu: chi ghi so token va ten noi goi. KHONG ghi noi dung prompt,
 """
 from __future__ import annotations
 
+import contextvars
 import json
 import logging
 import os
@@ -26,6 +27,29 @@ import time
 from typing import Any, Optional
 
 log = logging.getLogger("camas.llm_usage")
+
+# Lop ghi nhan nam sau cung, khong biet dang phuc vu hoc vien nao. Route dat
+# gia tri nay o dau request, moi lan goi LLM ben trong tu doc ra.
+# Dung contextvars nen an toan voi asyncio: hai request chay song song khong
+# giam du lieu cua nhau.
+_STUDENT: contextvars.ContextVar[Optional[str]] = contextvars.ContextVar(
+    "llm_usage_student_id", default=None
+)
+
+
+def set_student(student_id: Any) -> None:
+    """Route goi ham nay o dau request. Hong cung khong duoc lam gay request."""
+    try:
+        _STUDENT.set(str(student_id) if student_id else None)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def current_student() -> Optional[str]:
+    try:
+        return _STUDENT.get()
+    except Exception:  # noqa: BLE001
+        return None
 
 # Gia USD tren 1 trieu token, lay tu AWS Bedrock ngay 2026-08-13
 # (list_foundation_model_agreement_offers, vung ap-southeast-2).
@@ -160,6 +184,8 @@ async def record(
         caller, group = caller_hint()
         model = _base_model_name(model_raw)
         cost = estimate_cost_usd(model_raw, input_tokens, output_tokens)
+        if student_id is None:
+            student_id = current_student()
 
         # Luon ghi mot dong JSON ra log. Chay duoc o moi noi, khong phu thuoc DB.
         log.info(
