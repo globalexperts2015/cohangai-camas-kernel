@@ -1001,6 +1001,12 @@ def _render_landing_foundation() -> str:
   .cta{display:inline-block;background:var(--brand);color:#fff;font-size:19px;font-weight:700;text-decoration:none;padding:16px 30px;border-radius:12px;box-shadow:0 8px 22px rgba(225,29,42,.30);transition:transform .12s ease,background .2s}
   .cta:hover{background:var(--brand-dark);transform:translateY(-1px)}
   .cta-note{font-size:15px;color:var(--muted);margin-top:12px}
+  /* Lua chon tra gop, dat canh nut chinh. Vien chu khong to mau de khong canh
+     tranh voi nut tra mot lan, nhung van du ro de nguoi can thi thay. */
+  .cta-tragop{display:inline-block;background:transparent;color:var(--brand);font-size:16px;
+    font-weight:700;text-decoration:none;padding:13px 24px;border-radius:12px;
+    border:1.5px solid var(--brand);margin-top:12px;transition:background .2s}
+  .cta-tragop:hover{background:rgba(225,29,42,.06)}
   .center{text-align:center}
   /* image placeholder */
   .imgph{border:2px dashed #c3c9d6;background:var(--soft);border-radius:14px;padding:40px 20px;text-align:center;color:var(--muted);font-size:15px;margin:8px 0 22px}
@@ -1068,6 +1074,7 @@ def _render_landing_foundation() -> str:
     <p class="sub" style="font-weight:700;font-size:23px;color:var(--ink)">Không còn bắt đầu lại từ đầu mỗi lần mở AI (ChatGPT, Claude, Gemini).</p>
     <p class="nots">Bạn không cần thêm người.<br>Bạn cần một hệ thống AI hiểu bạn, nhớ thay bạn và làm việc cùng bạn mỗi ngày.<br>Sau 7 ngày, bạn ngừng làm việc một mình.</p>
     <a class="cta" href="https://app.breakout.live/thanh-toan.html?product=foundation&source=landing_hero">Đăng ký Foundation System 3 triệu</a>
+    <div><a class="cta-tragop" href="https://app.breakout.live/tra-gop.html?source=foundation_landing_hero">Hoặc trả góp 3 kỳ, mỗi kỳ 1 triệu</a></div>
     <p class="cta-note">Lịch học Thứ Hai, Thứ Tư, Thứ Sáu từ 5h đến 6h30 sáng giờ Việt Nam. Chủ nhật từ 9h sáng đến 3h chiều giờ Việt Nam. Có video quay lại.</p>
   </div>
 </section>
@@ -1184,7 +1191,8 @@ def _render_landing_foundation() -> str:
       <p><strong>6. Hệ thống vận hành Solo Biz.</strong> Mục tiêu, KPI, cơ hội kinh doanh, sản phẩm, doanh thu, tất cả ở một cockpit. AI đọc dữ liệu và đề xuất hành động hàng ngày.</p>
     </div>
     <div class="pull">Sau 7 ngày bạn có phiên bản đầu tiên của hệ thống vận hành Solo Biz, đủ để dùng, thử, sửa và phát triển tiếp.</div>
-    <div class="center"><a class="cta" href="https://app.breakout.live/thanh-toan.html?product=foundation&source=landing_mid">Tôi muốn cài hệ điều hành Solo Biz</a></div>
+    <div class="center"><a class="cta" href="https://app.breakout.live/thanh-toan.html?product=foundation&source=landing_mid">Tôi muốn cài hệ điều hành Solo Biz</a>
+    <div><a class="cta-tragop" href="https://app.breakout.live/tra-gop.html?source=foundation_landing_mid">Hoặc trả góp 3 kỳ, mỗi kỳ 1 triệu</a></div></div>
   </div>
 </section>
 
@@ -1351,6 +1359,7 @@ def _render_landing_foundation() -> str:
     <p class="big">Đợt này chỉ nhận 20 người.</p>
     <div class="gap"></div>
     <a class="cta" href="https://app.breakout.live/thanh-toan.html?product=foundation&source=landing_bottom">Đăng ký, còn 20 suất</a>
+    <div><a class="cta-tragop" href="https://app.breakout.live/tra-gop.html?source=foundation_landing_bottom">Hoặc trả góp 3 kỳ, mỗi kỳ 1 triệu</a></div>
     
   </div>
 </section>
