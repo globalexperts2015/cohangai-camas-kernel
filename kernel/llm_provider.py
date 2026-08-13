@@ -24,9 +24,37 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time as _time
 from typing import Any, Callable
 
 log = logging.getLogger("camas.llm_provider")
+
+
+async def _record_usage(
+    *, model_raw: str, resp: Any = None, success: bool = True,
+    error_type: str | None = None, duration_ms: int | None = None,
+) -> None:
+    """Ghi nhan mot lan goi LLM. Boc kin, khong bao gio lam hong lenh goi that."""
+    try:
+        from . import llm_usage
+
+        if not llm_usage.enabled():
+            return
+        u = getattr(resp, "usage", None)
+        await llm_usage.record(
+            provider=provider(),
+            model_raw=model_raw,
+            input_tokens=int(getattr(u, "input_tokens", 0) or 0),
+            output_tokens=int(getattr(u, "output_tokens", 0) or 0),
+            cache_read_tokens=int(getattr(u, "cache_read_input_tokens", 0) or 0),
+            cache_write_tokens=int(getattr(u, "cache_creation_input_tokens", 0) or 0),
+            request_id=getattr(resp, "_request_id", None) or getattr(resp, "id", None),
+            success=success,
+            error_type=error_type,
+            duration_ms=duration_ms,
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning("khong ghi duoc llm_usage: %s", exc)
 
 DEFAULT_BEDROCK_REGION = "ap-southeast-2"
 
@@ -114,7 +142,22 @@ class _MessagesProxy:
         return kwargs
 
     async def create(self, **kwargs: Any) -> Any:
-        return await self._inner.create(**self._fix(kwargs))
+        kwargs = self._fix(kwargs)
+        model_raw = kwargs.get("model", "unknown")
+        t0 = _time.monotonic()
+        try:
+            resp = await self._inner.create(**kwargs)
+        except Exception as exc:
+            await _record_usage(
+                model_raw=model_raw, success=False, error_type=type(exc).__name__,
+                duration_ms=int((_time.monotonic() - t0) * 1000),
+            )
+            raise
+        await _record_usage(
+            model_raw=model_raw, resp=resp, success=True,
+            duration_ms=int((_time.monotonic() - t0) * 1000),
+        )
+        return resp
 
     def stream(self, **kwargs: Any) -> Any:
         return self._inner.stream(**self._fix(kwargs))
@@ -162,7 +205,9 @@ def build_async_client(api_key: str | None = None) -> Any:
             "Chua co ANTHROPIC_API_KEY. Neu tai khoan Anthropic het credit, "
             "dat LLM_PROVIDER=bedrock de chay qua AWS."
         )
-    return AsyncAnthropic(api_key=key)
+    # Van boc proxy o che do goi thang, de lop ghi nhan usage chay o ca hai duong.
+    # Mapper la ham dong nhat vi Anthropic dung dung ten model goc.
+    return _ClientProxy(AsyncAnthropic(api_key=key), lambda m: m)
 
 
 def ready() -> bool:

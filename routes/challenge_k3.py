@@ -49,11 +49,20 @@ K3_LLM_MAX_TOKENS = int(os.getenv("K3_LLM_MAX_TOKENS", "6000"))
 K3_DAY3_MAX_TOKENS = int(os.getenv("K3_DAY3_MAX_TOKENS", "8000"))
 PUBLIC_BASE_URL = os.getenv("K3_PUBLIC_BASE_URL", "https://os.breakout.live").rstrip("/")
 
-# Pricing constants (USD per 1M tokens) - update khi model price thay doi
+# Gia USD tren 1 trieu token. Lay tu AWS Bedrock ngay 2026-08-13
+# (list_foundation_model_agreement_offers, vung ap-southeast-2).
+# Sua lai 2026-08-13: opus-4-7 truoc ghi 15/75, gap 3 lan gia that, lam bao cao
+# chi phi bi thoi phong. Gia dung la 5/25.
 _MODEL_PRICING_USD = {
+    "claude-haiku-4-5": {"in": 1.0, "out": 5.0},
     "claude-haiku-4-5-20251001": {"in": 1.0, "out": 5.0},
+    "claude-sonnet-5": {"in": 2.0, "out": 10.0},
     "claude-sonnet-4-6": {"in": 3.0, "out": 15.0},
-    "claude-opus-4-7": {"in": 15.0, "out": 75.0},
+    "claude-opus-4-6": {"in": 5.0, "out": 25.0},
+    "claude-opus-4-7": {"in": 5.0, "out": 25.0},
+    "claude-opus-4-8": {"in": 5.0, "out": 25.0},
+    "claude-opus-5": {"in": 5.0, "out": 25.0},
+    "claude-fable-5": {"in": 10.0, "out": 50.0},
 }
 _DATAFORSEO_COST_PER_KW = 0.003  # USD per keyword search volume call
 _YOUTUBE_COST_PER_CALL = 0.0  # free tier

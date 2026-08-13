@@ -179,6 +179,14 @@ async def get_pool() -> asyncpg.Pool:
             dsn, min_size=1, max_size=5, command_timeout=15,
         )
         log.info("SDL pool created (min=1 max=5)")
+        # Cho lop ghi nhan usage LLM dung chung pool nay. Boc try vi day chi la
+        # do dac, hong cung khong duoc lam gay duong phuc vu hoc vien.
+        try:
+            from kernel.llm_usage import set_pool as _set_usage_pool
+
+            _set_usage_pool(_POOL)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("khong noi duoc pool cho llm_usage: %s", exc)
         return _POOL
 
 
