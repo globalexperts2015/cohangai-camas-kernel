@@ -51,6 +51,20 @@ def _precheck_evidence(file_key: str, inputs: dict[str, Any]) -> dict[str, Any] 
     return None
 
 
+def _hoac(d: dict, khoa: str, mac_dinh: str = "") -> str:
+    """Lay gia tri, coi None va chuoi rong nhu la thieu.
+
+    Vi sao can (2026-08-13): dict.get(k, mac_dinh) chi tra mac_dinh khi THIEU
+    khoa. Khi AI tra JSON co khoa nhung gia tri la null, .get tra ve None va
+    chu "None" in thang ra bai cua hoc vien. Da xay ra that voi file
+    founder-assets: "None nam · giao duc tieng Anh", "None nguoi · tier None".
+    """
+    x = d.get(khoa)
+    if x is None or (isinstance(x, str) and not x.strip()):
+        return mac_dinh
+    return str(x)
+
+
 def _client():
     global _CLIENT
     if _CLIENT is None:
@@ -173,26 +187,44 @@ def render_markdown(file_key: str, structured: dict[str, Any], student_id: UUID)
             sections.append(f"- {k}\n")
         sections.append(f"\n## Kinh nghiệm\n")
         for exp in structured.get("experience", []):
-            sections.append(f"- {exp.get('years', '')} năm · {exp.get('field', '')} · {exp.get('role', '')}\n")
+            phan = []
+            nam = _hoac(exp, "years")
+            if nam:
+                phan.append(f"{nam} năm")
+            for k in ("field", "role"):
+                v = _hoac(exp, k)
+                if v:
+                    phan.append(v)
+            if phan:
+                sections.append("- " + " · ".join(phan) + "\n")
         sections.append(f"\n## Chứng chỉ\n")
         for c in structured.get("certifications", []):
             sections.append(f"- {c}\n")
-        net = structured.get("network", {})
-        sections.append(f"\n## Mạng lưới\n- {net.get('count', '?')} người · tier {net.get('tier', '?')} · niche {net.get('niche', '?')}\n")
+        net = structured.get("network", {}) or {}
+        phan_net = []
+        if _hoac(net, "count"):
+            phan_net.append(f"{_hoac(net, 'count')} người")
+        if _hoac(net, "tier"):
+            phan_net.append(f"tier {_hoac(net, 'tier')}")
+        if _hoac(net, "niche"):
+            phan_net.append(f"niche {_hoac(net, 'niche')}")
+        sections.append("\n## Mạng lưới\n")
+        sections.append(("- " + " · ".join(phan_net) + "\n") if phan_net
+                        else "- (học viên chưa khai)\n")
         sections.append(f"\n## Case studies\n")
         for cs in structured.get("case_studies", []):
             sections.append(f"- **{cs.get('title', '')}**: {cs.get('proof', '')}\n")
         sections.append(f"\n## Story tags\n")
         for t in structured.get("story_tags", []):
             sections.append(f"- {t}\n")
-        media = structured.get("media", {})
+        media = structured.get("media", {}) or {}
         sections.append(f"\n## Truyền thông\n- FB page: {'✓' if media.get('fb_page') else '✗'}\n")
-        sections.append(f"- Email list: {media.get('email_list', 0)}\n")
+        sections.append(f"- Email list: {_hoac(media, 'email_list', '0')}\n")
         sections.append(f"- Podcast: {'✓' if media.get('podcast') else '✗'}\n")
         sections.append(f"\n## Kỹ năng\n")
         for s in structured.get("skills", []):
             sections.append(f"- {s}\n")
-        sections.append(f"\n---\n*Asset strength: {structured.get('asset_strength_score', 0)}/100*\n")
+        sections.append(f"\n---\n*Asset strength: {_hoac(structured, 'asset_strength_score', '0')}/100*\n")
         return fm + "".join(sections)
 
     if file_key == "founder-story":
