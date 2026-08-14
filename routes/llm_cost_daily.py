@@ -36,7 +36,7 @@ _TZ = ZoneInfo(os.environ.get("REPORT_TZ", "Australia/Perth"))
 _REPORT_HOUR = int(os.environ.get("LLM_COST_REPORT_HOUR", "7"))
 
 # Nguong canh bao, USD mot ngay. Vuot thi bao gap.
-_NGUONG_CANH_BAO = float(os.environ.get("LLM_COST_ALERT_USD", "20"))
+_NGUONG_CANH_BAO = float(os.environ.get("LLM_COST_ALERT_USD", "5"))
 
 # Ty gia quy ra tien Viet. De thanh bien de chinh duoc khi ty gia doi,
 # va IN RO trong bao cao de Anna biet con so dua tren ty gia nao.
@@ -68,7 +68,9 @@ def _usd(v: Any) -> str:
         tien_viet = f"{d/1000:.0f} nghìn"
     else:
         tien_viet = f"{d:.0f}đ"
-    return f"${u:.4f} ({tien_viet})"
+    # So to thi 2 chu so la du; so nho van can 4 de khong tron thanh $0.00.
+    do_la = f"${u:,.2f}" if u >= 1 else f"${u:.4f}"
+    return f"{do_la} ({tien_viet})"
 
 
 async def build_daily_report(pool: asyncpg.Pool, ngay: Optional[str] = None) -> str:
