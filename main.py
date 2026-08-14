@@ -515,6 +515,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bridge_task = __import__("asyncio").create_task(
         bridge_scheduler_loop(challenge_stop)
     )
+    # Bao cao chi phi LLM hang ngay gui Telegram. Tu tat neu chua bat bien
+    # LLM_COST_REPORT_AUTO, va boc try de bao cao hong khong lam gay app.
+    try:
+        from routes.llm_cost_daily import cost_report_scheduler_loop
+        cost_task = __import__("asyncio").create_task(
+            cost_report_scheduler_loop(challenge_stop)
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning("bao cao chi phi LLM khong khoi dong duoc: %r", exc)
+        cost_task = None
     try:
         yield
     finally:
@@ -565,6 +575,13 @@ app.include_router(challenge_k3_router, tags=["challenge-k3"])
 from routes.k3_bridge import router as k3_bridge_router
 app.include_router(k3_bridge_router, tags=["k3-bridge"])
 app.include_router(coaching_router, tags=["coaching-landing"])
+
+# Bao cao chi phi LLM hang ngay. Boc try vi day la do dac, hong khong duoc lam gay app.
+try:
+    from routes.llm_cost_daily import router as llm_cost_router
+    app.include_router(llm_cost_router, tags=["llm-cost"])
+except Exception as _exc:  # noqa: BLE001
+    log.warning("khong nap duoc router bao cao chi phi LLM: %r", _exc)
 mount_cohort_static(app)
 
 
