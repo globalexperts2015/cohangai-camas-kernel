@@ -38,6 +38,10 @@ _REPORT_HOUR = int(os.environ.get("LLM_COST_REPORT_HOUR", "7"))
 # Nguong canh bao, USD mot ngay. Vuot thi bao gap.
 _NGUONG_CANH_BAO = float(os.environ.get("LLM_COST_ALERT_USD", "20"))
 
+# Ty gia quy ra tien Viet. De thanh bien de chinh duoc khi ty gia doi,
+# va IN RO trong bao cao de Anna biet con so dua tren ty gia nao.
+_TY_GIA = float(os.environ.get("USD_VND_RATE", "26000"))
+
 _NHAN_NHOM = {
     "hoc_vien_lam_bai": "Học viên làm bài",
     "chat_lop": "Chat lớp",
@@ -53,7 +57,18 @@ _NHAN_NHOM = {
 
 
 def _usd(v: Any) -> str:
-    return "n/a" if v is None else f"${float(v):.4f}"
+    """Hien ca do la lan tien Viet. Anna doc tien Viet nhanh hon."""
+    if v is None:
+        return "n/a"
+    u = float(v)
+    d = u * _TY_GIA
+    if d >= 1_000_000:
+        tien_viet = f"{d/1_000_000:.1f} triệu"
+    elif d >= 1000:
+        tien_viet = f"{d/1000:.0f} nghìn"
+    else:
+        tien_viet = f"{d:.0f}đ"
+    return f"${u:.4f} ({tien_viet})"
 
 
 async def build_daily_report(pool: asyncpg.Pool, ngay: Optional[str] = None) -> str:
@@ -129,7 +144,7 @@ async def build_daily_report(pool: asyncpg.Pool, ngay: Optional[str] = None) -> 
     dong = [f"📊 <b>Chi phí AI ngày {hom_qua}</b>", ""]
 
     if tien >= _NGUONG_CANH_BAO:
-        dong.insert(0, f"🚨 <b>VƯỢT NGƯỠNG ${_NGUONG_CANH_BAO:.0f}</b>")
+        dong.insert(0, f"🚨 <b>VƯỢT NGƯỠNG {_usd(_NGUONG_CANH_BAO)}</b>")
 
     xu_huong = ""
     if truoc is not None and float(truoc) > 0:
@@ -161,6 +176,8 @@ async def build_daily_report(pool: asyncpg.Pool, ngay: Optional[str] = None) -> 
         for r in top:
             dong.append(f"· [{r['source']}] {r['caller']}: {_usd(r['tien'])}")
 
+    dong.append("")
+    dong.append(f"<i>Quy đổi theo tỷ giá {_TY_GIA:,.0f}đ/$. Sai thì sửa biến USD_VND_RATE.</i>")
     return "\n".join(dong)
 
 
