@@ -267,7 +267,11 @@ async def append_freedom_score(
 ) -> dict:
     """V3.6: 10 questions × 0-10 = 100. Generate Founder Freedom Report background."""
     sig = request_signature(request)
-    if body.source == "self_baseline":
+    # Moi ban do do HOC VIEN tu nop (self_*) deu phai co chu ky, khong rieng lan
+    # dau. Truoc day chi chan self_baseline, nen bat ky ai cung ghi duoc diem
+    # self_weekly cho bat ky student_id nao. Nguon may tinh (ai_compute) di
+    # duong khac, khong doi chu ky hoc vien.
+    if body.source.startswith("self_"):
         require_student_signature(str(student_id), sig)
 
     async with pool.acquire() as conn:
@@ -644,10 +648,15 @@ async def baseline_form(
                     )
         except Exception as exc:
             log.warning("baseline_form auto-detect skipped: %s", exc)
-    return HTMLResponse(_render_baseline_form_v36(student_id, sig))
+    # retake=1 la DO LAI, khong phai do lan dau. Ghi source='self_weekly' de T0
+    # (ban self_baseline som nhat) khong bi de len, va so sanh T0 vs T+ moi co
+    # nghia. Truoc day retake van ghi 'self_baseline' nen moi lan do lai lai tao
+    # them mot ban goi la baseline, khong bao gio co diem do lai nao.
+    return HTMLResponse(_render_baseline_form_v36(
+        student_id, sig, source="self_weekly" if retake else "self_baseline"))
 
 
-def _render_baseline_form_v36(student_id: str, sig: str) -> str:
+def _render_baseline_form_v36(student_id: str, sig: str, source: str = "self_baseline") -> str:
     # V3.6.3 reorder cảm xúc + tách Hệ thống/AI (Anna 2026-06-12 đêm muộn).
     # Hành trình: Tôi là ai → Tôi sống thế nào → Tôi kiếm tiền thế nào → Tôi có hệ thống không → Tôi có tự do không.
     # DB column name KHÔNG đổi (q1_income, q2_profit, ...) để giữ schema; chỉ đổi semantic + display order.
@@ -1088,7 +1097,7 @@ document.getElementById('baseline-form').addEventListener('submit', async (e) =>
   const sid = fd.get('student_id');
   const sig = fd.get('signature');
   if (!sid) {{ alert('Thiếu student_id'); btn.disabled=false; btn.textContent='Hoàn tất'; return; }}
-  const payload = {{ source: 'self_baseline' }};
+  const payload = {{ source: '{source}' }};
   for (const k of Q_KEYS) payload[k] = parseInt(fd.get(k) || 0);
 
   try {{
