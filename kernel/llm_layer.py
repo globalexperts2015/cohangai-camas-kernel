@@ -7,11 +7,14 @@ Anna's preference (memory feedback-claude-not-openrouter-automation):
 """
 from __future__ import annotations
 
+import logging
 import os
 from enum import Enum
 from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
+
+log = logging.getLogger(__name__)
 
 try:
     from anthropic import AsyncAnthropic
@@ -54,7 +57,14 @@ class LLMLayer:
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         self._client: Optional[Any] = None
         if AsyncAnthropic is not None and (self.api_key or _provider_ready()):
-            self._client = build_async_client(self.api_key)
+            try:
+                self._client = build_async_client(self.api_key)
+            except RuntimeError as exc:
+                # Cong tac chi tieu LLM dang TAT (HANGOS_ALLOW_PAID_LLM / HANGOS_ENABLE_BEDROCK).
+                # Khong duoc lam chet ca service vi chuyen do: kernel con phuc vu landing page,
+                # webhook, trang thanh toan. Duong nao that su goi LLM se bao loi rieng qua `ready`.
+                log.warning("LLM tat: %s", exc)
+                self._client = None
 
     @property
     def ready(self) -> bool:
