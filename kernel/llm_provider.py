@@ -83,7 +83,17 @@ _MAP_WARNED: set[str] = set()
 
 def provider() -> str:
     """Trả về 'bedrock' hoặc 'anthropic'."""
-    return "bedrock" if os.environ.get("LLM_PROVIDER", "").strip().lower() == "bedrock" else "anthropic"
+    requested = os.environ.get("LLM_PROVIDER", "").strip().lower()
+    if requested == "bedrock" and os.environ.get("HANGOS_ENABLE_BEDROCK", "").strip() == "1":
+        return "bedrock"
+    if requested == "bedrock":
+        log.warning("AWS Bedrock disabled by HangOS policy. Ignoring LLM_PROVIDER=bedrock.")
+    return "anthropic"
+
+
+def paid_llm_allowed() -> bool:
+    """Global cost kill switch. Paid Claude/Bedrock calls are off unless explicit."""
+    return os.environ.get("HANGOS_ALLOW_PAID_LLM", "").strip() == "1"
 
 
 def _model_map() -> dict[str, str]:
@@ -190,7 +200,13 @@ def build_async_client(api_key: str | None = None) -> Any:
     api_key chỉ dùng cho đường gọi thẳng Anthropic. Đường Bedrock lấy thông tin
     đăng nhập từ AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY / AWS_REGION.
     """
+    if not paid_llm_allowed():
+        raise RuntimeError(
+            "Paid LLM calls disabled. Set HANGOS_ALLOW_PAID_LLM=1 only after cost approval."
+        )
     if provider() == "bedrock":
+        if os.environ.get("HANGOS_ENABLE_BEDROCK", "").strip() != "1":
+            raise RuntimeError("AWS Bedrock API disabled. Set HANGOS_ENABLE_BEDROCK=1 only after Anna approves.")
         from anthropic import AsyncAnthropicBedrock
 
         region = os.environ.get("AWS_REGION", DEFAULT_BEDROCK_REGION)
@@ -202,8 +218,7 @@ def build_async_client(api_key: str | None = None) -> Any:
     key = api_key or os.environ.get("ANTHROPIC_API_KEY", "")
     if not key:
         raise RuntimeError(
-            "Chua co ANTHROPIC_API_KEY. Neu tai khoan Anthropic het credit, "
-            "dat LLM_PROVIDER=bedrock de chay qua AWS."
+            "Chua co ANTHROPIC_API_KEY. AWS Bedrock da ngat khoi HangOS."
         )
     # Van boc proxy o che do goi thang, de lop ghi nhan usage chay o ca hai duong.
     # Mapper la ham dong nhat vi Anthropic dung dung ten model goc.
@@ -212,7 +227,11 @@ def build_async_client(api_key: str | None = None) -> Any:
 
 def ready() -> bool:
     """Có đủ thông tin đăng nhập để gọi LLM không."""
+    if not paid_llm_allowed():
+        return False
     if provider() == "bedrock":
+        if os.environ.get("HANGOS_ENABLE_BEDROCK", "").strip() != "1":
+            return False
         return bool(
             os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")
         )
